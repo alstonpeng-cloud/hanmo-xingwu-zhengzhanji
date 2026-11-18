@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>汉末行伍征战记 · UI 重设计方案</title>
+<style>
+:root{
+  /* 暖墨中性 */
+  --ink-900:#100D0A; --ink-850:#17130E; --ink-800:#1C1813; --ink-700:#262019;
+  --ink-600:#332A20; --ink-500:#4A3E31; --ink-400:#6B5B49; --ink-300:#9A8B75;
+  --ink-200:#C9BCA6; --ink-100:#F2E9D8;
+  /* 品牌语义 */
+  --vermilion:#C8473E; --vermilion-lt:#E8948A; --vermilion-dk:#7E2922;
+  --gold:#D9A441; --gold-lt:#EBD191; --gold-dk:#8C6422;
+  --jade:#6E9B72; --indigo:#5B7C99; --purple:#A06BB5;
+  /* 稀有度 */
+  --r1:#9A8B75; --r2:#6E9B72; --r3:#5B7C99; --r4:#A06BB5; --r5:#D9A441; --r6:#C8473E;
+  --serif:"Songti SC","SimSun","Noto Serif CJK SC",serif;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink-900); color:var(--ink-200);
+  font-family:var(--sans); font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+::selection{background:var(--vermilion);color:#fff}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px}
+.serif{font-family:var(--serif)}
+
+/* ============ 顶部导航 ============ */
+.nav{
+  position:fixed;top:0;left:0;right:0;height:58px;z-index:50;
+  background:rgba(16,13,10,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--ink-700);
+}
+.nav .wrap{height:100%;display:flex;align-items:center;justify-content:space-between}
+.nav-brand{font-family:var(--serif);color:var(--ink-100);font-size:17px;letter-spacing:2px;display:flex;align-items:center;gap:10px}
+.seal{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:26px;height:26px;background:var(--vermilion);color:#fff;
+  font-family:var(--serif);font-size:14px;border-radius:3px;line-height:1;
+}
+.nav-links{display:flex;gap:22px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:var(--ink-300);text-decoration:none;font-size:13px;white-space:nowrap;transition:color .2s}
+.nav-links a:hover{color:var(--gold)}
+
+/* ============ 封面 ============ */
+.cover{
+  min-height:100vh;display:flex;align-items:center;position:relative;
+  padding-top:58px;overflow:hidden;
+  background:
+    radial-gradient(circle at 78% 30%,rgba(200,71,62,.10),transparent 42%),
+    radial-gradient(circle at 15% 78%,rgba(217,164,65,.07),transparent 45%),
+    var(--ink-900);
+}
+.cover:before{
+  content:"";position:absolute;inset:0;opacity:.05;pointer-events:none;
+  background-image:repeating-linear-gradient(0deg,transparent,transparent 3px,#fff 3px,#fff 4px);
+}
+.cover .wrap{position:relative;z-index:2}
+.cover-kicker{color:var(--gold);letter-spacing:6px;font-size:13px;margin-bottom:26px;display:flex;align-items:center;gap:14px}
+.cover-kicker:before{content:"";width:42px;height:1px;background:var(--gold)}
+.cover h1{
+  font-family:var(--serif);color:var(--ink-100);font-size:clamp(48px,8vw,96px);
+  line-height:1.15;letter-spacing:4px;font-weight:700;margin-bottom:8px;
+}
+.cover h1 em{font-style:normal;color:var(--vermilion)}
+.cover-sub{font-family:var(--serif);font-size:clamp(20px,3vw,30px);color:var(--ink-200);letter-spacing:3px;margin-bottom:34px}
+.cover-desc{max-width:620px;color:var(--ink-300);font-size:16px;line-height:2;margin-bottom:44px}
+.cover-meta{display:flex;flex-wrap:wrap;gap:12px}
+.cover-meta span{
+  border:1px solid var(--ink-600);color:var(--ink-300);
+  padding:8px 16px;border-radius:2px;font-size:12px;letter-spacing:1px;
+}
+.cover-meta b{color:var(--gold);font-weight:500}
+.scroll-hint{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);color:var(--ink-400);font-size:12px;letter-spacing:3px;text-align:center;z-index:2}
+.scroll-hint:after{content:"";display:block;width:1px;height:38px;background:linear-gradient(var(--ink-500),transparent);margin:12px auto 0}
+
+/* ============ 通用 section ============ */
+section{padding:104px 0;border-top:1px solid var(--ink-800)}
+.sec-head{margin-bottom:56px}
+.sec-num{font-family:var(--serif);color:var(--vermilion);font-size:14px;letter-spacing:3px;margin-bottom:14px}
+.sec-head h2{font-family:var(--serif);color:var(--ink-100);font-size:clamp(30px,4vw,46px);letter-spacing:2px;line-height:1.3}
+.sec-head p{color:var(--ink-300);max-width:720px;margin-top:16px;font-size:15px}
+
+/* ============ 诊断 ============ */
+.diag-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:820px){.diag-grid{grid-template-columns:1fr}}
+.diag-card{
+  background:var(--ink-800);border:1px solid var(--ink-700);
+  border-left:3px solid var(--vermilion);padding:24px 26px;border-radius:3px;
+}
+.diag-card .tag{color:var(--vermilion);font-size:12px;letter-spacing:2px;margin-bottom:10px}
+.diag-card h3{font-family:var(--serif);color:var(--ink-100);font-size:21px;margin-bottom:10px;font-weight:600}
+.diag-card p{color:var(--ink-300);font-size:14px;line-height:1.9}
+.diag-card .fix{color:var(--gold);font-size:13px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--ink-600)}
+.diag-card .fix b{font-weight:500}
+.diag-summary{
+  margin-top:26px;background:var(--ink-850);border:1px solid var(--ink-600);
+  padding:22px 28px;border-radius:3px;color:var(--ink-200);font-size:14px;
+}
+.diag-summary b{color:var(--vermilion)}
+
+/* ============ 方向 ============ */
+.direction{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center}
+@media(max-width:820px){.direction{grid-template-columns:1fr;gap:36px}}
+.dir-quote{font-family:var(--serif);font-size:clamp(26px,4vw,44px);color:var(--ink-100);line-height:1.6;letter-spacing:2px}
+.dir-quote em{font-style:normal;color:var(--gold)}
+.dir-text{color:var(--ink-300);margin-top:22px;line-height:2}
+.dir-keys{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.dir-keys span{border:1px solid var(--ink-600);border-radius:20px;padding:7px 16px;font-size:13px;color:var(--gold)}
+.dir-panel{
+  background:linear-gradient(150deg,var(--ink-700),var(--ink-850));
+  border:1px solid var(--ink-600);border-radius:6px;padding:34px;position:relative;overflow:hidden;
+}
+.dir-panel:before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;border:1px solid var(--ink-600);border-radius:50%;opacity:.5}
+.dir-panel:after{content:"";position:absolute;top:-30px;right:-30px;width:140px;height:140px;border:1px solid var(--ink-600);border-radius:50%;opacity:.5}
+.dir-panel h4{font-family:var(--serif);color:var(--gold);font-size:18px;letter-spacing:3px;margin-bottom:20px;position:relative}
+.dir-panel ul{list-style:none;position:relative}
+.dir-panel li{padding:10px 0 10px 22px;position:relative;color:var(--ink-200);font-size:14px;border-bottom:1px solid var(--ink-700)}
+.dir-panel li:last-child{border:none}
+.dir-panel li:before{content:"";position:absolute;left:0;top:19px;width:7px;height:7px;background:var(--vermilion);transform:rotate(45deg)}
+.dir-panel li b{color:var(--ink-100);font-weight:500}
+
+/* ============ 设计系统 - 色彩 ============ */
+.sys-block{margin-bottom:60px}
+.sys-title{display:flex;align-items:baseline;gap:14px;margin-bottom:24px;border-bottom:1px solid var(--ink-700);padding-bottom:14px}
+.sys-title .n{font-family:var(--serif);color:var(--gold);font-size:15px}
+.sys-title h3{font-family:var(--serif);color:var(--ink-100);font-size:26px;letter-spacing:2px}
+.sys-title small{color:var(--ink-400);font-size:12px;margin-left:auto}
+.swatches{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:10px}
+.sw{height:96px;border-radius:3px;position:relative;border:1px solid rgba(255,255,255,.05);display:flex;align-items:flex-end;padding:9px;overflow:hidden}
+.sw .sw-lbl{font-size:10px;line-height:1.3;color:rgba(255,255,255,.92);text-shadow:0 1px 3px rgba(0,0,0,.6);position:relative;z-index:2}
+.sw .sw-lbl b{display:block;font-size:11px;font-weight:600}
+.sw.dark .sw-lbl{color:rgba(255,255,255,.85)}
+.rowlabel{color:var(--ink-300);font-size:13px;margin:22px 0 12px;display:flex;align-items:center;gap:12px}
+.rowlabel:after{content:"";flex:1;height:1px;background:var(--ink-800)}
+.rarity-row{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:640px){.rarity-row{grid-template-columns:repeat(3,1fr)}}
+.rar{border:1px solid var(--ink-600);border-radius:3px;padding:14px;text-align:center;background:var(--ink-800)}
+.rar .dot{width:100%;height:34px;border-radius:2px;margin-bottom:10px}
+.rar .nm{color:var(--ink-100);font-size:13px;font-family:var(--serif)}
+.rar .cd{color:var(--ink-400);font-size:10px;font-family:var(--sans)}
+
+/* ============ 设计系统 - 字体 ============ */
+.type-scale{display:flex;flex-direction:column;gap:2px}
+.type-row{
+  display:flex;align-items:baseline;gap:24px;padding:16px 20px;
+  background:var(--ink-800);border-radius:2px;border-left:2px solid var(--gold);
+}
+.type-row:nth-child(odd){background:var(--ink-850)}
+.type-row .meta{min-width:150px;color:var(--ink-400);font-size:12px;font-family:var(--sans)}
+.type-row .meta b{color:var(--gold);font-weight:500}
+.type-row .sample{color:var(--ink-100);flex:1}
+.font-pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+@media(max-width:640px){.font-pair{grid-template-columns:1fr}}
+.font-card{background:var(--ink-800);border:1px solid var(--ink-700);padding:24px;border-radius:3px}
+.font-card .lab{color:var(--ink-400);font-size:12px;margin-bottom:10px}
+.font-card .big{color:var(--ink-100);font-size:40px;line-height:1.4}
+.font-card.serif .big{font-family:var(--serif)}
+.font-card.sans .big{font-family:var(--sans)}
+
+/* ============ 设计系统 - 间距/圆角/层次 ============ */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:640px){.spec-grid{grid-template-columns:1fr}}
+.spec-card{background:var(--ink-800);border:1px solid var(--ink-700);padding:24px;border-radius:3px}
+.spec-card h4{color:var(--ink-100);font-family:var(--serif);font-size:17px;margin-bottom:18px}
+.space-list{display:flex;flex-direction:column;gap:8px}
+.space-item{display:flex;align-items:center;gap:12px;color:var(--ink-400);font-size:12px}
+.space-bar{height:14px;background:var(--jade);border-radius:1px}
+.radius-list{display:flex;gap:12px;flex-wrap:wrap}
+.radius-box{width:74px;height:74px;background:var(--ink-700);border:1px solid var(--ink-500);display:flex;align-items:center;justify-content:center;color:var(--ink-300);font-size:11px}
+.elev-list{display:flex;flex-direction:column;gap:12px}
+.elev-box{padding:16px;background:var(--ink-700);color:var(--ink-200);font-size:13px}
+.elev-1{border:1px solid var(--ink-500)}
+.elev-2{border:1px solid var(--ink-500);box-shadow:inset 0 1px 0 rgba(255,255,255,.09)}
+.elev-3{border:1px solid var(--gold-dk);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 0 0 1px rgba(217,164,65,.15)}
+
+/* ============ 组件库 ============ */
+.comp-cats{margin-bottom:30px}
+.comp-cats h4{color:var(--gold);font-family:var(--serif);font-size:16px;letter-spacing:2px;margin-bottom:16px}
+.btn-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center;background:var(--ink-800);padding:26px;border:1px solid var(--ink-700);border-radius:3px}
+.btn{
+  padding:11px 24px;border-radius:3px;font-size:14px;cursor:default;
+  font-family:var(--sans);border:1px solid transparent;
+}
+.btn-primary{background:var(--vermilion);color:#fff;border-color:var(--vermilion-lt)}
+.btn-gold{background:var(--gold);color:var(--ink-900);font-weight:600}
+.btn-ghost{background:transparent;color:var(--ink-200);border-color:var(--ink-500)}
+.btn-disabled{background:var(--ink-700);color:var(--ink-400);border-color:var(--ink-600)}
+.btn-danger{background:transparent;color:var(--vermilion-lt);border-color:var(--vermilion-dk)}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-lg{padding:14px 40px;font-size:16px}
+.chip-row{display:flex;gap:10px;flex-wrap:wrap;background:var(--ink-800);padding:26px;border:1px solid var(--ink-700);border-radius:3px}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;border:1px solid}
+.demo-card{background:var(--ink-800);border:1px solid var(--ink-600);border-radius:4px;padding:22px;max-width:340px}
+.demo-card .t{font-family:var(--serif);color:var(--ink-100);font-size:19px;margin-bottom:6px}
+.demo-card .d{color:var(--ink-300);font-size:13px;margin-bottom:16px}
+.progress{height:16px;background:var(--ink-900);border:1px solid var(--ink-600);border-radius:8px;overflow:hidden;position:relative}
+.progress i{display:block;height:100%;border-radius:8px}
+.comp-note{color:var(--ink-400);font-size:12px;margin-top:10px}
+.tabs-demo{display:flex;gap:0;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:3px;overflow:hidden;width:max-content;max-width:100%}
+.tab{padding:10px 22px;font-size:13px;color:var(--ink-300);border-right:1px solid var(--ink-700)}
+.tab.on{color:var(--ink-900);background:var(--gold);font-weight:600}
+.tab:last-child{border:none}
+.orb-demo{display:flex;align-items:center;gap:24px;background:var(--ink-800);padding:22px;border:1px solid var(--ink-700);border-radius:3px;flex-wrap:wrap}
+.orb{
+  width:70px;height:70px;border-radius:50%;position:relative;flex-shrink:0;
+  background:radial-gradient(circle at 50% 40%,#3a2b18,#17130E);
+  border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:19px;color:var(--gold-lt);
+  box-shadow:0 0 0 5px rgba(217,164,65,.12),0 0 22px rgba(217,164,65,.4);
+}
+.orb .badge{
+  position:absolute;top:-6px;right:-6px;min-width:20px;height:20px;padding:0 5px;
+  background:var(--vermilion);color:#fff;border:2px solid var(--ink-800);border-radius:10px;
+  font-family:var(--sans);font-size:11px;display:flex;align-items:center;justify-content:center;
+}
+.orb .spark{position:absolute;width:4px;height:4px;background:var(--gold-lt);border-radius:50%;box-shadow:0 0 6px var(--gold)}
+.orb .spark.a{top:6px;left:-8px}.orb .spark.b{bottom:8px;right:-9px}.orb .spark.c{top:30px;left:-12px}
+
+/* ============ 界面重设计 mockup ============ */
+.screens-intro{color:var(--ink-300);margin-bottom:40px}
+.phone-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:34px;justify-items:center}
+.phone-wrap{width:100%;max-width:340px}
+.phone-label{text-align:center;color:var(--gold);font-family:var(--serif);font-size:16px;letter-spacing:2px;margin-bottom:14px}
+.phone{
+  width:100%;aspect-ratio:750/1334;background:var(--ink-900);
+  border:8px solid var(--ink-700);border-radius:26px;overflow:hidden;
+  position:relative;box-shadow:0 16px 50px rgba(0,0,0,.5);
+  font-size:4.6px; /* 基准：按手机显示宽度等比缩放 */
+}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column}
+.sc-top{
+  height:9%;display:flex;align-items:center;justify-content:space-between;
+  padding:0 3.2%;background:var(--ink-850);border-bottom:1px solid var(--ink-700);flex-shrink:0;
+}
+.sc-top .coin{display:flex;align-items:center;gap:1.2%;color:var(--gold);font-size:2.6em}
+.sc-top .coin i{width:2.2em;height:2.2em;background:var(--gold);border-radius:50%;display:inline-block;box-shadow:inset 0 0 0 .3em var(--gold-dk)}
+.sc-top .back{color:var(--ink-200);font-size:2.6em}
+.sc-titlebar{
+  padding:2.6% 15%;text-align:center;color:var(--ink-100);
+  font-family:var(--serif);font-size:3.3em;letter-spacing:1px;position:relative;flex-shrink:0;
+  white-space:nowrap;overflow:hidden;
+}
+.sc-titlebar .back{position:absolute;left:4%;top:50%;transform:translateY(-50%);color:var(--ink-200);font-size:.62em}
+.sc-titlebar .coin{position:absolute;right:4%;top:50%;transform:translateY(-50%);color:var(--gold);font-size:.6em;display:flex;align-items:center;gap:6px}
+.sc-titlebar .coin i{width:1.6em;height:1.6em;background:var(--gold);border-radius:50%}
+.sc-body{flex:1;overflow:hidden;padding:2.5% 3.2%;display:flex;flex-direction:column;gap:2.4%}
+.sc-footer{height:5.5%;display:flex;align-items:center;justify-content:center;color:var(--ink-400);font-family:var(--serif);font-size:2.2em;letter-spacing:3px;border-top:1px solid var(--ink-800);flex-shrink:0}
+.pnl{background:var(--ink-800);border:1px solid var(--ink-600);border-radius:1.6em;padding:3.4%}
+.pnl-hi{background:var(--ink-700);border-color:var(--gold-dk)}
+.card-title{font-family:var(--serif);color:var(--ink-100);font-size:3.1em;line-height:1.3}
+.card-sub{color:var(--ink-300);font-size:2.3em;margin-top:1.2%}
+.big-btn{
+  background:var(--vermilion);color:#fff;border:1px solid var(--vermilion-lt);
+  border-radius:1.4em;padding:4% 0;text-align:center;font-family:var(--serif);
+  font-size:4.2em;letter-spacing:3px;box-shadow:inset 0 1px 0 rgba(255,255,255,.2);
+}
+.big-btn.gold{background:var(--gold);color:var(--ink-900);border-color:var(--gold-lt)}
+.big-btn.ghost{background:var(--ink-700);color:var(--ink-200);border-color:var(--ink-500);box-shadow:none}
+.pill{display:inline-block;padding:1.4% 3%;border-radius:3em;font-size:2.1em}
+.pill.gold{background:rgba(217,164,65,.14);color:var(--gold);border:1px solid var(--gold-dk)}
+.pill.jade{background:rgba(110,155,114,.14);color:var(--jade);border:1px solid var(--jade)}
+.hero-title{font-family:var(--serif);color:var(--ink-100);font-size:8.4em;letter-spacing:5px;text-align:center;line-height:1.2;margin:3% 0}
+.hero-title em{font-style:normal;color:var(--gold)}
+.stat-pill{display:flex;align-items:center;justify-content:space-between;padding:2.6% 3.4%;background:var(--ink-800);border:1px solid var(--ink-700);border-radius:1.4em}
+.stat-pill .k{color:var(--ink-300);font-size:2.5em}
+.stat-pill .v{color:var(--gold);font-size:3em;font-weight:600}
+.metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.4%}
+.metric{padding:3.4%;background:var(--ink-800);border:1px solid var(--ink-600);border-radius:1.4em}
+.metric .lbl{color:var(--ink-400);font-size:2.1em;margin-bottom:2%}
+.metric .val{color:var(--ink-100);font-size:4.4em;font-weight:600}
+.metric .val small{font-size:.5em;color:var(--ink-300)}
+.entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.4%}
+.entry{padding:4.2% 3%;background:var(--ink-800);border:1px solid var(--ink-600);border-radius:1.4em;text-align:center}
+.entry.hl{border-color:var(--gold);background:linear-gradient(160deg,rgba(217,164,65,.16),var(--ink-800))}
+.entry .ico{font-family:var(--serif);font-size:5.4em;color:var(--gold);line-height:1.2}
+.entry .nm{font-family:var(--serif);color:var(--ink-100);font-size:3.2em;margin-top:1%}
+.entry .ds{color:var(--ink-400);font-size:2.1em}
+.entry.hl .nm{color:var(--gold)}
+.battle-stage{flex:1;background:linear-gradient(#c9893a,#a7651f);position:relative;overflow:hidden;border-radius:1.2em}
+.battle-stage:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.05) 1px,transparent 1px);background-size:8% 5%}
+.unit{position:absolute;width:7%;height:8%;border-radius:50% 50% 30% 30%}
+.u-red{background:#9e3b2f}.u-blue{background:#e3e6e4;border:1px solid #9aa}
+.sc-body-overlay{position:absolute;top:0;left:0;right:0;padding:2.5% 3.2%}
+.score-bar{display:flex;align-items:center;justify-content:center;gap:6%;color:#fff;font-size:3.4em;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.score-bar .mine{color:#e8f5e9}.score-bar .foe{color:#ffe0dd}
+.score-bar .speed{margin-left:auto;background:rgba(0,0,0,.4);padding:1.4% 3%;border-radius:1em;font-size:.8em}
+.rank-row{display:flex;align-items:center;gap:2%;padding:1.4% 0;font-size:2.3em;border-bottom:1px solid var(--ink-700)}
+.rank-row:last-child{border:none}
+.rank-row .no{color:var(--gold);width:1.6em}
+.rank-row .nm{color:var(--ink-200);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-row .bar{width:38%;height:.7em;background:var(--ink-900);border-radius:1em;overflow:hidden;flex-shrink:0}
+.rank-row .bar i{display:block;height:100%;background:var(--jade)}
+.rank-row .bar.foe i{background:var(--vermilion)}
+.rank-row .num{color:var(--ink-100);width:3.4em;text-align:right}
+.rank-two{display:grid;grid-template-columns:1fr 1fr;gap:2.4%}
+.win-title{font-family:var(--serif);color:var(--gold);font-size:11em;text-align:center;letter-spacing:6px;text-shadow:0 2px 12px rgba(217,164,65,.3);margin:2% 0}
+.win-sub{text-align:center;color:var(--ink-300);font-size:2.7em;margin-bottom:3%}
+
+/* ============ 对比 ============ */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+@media(max-width:760px){.compare{grid-template-columns:1fr}}
+.cmp-col{border:1px solid var(--ink-700);border-radius:4px;overflow:hidden}
+.cmp-head{padding:14px 20px;font-family:var(--serif);font-size:16px;letter-spacing:2px}
+.cmp-old .cmp-head{background:var(--ink-700);color:var(--ink-300)}
+.cmp-new .cmp-head{background:var(--vermilion);color:#fff}
+.cmp-body{padding:22px;background:var(--ink-850)}
+.cmp-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--ink-700);font-size:14px}
+.cmp-item:last-child{border:none}
+.cmp-item .x{color:var(--vermilion);font-weight:600}
+.cmp-item .v{color:var(--jade);font-weight:600}
+.cmp-item span{color:var(--ink-200)}
+
+/* ============ 落地路径 ============ */
+.roadmap{display:flex;flex-direction:column;gap:0;position:relative}
+.phase{display:grid;grid-template-columns:120px 1fr;gap:28px;padding:0 0 34px;position:relative}
+.phase:before{content:"";position:absolute;left:59px;top:20px;bottom:0;width:1px;background:var(--ink-700)}
+.phase:last-child:before{display:none}
+.phase-n{
+  width:120px;height:44px;background:var(--ink-800);border:1px solid var(--gold-dk);
+  color:var(--gold);font-family:var(--serif);font-size:15px;display:flex;align-items:center;justify-content:center;border-radius:3px;position:relative;z-index:2;
+}
+.phase-body{background:var(--ink-800);border:1px solid var(--ink-700);border-radius:3px;padding:22px 26px;flex:1}
+.phase-body h4{color:var(--ink-100);font-family:var(--serif);font-size:19px;margin-bottom:10px}
+.phase-body p{color:var(--ink-300);font-size:14px;line-height:1.9}
+.phase-body code{background:var(--ink-900);color:var(--gold-lt);padding:2px 7px;border-radius:2px;font-size:12px;font-family:monospace}
+.effect-table{width:100%;border-collapse:collapse;margin-top:14px;font-size:13px}
+.effect-table th,.effect-table td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--ink-700)}
+.effect-table th{color:var(--gold);font-weight:500}
+.effect-table td{color:var(--ink-200)}
+.effect-table td:first-child{color:var(--ink-100)}
+
+/* ============ 决策 ============ */
+.decision{text-align:center;padding:96px 0 120px}
+.decision h2{font-family:var(--serif);color:var(--ink-100);font-size:clamp(30px,4vw,44px);letter-spacing:3px;margin-bottom:18px}
+.decision p{color:var(--ink-300);max-width:600px;margin:0 auto 40px}
+.opts{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.opt{
+  background:var(--ink-800);border:1px solid var(--ink-600);border-radius:4px;
+  padding:26px 30px;width:230px;text-align:left;transition:transform .25s,border-color .25s;
+}
+.opt:hover{transform:translateY(-4px);border-color:var(--gold)}
+.opt.reco{border-color:var(--vermilion);background:linear-gradient(160deg,rgba(200,71,62,.12),var(--ink-800))}
+.opt .badge{color:var(--vermilion);font-size:11px;letter-spacing:2px;margin-bottom:10px;display:block}
+.opt.reco .badge{color:var(--gold)}
+.opt h4{font-family:var(--serif);color:var(--ink-100);font-size:19px;margin-bottom:8px}
+.opt p{color:var(--ink-300);font-size:13px;line-height:1.7;margin:0}
+.foot{text-align:center;color:var(--ink-500);font-size:12px;padding:40px 0;border-top:1px solid var(--ink-800);letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <div class="nav-brand"><span class="seal">汉</span> 汉末行伍征战记</div>
+    <div class="nav-links">
+      <a href="#diag">01 现状诊断</a>
+      <a href="#dir">02 设计方向</a>
+      <a href="#system">03 设计规范</a>
+      <a href="#screens">04 界面重设计</a>
+      <a href="#compare">05 新旧对比</a>
+      <a href="#roadmap">06 落地路径</a>
+      <a href="#decision">决策</a>
+    </div>
+  </div>
+</nav>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="cover-kicker">UI REDESIGN PROPOSAL · v1.0</div>
+    <h1>汉帛<em>·</em>朱金</h1>
+    <div class="cover-sub">汉末行伍征战记 —— 界面重塑提案</div>
+    <p class="cover-desc">这不是一次换色，而是一次从「工具面板」到「汉末书卷」的重构。以印玺朱红为身份色、鎏金为尊贵色，建立完整的色彩语义、字体层级与组件规范，让 30+ 界面共享同一套设计语言。</p>
+    <div class="cover-meta">
+      <span>设计基准 <b>750 × 1334</b></span>
+      <span>交付形态 <b>Canvas 手绘 Token 化</b></span>
+      <span>核心界面 <b>13 屏高保真稿</b></span>
+      <span>可访问性 <b>WCAG AA</b></span>
+    </div>
+  </div>
+  <div class="scroll-hint">向下滚动查看完整方案</div>
+</header>
+
+<section id="diag">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">01 / DIAGNOSIS</div>
+      <h2>现状诊断：问题不在表面</h2>
+      <p>我逐一查看了 30+ 界面与核心绘制层。现有 UI 有统一的基础控件，但缺少「系统」——颜色靠手写 hex 散落在每个文件，没有语义、没有层级、没有状态规范。以下是五个结构性问题：</p>
+    </div>
+    <div class="diag-grid">
+      <div class="diag-card">
+        <div class="tag">问题 01 · 色彩</div>
+        <h3>金色被过度使用，失去语义</h3>
+        <p>金色同时承担货币、标题、按钮描边、稀有度与强调，满屏泛金，反而没有真正的视觉焦点；红/绿/蓝都是孤立色值，不构成语义系统。</p>
+        <div class="fix"><b>改法：</b>朱砂=行动/危险，鎏金=货币/尊贵，竹青=收益，靛青=敌方，紫檀=稀有。每色有明确岗位。</div>
+      </div>
+      <div class="diag-card">
+        <div class="tag">问题 02 · 字体</div>
+        <h3>无字号层级，题材感弱</h3>
+        <p>全站单一黑体，字号零散（28/34/22…）无比例关系；汉末题材完全靠 Q 版立绘支撑，文字层面没有任何书卷气。</p>
+        <div class="fix"><b>改法：</b>宋体做标题/大字数字，黑体做正文；建立 8 级模块化字号阶梯，形成清晰层次。</div>
+      </div>
+      <div class="diag-card">
+        <div class="tag">问题 03 · 结构</div>
+        <h3>信息密度失衡，缺少呼吸</h3>
+        <p>首页塞入 15+ 入口，关卡页奖励格密密麻麻；所有区块都是同一种「深灰描边卡」，没有主次，视线无处落脚。</p>
+        <div class="fix"><b>改法：</b>建立 4pt 间距网格 + 三级表面层次，主按钮、主数据用朱砂/鎏金拉开层级，次要信息降噪。</div>
+      </div>
+      <div class="diag-card">
+        <div class="tag">问题 04 · 组件</div>
+        <h3>控件无状态规范</h3>
+        <p>按钮仅 active / disabled 两态，缺 hover、press、loading；没有统一的标签、徽章、Tab、进度条规范，各处重复手写。</p>
+        <div class="fix"><b>改法：</b>定义 12 类基础组件及完整状态；component 收敛到 draw.js，页面只传参数。</div>
+      </div>
+      <div class="diag-card">
+        <div class="tag">问题 05 · 工程</div>
+        <h3>颜色硬编码，无法统一换肤</h3>
+        <p>hex 值散落在 40+ 文件（config、screen、render），改一个主色要动几十处，极易遗漏、产生不一致。</p>
+        <div class="fix"><b>改法：</b>新建 <code>tokens.js</code> 作为唯一色彩/字号来源，扩展 THEME，所有绘制引用 token。</div>
+      </div>
+      <div class="diag-card">
+        <div class="tag">问题 06 · 可访问性</div>
+        <h3>对比度与触控不达标</h3>
+        <p>次要文字 <code>#5f6b7f</code> 在深底上对比度不足 4.5:1；部分按钮热区偏小，数字标签仅靠颜色区分。</p>
+        <div class="fix"><b>改法：</b>文字阶梯全部校准至 AA；状态用「颜色 + 文字/形状」双通道；热区 ≥ 88 逻辑像素。</div>
+      </div>
+    </div>
+    <div class="diag-summary">
+      <b>一句话结论：</b>现有代码质量不错（逻辑与数据分离得很干净），问题集中在「表现层缺乏系统化」。因此这次改造的价值是——用一套 token + 组件层，让未来所有界面自动保持一致，而不是逐屏打补丁。
+    </div>
+  </div>
+</section>
+
+<section id="dir">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">02 / DIRECTION</div>
+      <h2>设计方向：汉帛 · 朱金</h2>
+      <p>保留 Q 版轻松的内核，把「汉末」从立绘延伸到界面本身——像展开一卷竹简帛书：暖墨为纸，朱砂为印，鎏金为饰。</p>
+    </div>
+    <div class="direction">
+      <div>
+        <div class="dir-quote">以墨为纸，<br>以<em>朱</em>为印，<br>以<em>金</em>为饰。</div>
+        <p class="dir-text">从冷蓝灰的工具台，转向带温度的暖墨色阶；把泛用的金色收敛为「货币与尊贵」的专属信号，让朱砂红成为每一次关键行动的视觉锤。标题用宋体承载历史厚重感，正文用黑体保证小屏可读性——题材与实用，各司其职。</p>
+        <div class="dir-keys">
+          <span>暖墨书卷</span><span>印玺朱砂</span><span>鎏金点题</span><span>宋体标题</span><span>克制装饰</span><span>语义清晰</span>
+        </div>
+      </div>
+      <div class="dir-panel">
+        <h4>设计三原则</h4>
+        <ul>
+          <li><b>一方寸，一重心</b> —— 每屏只留一个朱砂主按钮，视线有落点</li>
+          <li><b>色必有义</b> —— 颜色先表意，再装饰，绝不混用</li>
+          <li><b>字有层级</b> —— 宋体镇场，黑体叙事，数字用等宽感</li>
+          <li><b>留白即呼吸</b> —— 8pt 网格，宁可少放，不塞满</li>
+          <li><b>状态可感</b> —— 每个可点元素都有完整反馈态</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="system">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">03 / DESIGN SYSTEM</div>
+      <h2>完整设计规范系统</h2>
+      <p>这是整个提案的核心。所有数值可直接落地为 <code>tokens.js</code> 与 <code>draw.js</code> 的扩展，一次定义，全项目复用。</p>
+    </div>
+
+    <!-- 色彩 -->
+    <div class="sys-block">
+      <div class="sys-title"><span class="n">3.1</span><h3>色彩系统</h3><small>暖墨中性 + 语义品牌色</small></div>
+
+      <div class="rowlabel">中性色阶 Neutral · 背景 / 表面 / 描边 / 文字</div>
+      <div class="swatches" id="neutralSw"></div>
+
+      <div class="rowlabel">品牌与语义色 Brand & Semantic</div>
+      <div class="swatches" id="brandSw"></div>
+
+      <div class="rowlabel">稀有度色阶 Rarity · 武将/宝箱品质</div>
+      <div class="rarity-row" id="rarityRow"></div>
+    </div>
+
+    <!-- 字体 -->
+    <div class="sys-block">
+      <div class="sys-title"><span class="n">3.2</span><h3>字体系统</h3><small>宋体标题 + 黑体正文</small></div>
+      <div class="font-pair">
+        <div class="font-card serif">
+          <div class="lab">展示字体 DISPLAY · 宋体系</div>
+          <div class="big">汉末行伍</div>
+          <div class="lab" style="margin-top:10px">用于页面主标题、胜利/失败、大字数字、按钮主文案</div>
+        </div>
+        <div class="font-card sans">
+          <div class="lab">正文字体 BODY · 黑体系</div>
+          <div class="big">征战天下</div>
+          <div class="lab" style="margin-top:10px">用于正文、数值、标签、说明，保证小屏清晰可读</div>
+        </div>
+      </div>
+      <div class="type-scale" id="typeScale"></div>
+    </div>
+
+    <!-- 间距 圆角 层次 -->
+    <div class="sys-block">
+      <div class="sys-title"><span class="n">3.3</span><h3>间距 · 圆角 · 层次</h3><small>8pt 网格 · 三级表面</small></div>
+      <div class="spec-grid">
+        <div class="spec-card">
+          <h4>间距 Spacing</h4>
+          <div class="space-list" id="spaceList"></div>
+        </div>
+        <div class="spec-card">
+          <h4>圆角 Radius</h4>
+          <div class="radius-list">
+            <div class="radius-box" style="border-radius:4px">4<small> / 标签</small></div>
+            <div class="radius-box" style="border-radius:8px">8<small> / 按钮</small></div>
+            <div class="radius-box" style="border-radius:14px">14<small> / 卡片</small></div>
+            <div class="radius-box" style="border-radius:24px">24<small> / 面板</small></div>
+          </div>
+        </div>
+        <div class="spec-card">
+          <h4>表面层次 Elevation</h4>
+          <div class="elev-list">
+            <div class="elev-box elev-1">Surface 1 · 基础面板（描边）</div>
+            <div class="elev-box elev-2">Surface 2 · 顶部高光，浮起一层</div>
+            <div class="elev-box elev-3">Surface 3 · 鎏金描边，最高层级</div>
+          </div>
+        </div>
+        <div class="spec-card">
+          <h4>应用原则</h4>
+          <p style="color:var(--ink-300);font-size:13px;line-height:2">Canvas 手绘不依赖 CSS 阴影，层次靠「表面明度 + 1px 描边 + 顶部高光线」模拟，兼顾性能与一致性。同级元素用同色描边，强调元素才用鎏金描边。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 组件 -->
+    <div class="sys-block">
+      <div class="sys-title"><span class="n">3.4</span><h3>组件库</h3><small>含完整交互状态</small></div>
+
+      <div class="comp-cats">
+        <h4>按钮 Buttons · 主/次/幽灵/危险/禁用 + 三档尺寸</h4>
+        <div class="btn-row">
+          <span class="btn btn-primary">闯关</span>
+          <span class="btn btn-gold">领取奖励</span>
+          <span class="btn btn-ghost">返回</span>
+          <span class="btn btn-danger">重置存档</span>
+          <span class="btn btn-disabled">未解锁</span>
+          <span class="btn btn-primary btn-sm">小按钮</span>
+          <span class="btn btn-primary btn-lg">大按钮</span>
+        </div>
+        <div class="comp-note">状态：默认 / 按下(下沉+降亮) / 禁用(降透明度+弱色) / 加载(转圈)。每屏仅一个主按钮。</div>
+      </div>
+
+      <div class="comp-cats">
+        <h4>标签与徽章 Chips & Badges</h4>
+        <div class="chip-row">
+          <span class="chip" style="color:var(--gold);border-color:var(--gold-dk)">传奇</span>
+          <span class="chip" style="color:var(--purple);border-color:var(--purple)">史诗</span>
+          <span class="chip" style="color:var(--jade);border-color:var(--jade)">已达成</span>
+          <span class="chip" style="color:var(--indigo);border-color:var(--indigo)">进行中</span>
+          <span class="chip" style="color:var(--ink-400);border-color:var(--ink-500)">未解锁</span>
+          <span class="chip" style="color:#fff;background:var(--vermilion);border-color:var(--vermilion)">×30</span>
+        </div>
+      </div>
+
+      <div class="comp-cats">
+        <h4>卡片 / 进度条 / Tab</h4>
+        <div class="spec-grid">
+          <div class="demo-card">
+            <div class="t">第一章 · 黄巾风起</div>
+            <div class="d">宛城 301~400 关</div>
+            <div class="progress"><i style="width:72%;background:linear-gradient(90deg,var(--jade),var(--gold))"></i></div>
+            <div class="comp-note">章节进度 72%</div>
+          </div>
+          <div>
+            <div class="tabs-demo">
+              <div class="tab">综合</div>
+              <div class="tab on">我方输出</div>
+              <div class="tab">敌方输出</div>
+              <div class="tab">承伤</div>
+            </div>
+            <div class="comp-note">选中态用鎏金实底 + 深色字，未选中为幽灵态。</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comp-cats">
+        <h4>悬浮提醒按钮 Floating Event Orb · 首页左侧活动入口</h4>
+        <div class="orb-demo">
+          <div class="orb">每周<span class="badge">3</span><span class="spark a"></span><span class="spark b"></span><span class="spark c"></span></div>
+          <div class="orb">每日<span class="badge">5</span><span class="spark a"></span><span class="spark b"></span></div>
+          <div style="color:var(--ink-300);font-size:13px;line-height:1.9;flex:1;min-width:220px">
+            用于「每周/每日挑战」等高价值、限次入口。鎏金圆环 + 内发光 + 呼吸光晕（1.6s 循环），角标显示可打次数，粒子点缀制造"有奖励待领"的吸引力。<br>
+            <span style="color:var(--gold)">动效：</span>光晕呼吸循环 + 角标弹跳；有可领次数时常亮，打完后光晕减弱、角标消失。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 图标/动效/a11y -->
+    <div class="sys-block">
+      <div class="sys-title"><span class="n">3.5</span><h3>图标 · 动效 · 可访问性</h3><small>规范补充</small></div>
+      <div class="spec-grid">
+        <div class="spec-card">
+          <h4>图标 Icon</h4>
+          <p style="color:var(--ink-300);font-size:13px;line-height:2">统一线性风格，2px 描边、圆头端点、24×24 网格。货币用实心金色圆形徽章；功能图标（返回/设置为/音量）用中性色，仅在激活时着朱砂或鎏金。</p>
+        </div>
+        <div class="spec-card">
+          <h4>动效 Motion</h4>
+          <p style="color:var(--ink-300);font-size:13px;line-height:2">缓动统一用 ease-out-quart；界面转入 220ms，按钮按下 90ms，飘字上浮 600ms。尊重系统「减少动态效果」设置，关键时刻（胜利/抽卡）才用强反馈。</p>
+        </div>
+        <div class="spec-card">
+          <h4>可访问性 A11y</h4>
+          <p style="color:var(--ink-300);font-size:13px;line-height:2">正文对比度 ≥ 4.5:1，大字 ≥ 3:1；状态采用「颜色 + 文字/形状」双编码；触控热区 ≥ 88 逻辑像素；数字用等宽感字体便于对齐比较。</p>
+        </div>
+        <div class="spec-card">
+          <h4>工程落地 Engineering</h4>
+          <p style="color:var(--ink-300);font-size:13px;line-height:2">新增 <code>tokens.js</code> 导出色彩/字号/间距常量；扩展 <code>draw.js</code> 的 <code>THEME</code> 与组件函数；各 screen 逐步替换硬编码 hex 为 token 引用，零行为改动。</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="screens">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">04 / REDESIGN MOCKUPS</div>
+      <h2>核心界面重设计稿</h2>
+      <p class="screens-intro">以下 6 屏按 750×1334 设计稿等比还原，可直接对照现有界面。重点看三件事：朱砂主按钮如何聚焦视线、暖墨色阶如何拉开层次、宋体标题如何带来书卷气。（手机模型内的文字为等比缩放示意，实际清晰度以落地渲染为准）</p>
+    </div>
+
+    <div class="phone-grid">
+
+      <!-- 首页 -->
+      <div class="phone-wrap">
+        <div class="phone-label">01 · 首页</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-top">
+              <span class="coin"><i></i>98000</span>
+              <span style="display:flex;gap:6%">
+                <span class="pill gold">音</span>
+                <span class="pill gold">每日</span>
+              </span>
+            </div>
+            <div class="sc-body">
+              <div style="display:flex;gap:2%;justify-content:center">
+                <span class="pill" style="color:var(--purple);border:1px solid var(--purple)">演武</span>
+                <span class="pill" style="color:var(--vermilion);border:1px solid var(--vermilion)">英雄战</span>
+                <span class="pill" style="color:var(--ink-200);border:1px solid var(--ink-500)">成长之路</span>
+              </div>
+              <div class="hero-title" style="font-size:7.6em;line-height:1.25">汉末行伍<br><em style="color:var(--gold);font-style:normal">征战记</em></div>
+              <div style="text-align:center;color:var(--ink-300);font-size:2.5em;letter-spacing:1px">单机试玩版 v0.1 · 黄巾风起</div>
+              <div class="stat-pill" style="padding:2.6% 4%">
+                <span class="k">闯关进度</span><span class="v">50 <small style="color:var(--ink-400)">/ 100 关</small></span>
+              </div>
+              <div class="big-btn" style="line-height:1.2">闯 关<div style="color:rgba(255,255,255,.85);text-align:center;font-size:9px;font-family:var(--sans);margin-top:1%">第 351 关待挑战 · 自动战斗已开放</div></div>
+              <div class="entry-grid">
+                <div class="entry hl"><div class="ico">匣</div><div class="nm">宝箱</div><div class="ds">6 个待开</div></div>
+                <div class="entry"><div class="ico" style="color:var(--gold)">市</div><div class="nm">商城</div><div class="ds">铜钱买兵直入营</div></div>
+              </div>
+              <div class="entry-grid">
+                <div class="entry"><div class="ico" style="color:var(--jade)">营</div><div class="nm">兵营</div><div class="ds">合成升阶 · Lv10</div></div>
+                <div class="entry"><div class="ico" style="color:var(--purple)">募</div><div class="nm">招募</div><div class="ds">招募券 30 · 4/12</div></div>
+              </div>
+              <div class="stat-pill">
+                <span class="k">挂机收益 · <b style="color:var(--jade)">+0</b>/小时</span>
+                <span class="pill jade">领取</span>
+              </div>
+            </div>
+            <div style="position:absolute;left:2.5%;top:30%;display:flex;flex-direction:column;gap:9px;z-index:5">
+              <div style="position:relative;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#3a2b18,#17130E);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:var(--gold-lt);box-shadow:0 0 0 3px rgba(217,164,65,.16),0 0 14px rgba(217,164,65,.5)">
+                每周
+                <span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;background:var(--vermilion);color:#fff;border:2px solid var(--ink-900);border-radius:9px;font-family:var(--sans);font-size:10px;display:flex;align-items:center;justify-content:center">3</span>
+              </div>
+              <div style="position:relative;width:46px;height:46px;border-radius:50%;background:radial-gradient(circle at 50% 40%,#3a2b18,#17130E);border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-size:13px;color:var(--gold-lt);box-shadow:0 0 0 3px rgba(217,164,65,.16),0 0 14px rgba(217,164,65,.5)">
+                每日
+                <span style="position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;background:var(--vermilion);color:#fff;border:2px solid var(--ink-900);border-radius:9px;font-family:var(--sans);font-size:10px;display:flex;align-items:center;justify-content:center">5</span>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 关卡 -->
+      <div class="phone-wrap">
+        <div class="phone-label">02 · 关卡选择</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>征战 · 黄巾风起<span class="coin"><i></i>98000</span></div>
+            <div class="sc-body">
+              <div class="pnl pnl-hi">
+                <div class="card-title">第一章 · 黄巾风起</div>
+                <div class="card-sub">宛城 301~400 关 · 本期 88%</div>
+                <div class="progress" style="margin-top:3%"><i style="width:88%;background:linear-gradient(90deg,var(--jade),var(--gold))"></i></div>
+                <div style="display:flex;justify-content:space-between;margin-top:2.4%;color:var(--gold);font-size:2.2em"><span>涿郡</span><span>广宗</span><span>颍川</span><span>宛城</span></div>
+              </div>
+              <div class="pnl">
+                <div class="card-sub" style="color:var(--ink-200);margin-bottom:3%">城池 / 章节奖励</div>
+                <div style="display:flex;gap:2%">
+                  <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:3.6em">兵</div><div class="ds" style="font-size:1.8em">涿郡</div></div>
+                  <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:3.6em">募</div><div class="ds" style="font-size:1.8em">广宗</div></div>
+                  <div class="entry hl" style="padding:4% 0"><div class="ico" style="font-size:3.6em">匣</div><div class="ds" style="font-size:1.8em">颍川</div></div>
+                  <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:3.6em">印</div><div class="ds" style="font-size:1.8em">宛城</div></div>
+                </div>
+              </div>
+              <div class="pnl" style="flex:1">
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                  <div class="card-sub" style="color:var(--ink-200)">第 351~375 关奖励</div>
+                  <span class="pill gold" style="font-size:1.8em">每 5 关 1 箱</span>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:2%;margin-top:4%">
+                  <div class="entry hl" style="padding:10% 0"><div class="ico" style="font-size:3.4em">匣</div><div class="ds" style="font-size:1.7em">351-355</div></div>
+                  <div class="entry" style="padding:10% 0"><div class="ico" style="font-size:3.4em">匣</div><div class="ds" style="font-size:1.7em">356-360</div></div>
+                  <div class="entry" style="padding:10% 0"><div class="ico" style="font-size:3.4em">匣</div><div class="ds" style="font-size:1.7em">361-365</div></div>
+                  <div class="entry" style="padding:10% 0"><div class="ico" style="font-size:3.4em">匣</div><div class="ds" style="font-size:1.7em">366-370</div></div>
+                  <div class="entry" style="padding:10% 0"><div class="ico" style="font-size:3.4em">匣</div><div class="ds" style="font-size:1.7em">371-375</div></div>
+                </div>
+              </div>
+              <div class="big-btn gold">挑战第 351 关</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 商城 -->
+      <div class="phone-wrap">
+        <div class="phone-label">03 · 商城</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>商城<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <span class="pill gold" style="font-size:2.4em">每日商店</span>
+                <span class="card-sub" style="font-size:2.1em">今日已购 0/6</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:3%">
+                <span class="card-sub" style="font-size:2.2em">购买等级</span>
+                <div style="flex:1;display:flex;gap:2%">
+                  <span class="pill gold" style="flex:1;text-align:center;font-size:2.1em">Lv1</span>
+                  <span class="pill" style="flex:1;text-align:center;font-size:2.1em;border:1px solid var(--ink-500)">Lv3</span>
+                  <span class="pill" style="flex:1;text-align:center;font-size:2.1em;border:1px solid var(--ink-500)">Lv6</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:2.4%;flex:1">
+                <div class="entry" style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:5%">
+                  <div class="card-title" style="font-size:3em">盾兵</div><div class="card-sub" style="font-size:2em">布衣盾卒</div>
+                  <div style="color:var(--ink-200);font-size:2em;line-height:1.6;margin:6% 0">生命 112<br>攻击 12<br>防御 8</div>
+                  <div style="margin-top:auto;width:100%;text-align:center;color:var(--gold);font-size:2.6em">● 600</div>
+                  <div class="big-btn gold" style="font-size:2.8em;padding:6% 0;margin-top:4%">购买</div>
+                </div>
+                <div class="entry" style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:5%">
+                  <div class="card-title" style="font-size:3em">弓兵</div><div class="card-sub" style="font-size:2em">布衣弓手</div>
+                  <div style="color:var(--ink-200);font-size:2em;line-height:1.6;margin:6% 0">生命 60<br>攻击 25<br>防御 6</div>
+                  <div style="margin-top:auto;width:100%;text-align:center;color:var(--gold);font-size:2.6em">● 750</div>
+                  <div class="big-btn gold" style="font-size:2.8em;padding:6% 0;margin-top:4%">购买</div>
+                </div>
+                <div class="entry" style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:5%">
+                  <div class="card-title" style="font-size:3em">枪兵</div><div class="card-sub" style="font-size:2em">布衣枪卒</div>
+                  <div style="color:var(--ink-200);font-size:2em;line-height:1.6;margin:6% 0">生命 85<br>攻击 21<br>防御 7</div>
+                  <div style="margin-top:auto;width:100%;text-align:center;color:var(--gold);font-size:2.6em">● 700</div>
+                  <div class="big-btn gold" style="font-size:2.8em;padding:6% 0;margin-top:4%">购买</div>
+                </div>
+                <div class="entry" style="display:flex;flex-direction:column;align-items:flex-start;text-align:left;padding:5%">
+                  <div class="card-title" style="font-size:3em">骑兵</div><div class="card-sub" style="font-size:2em">轻装骑兵</div>
+                  <div style="color:var(--ink-200);font-size:2em;line-height:1.6;margin:6% 0">生命 80<br>攻击 22<br>防御 7</div>
+                  <div style="margin-top:auto;width:100%;text-align:center;color:var(--gold);font-size:2.6em">● 680</div>
+                  <div class="big-btn gold" style="font-size:2.8em;padding:6% 0;margin-top:4%">购买</div>
+                </div>
+              </div>
+              <div class="pnl" style="display:flex;align-items:center;justify-content:space-between;padding:3% 4%">
+                <span style="color:var(--gold);font-size:2.4em">特殊宝箱 · 稀有 / 史诗</span>
+                <span class="pill gold" style="font-size:2em">购买</span>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 战斗 -->
+      <div class="phone-wrap">
+        <div class="phone-label">04 · 战斗</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-body-overlay" style="z-index:3">
+              <div class="score-bar"><span class="mine">我方 15</span><span>:</span><span class="foe">6 敌军</span><span class="speed">2×速</span></div>
+            </div>
+            <div style="display:flex;gap:2%;padding:15% 3.2% 0;position:absolute;top:0;left:0;right:0;z-index:2">
+              <div class="pnl" style="flex:1;background:rgba(28,24,19,.9)">
+                <div class="card-sub" style="color:var(--jade);font-size:2.1em">我方输出 Top5</div>
+                <div class="rank-row"><span class="no">1</span><span class="nm">虎豹骑·马具</span><span class="bar"><i style="width:58%"></i></span><span class="num">370</span></div>
+                <div class="rank-row"><span class="no">2</span><span class="nm">铁扑马骑</span><span class="bar"><i style="width:32%"></i></span><span class="num">224</span></div>
+                <div class="rank-row"><span class="no">3</span><span class="nm">铁扑马骑</span><span class="bar"><i style="width:16%"></i></span><span class="num">85</span></div>
+              </div>
+              <div class="pnl" style="flex:1;background:rgba(28,24,19,.9)">
+                <div class="card-sub" style="color:var(--vermilion);font-size:2.1em">敌方输出 Top5</div>
+                <div class="rank-row"><span class="no">1</span><span class="nm">布衣盾卒</span><span class="bar foe"><i style="width:68%"></i></span><span class="num">15</span></div>
+                <div class="rank-row"><span class="no">2</span><span class="nm">布衣盾卒</span><span class="bar foe"><i style="width:24%"></i></span><span class="num">4</span></div>
+                <div class="rank-row"><span class="no">3</span><span class="nm">轻装骑兵</span><span class="bar foe"><i style="width:14%"></i></span><span class="num">3</span></div>
+              </div>
+            </div>
+            <div class="battle-stage" style="margin-top:0">
+              <div class="unit u-red" style="left:24%;top:18%"></div>
+              <div class="unit u-red" style="left:38%;top:24%"></div>
+              <div class="unit u-red" style="left:60%;top:20%"></div>
+              <div class="unit u-red" style="left:72%;top:28%"></div>
+              <div class="unit u-blue" style="left:28%;top:56%"></div>
+              <div class="unit u-blue" style="left:44%;top:48%"></div>
+              <div class="unit u-blue" style="left:58%;top:58%"></div>
+              <div class="unit u-blue" style="left:70%;top:50%"></div>
+              <div style="position:absolute;bottom:3%;left:0;right:0;text-align:center;color:#fff;font-size:2.4em;text-shadow:0 1px 3px #000">左右 / 上下拖动 · 查看战场全貌</div>
+            </div>
+            <div class="sc-top" style="height:auto;padding:2.4% 4%;border-top:1px solid var(--ink-700);border-bottom:none">
+              <span style="color:var(--gold);font-size:2.6em">2.5 秒</span>
+              <span style="color:var(--ink-200);font-size:2.4em">我方 115 / 115 · 敌军 6 / 15</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 胜利结算 -->
+      <div class="phone-wrap">
+        <div class="phone-label">05 · 胜利结算</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-top"><span style="font-size:2.6em;color:var(--gold)">● 98081</span><span style="width:20%"></span></div>
+            <div class="sc-body">
+              <div class="win-title">胜利</div>
+              <div class="win-sub">第 12 关 通关 · 涿郡</div>
+              <div class="pnl" style="display:flex;justify-content:space-between;align-items:center;padding:4% 5%">
+                <div><div class="card-sub" style="font-size:2.1em">获得铜钱</div><div style="color:var(--gold);font-size:5em;font-weight:600">+81</div></div>
+                <span class="pill jade" style="font-size:2.2em">首通奖励已开</span>
+              </div>
+              <div class="pnl" style="flex:1">
+                <div class="tabs-demo" style="width:100%;margin-bottom:3%">
+                  <div class="tab on" style="flex:1;font-size:2.1em">综合</div>
+                  <div class="tab" style="flex:1;font-size:2.1em">我方输出</div>
+                  <div class="tab" style="flex:1;font-size:2.1em">敌方输出</div>
+                </div>
+                <div class="rank-two">
+                  <div>
+                    <div class="card-sub" style="color:var(--jade);font-size:2em;margin-bottom:2%">我方输出</div>
+                    <div class="rank-row"><span class="no">1</span><span class="nm">虎豹骑</span><span class="num">687</span></div>
+                    <div class="rank-row"><span class="no">2</span><span class="nm">铁扑马骑</span><span class="num">260</span></div>
+                    <div class="rank-row"><span class="no">3</span><span class="nm">铁扑马骑</span><span class="num">128</span></div>
+                  </div>
+                  <div>
+                    <div class="card-sub" style="color:var(--vermilion);font-size:2em;margin-bottom:2%">敌方输出</div>
+                    <div class="rank-row"><span class="no">1</span><span class="nm">布衣弓手</span><span class="num">34</span></div>
+                    <div class="rank-row"><span class="no">2</span><span class="nm">布衣弓手</span><span class="num">22</span></div>
+                    <div class="rank-row"><span class="no">3</span><span class="nm">布衣枪卒</span><span class="num">15</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="big-btn gold">继续挑战第 13 关</div>
+              <div class="big-btn ghost" style="font-size:3.2em;padding:3% 0">返回关卡进度</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 布阵 -->
+      <div class="phone-wrap">
+        <div class="phone-label">06 · 布阵</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>布阵 · 第 12 关<span class="coin"><i></i>98000</span></div>
+            <div class="sc-body">
+              <div class="pnl" style="display:flex;justify-content:space-between;align-items:center;padding:3% 4%">
+                <div><div class="card-sub" style="font-size:2.1em">敌军 6 支 · 15 兵</div></div>
+                <div style="text-align:right"><div class="card-sub" style="color:var(--jade);font-size:2.1em">我方 40,319</div><div class="card-sub" style="color:var(--vermilion);font-size:2.1em">敌方 2,024 · 20×优势</div></div>
+              </div>
+              <div class="battle-stage" style="background:linear-gradient(#c9893a,#a7651f);padding:3%;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(5,1fr);gap:2%">
+                <div class="entry" style="background:rgba(255,255,255,.14);padding:0;border-color:rgba(255,255,255,.25)"></div>
+                <div class="entry" style="background:rgba(255,255,255,.14);padding:0;border-color:rgba(255,255,255,.25)"></div>
+                <div class="entry hl" style="padding:0;background:rgba(217,164,65,.28)"></div>
+                <div class="entry" style="background:rgba(255,255,255,.14);padding:0;border-color:rgba(255,255,255,.25)"></div>
+                <div class="entry" style="background:rgba(255,255,255,.14);padding:0;border-color:rgba(255,255,255,.25)"></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">盾</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">枪</div></div>
+                <div class="entry hl" style="padding:0"><div class="ico" style="font-size:3em">骑</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">弓</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">盾</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">枪</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">弓</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">骑</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">盾</div></div>
+                <div class="entry" style="padding:0"><div class="ico" style="font-size:3em;color:#7a5">枪</div></div>
+              </div>
+              <div style="display:flex;gap:2%">
+                <span class="pill gold" style="flex:1;text-align:center;font-size:2em">按战力布阵</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2em;border:1px solid var(--ink-500)">清空</span>
+                <span class="pill gold" style="flex:1;text-align:center;font-size:2em">开箱 6</span>
+              </div>
+              <div class="big-btn">出 战</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 每周挑战 -->
+      <div class="phone-wrap">
+        <div class="phone-label">07 · 每周挑战</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>每周挑战<span class="coin"><i></i>12345</span></div>
+            <div class="sc-body">
+              <div style="display:flex;gap:2%">
+                <span class="pill gold" style="flex:1;text-align:center;font-size:2.4em">挑战关卡</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2.4em;border:1px solid var(--ink-500)">积分选兵</span>
+              </div>
+              <div style="display:flex;gap:1.6%">
+                <span class="pill gold" style="flex:1;text-align:center;font-size:2.3em">壹</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2.3em;border:1px solid var(--ink-500)">贰</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2.3em;border:1px solid var(--ink-500)">叁</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2.3em;border:1px solid var(--ink-500)">肆</span>
+                <span class="pill" style="flex:1;text-align:center;font-size:2.3em;border:1px solid var(--ink-500)">伍</span>
+              </div>
+              <div class="pnl" style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:2%">
+                <div class="entry" style="padding:4% 0;background:rgba(110,155,114,.14);border-color:var(--jade)"><div class="ico" style="font-size:2.8em;color:var(--jade)">✓</div><div class="ds" style="font-size:1.7em">1-1</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">1-2</div></div>
+                <div class="entry hl" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">1-3</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">1-4</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">1-5</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">匣</div><div class="ds" style="font-size:1.7em">2-1</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">匣</div><div class="ds" style="font-size:1.7em">2-2</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">匣</div><div class="ds" style="font-size:1.7em">2-3</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">匣</div><div class="ds" style="font-size:1.7em">2-4</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">匣</div><div class="ds" style="font-size:1.7em">2-5</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">3-1</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">3-2</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">3-3</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">3-4</div></div>
+                <div class="entry" style="padding:4% 0"><div class="ico" style="font-size:2.8em">匣</div><div class="ds" style="font-size:1.7em">3-5</div></div>
+              </div>
+              <div class="stat-pill" style="padding:2% 4%"><span class="k">本周积分</span><span class="v">1600</span></div>
+              <div style="display:flex;gap:2%">
+                <div class="big-btn gold" style="flex:1;font-size:3.2em">挑 战</div>
+                <div class="big-btn" style="flex:1;font-size:3.2em">扫 荡</div>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 每日挑战 -->
+      <div class="phone-wrap">
+        <div class="phone-label">08 · 每日挑战</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>每日挑战<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div class="pnl" style="padding:2.4% 4%">
+                <div class="card-sub" style="color:var(--ink-200);font-size:2.2em">主线30关后解锁 · 每日30关</div>
+                <div style="display:flex;justify-content:space-between;margin-top:2%"><span class="card-sub" style="font-size:2em">今日已通关</span><span style="color:var(--jade);font-size:2.2em">5/30</span></div>
+                <div class="progress" style="margin-top:1.6%;height:1.1em"><i style="width:17%;background:var(--jade)"></i></div>
+              </div>
+              <div class="pnl" style="flex:1;display:grid;grid-template-columns:repeat(5,1fr);grid-template-rows:repeat(4,1fr);gap:2%">
+                <div class="entry" style="padding:3% 0;background:rgba(110,155,114,.12)"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry" style="padding:3% 0;background:rgba(110,155,114,.12)"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry" style="padding:3% 0;background:rgba(110,155,114,.12)"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry" style="padding:3% 0;background:rgba(110,155,114,.12)"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry" style="padding:3% 0;background:rgba(110,155,114,.12)"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry" style="padding:3% 0"><div class="ico" style="font-size:3.2em;color:var(--purple)">将</div><div class="ds" style="font-size:1.6em;color:var(--jade)">已通关</div></div>
+                <div class="entry hl" style="padding:3% 0"><div class="ico" style="font-size:3.2em">将</div><div class="ds" style="font-size:1.6em;color:var(--gold)">待挑战</div></div>
+                <div class="entry" style="padding:3% 0;opacity:.5"><div class="ico" style="font-size:3.2em;color:var(--purple)">将</div><div class="ds" style="font-size:1.6em">未解锁</div></div>
+                <div class="entry" style="padding:3% 0;opacity:.5"><div class="ico" style="font-size:3.2em;color:var(--purple)">将</div><div class="ds" style="font-size:1.6em">未解锁</div></div>
+                <div class="entry" style="padding:3% 0;opacity:.5"><div class="ico" style="font-size:3.2em;color:var(--purple)">将</div><div class="ds" style="font-size:1.6em">未解锁</div></div>
+              </div>
+              <div class="big-btn">挑战第 6 关</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 招募 -->
+      <div class="phone-wrap">
+        <div class="phone-label">09 · 招募</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>招募系统<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:2% 4%">
+                <span style="color:var(--gold);font-size:2.6em">招募券 ×30</span>
+                <span class="pill gold" style="font-size:1.8em">看广告 +1券</span>
+              </div>
+              <div class="entry-grid" style="grid-template-columns:repeat(3,1fr);flex:1">
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em;color:var(--jade)">关</div><div class="nm" style="font-size:1.8em">关羽</div><div class="ds" style="font-size:1.5em">Lv4/30</div></div>
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em">张</div><div class="nm" style="font-size:1.8em">张飞</div><div class="ds" style="font-size:1.5em">Lv3/30</div></div>
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em;color:var(--indigo)">曹</div><div class="nm" style="font-size:1.8em">曹操</div><div class="ds" style="font-size:1.5em">未获得</div></div>
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em;color:var(--vermilion)">董</div><div class="nm" style="font-size:1.8em">董卓</div><div class="ds" style="font-size:1.5em">未获得</div></div>
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em;color:var(--gold)">刘</div><div class="nm" style="font-size:1.8em">刘备</div><div class="ds" style="font-size:1.5em">未获得</div></div>
+                <div class="entry hl" style="padding:6% 0"><div class="ico" style="font-size:4em;color:var(--vermilion)">周</div><div class="nm" style="font-size:1.8em">周瑜</div><div class="ds" style="font-size:1.5em">未获得</div></div>
+              </div>
+              <div class="pnl" style="padding:2.4% 4%;text-align:center">
+                <div class="card-title" style="font-size:2.4em">1 券 1 抽 · 20 抽必出传奇</div>
+                <div style="display:flex;gap:3%;margin-top:3%">
+                  <div class="big-btn ghost" style="flex:1;font-size:2em">招募 ×1</div>
+                  <div class="big-btn gold" style="flex:1;font-size:2em">十连招募</div>
+                </div>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 宝箱 -->
+      <div class="phone-wrap">
+        <div class="phone-label">10 · 宝箱</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>宝箱<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div class="card-sub" style="padding:2% 4%;font-size:2em;color:var(--ink-200)">宝箱 6 个 · 兵营 25/100</div>
+              <div class="card-title" style="padding:1% 4%;font-size:2.2em">常规宝箱 · 关卡轮换</div>
+              <div class="pnl" style="margin:0 4%;padding:2% 3%;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:2.2em;color:var(--gold)">小木箱 ×3</span><span class="pill gold" style="font-size:1.8em">开箱</span>
+              </div>
+              <div class="pnl" style="margin:1.5% 4%;padding:2% 3%;display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:2.2em">银箱 ×2</span><span class="pill" style="font-size:1.8em">开箱</span>
+              </div>
+              <div class="pnl" style="margin:0 4%;padding:2% 3%;display:flex;align-items:center;justify-content:space-between;border-color:var(--gold)">
+                <span style="font-size:2.2em;color:var(--gold)">金箱 ×1</span><span class="pill gold" style="font-size:1.8em">开箱</span>
+              </div>
+              <div class="card-title" style="padding:3% 4% 1%;font-size:2.2em;color:var(--purple)">特殊宝箱 · 必出对应品级</div>
+              <div class="pnl" style="margin:0 4%;padding:2% 3%;display:flex;align-items:center;justify-content:space-between;opacity:.5">
+                <span style="font-size:2.2em;color:var(--purple)">稀有 / 史诗 / 传奇 ×0</span><span class="pill" style="font-size:1.8em">暂无宝箱</span>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 兵营 -->
+      <div class="phone-wrap">
+        <div class="phone-label">11 · 兵营</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>兵营<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div style="display:flex;justify-content:space-between;padding:2% 4%"><span style="font-size:2.2em;color:var(--gold)">兵营 25/100</span><span style="font-size:1.8em;color:var(--ink-300)">已上阵 25/25</span></div>
+              <div class="entry-grid" style="grid-template-columns:repeat(5,1fr);flex:1;gap:2%">
+                <div class="entry hl" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--gold)">传</div><div class="ds" style="font-size:1.4em">Lv6</div></div>
+                <div class="entry hl" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">史</div><div class="ds" style="font-size:1.4em">Lv6</div></div>
+                <div class="entry hl" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--purple)">史</div><div class="ds" style="font-size:1.4em">Lv6</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--indigo)">稀</div><div class="ds" style="font-size:1.4em">Lv6</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--indigo)">稀</div><div class="ds" style="font-size:1.4em">Lv4</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--jade)">精</div><div class="ds" style="font-size:1.4em">Lv6</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--jade)">精</div><div class="ds" style="font-size:1.4em">Lv5</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--gold-dk)">普</div><div class="ds" style="font-size:1.4em">Lv4</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--jade)">精</div><div class="ds" style="font-size:1.4em">Lv4</div></div>
+                <div class="entry" style="padding:8% 0"><div class="ico" style="font-size:2.8em;color:var(--gold-dk)">普</div><div class="ds" style="font-size:1.4em">Lv4</div></div>
+              </div>
+              <div style="display:flex;gap:3%;padding:2% 4%">
+                <div class="big-btn gold" style="flex:1;font-size:2em">一键合成</div>
+                <div class="big-btn ghost" style="flex:1;font-size:2em">返回布阵</div>
+              </div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 兵种详情 -->
+      <div class="phone-wrap">
+        <div class="phone-label">12 · 兵种详情</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-titlebar"><span class="back">‹</span>单位详情<span class="coin"><i></i>98081</span></div>
+            <div class="sc-body">
+              <div class="pnl pnl-hi" style="margin:3% 4%;padding:3% 4%">
+                <div style="display:flex;justify-content:space-between"><div><div class="card-title" style="font-size:2.8em;color:var(--gold)">虎豹骑·马具</div><div class="card-sub" style="font-size:1.8em">传奇 · Lv6</div></div><div style="text-align:right"><div style="font-size:1.8em;color:var(--ink-200)">等级 6/10</div><div style="font-size:2.2em;color:var(--gold)">战力 5,536</div></div></div>
+                <div class="progress" style="margin-top:3%;height:1em"><i style="width:60%;background:var(--gold)"></i></div>
+              </div>
+              <div style="display:flex;gap:2%;margin:2% 4%">
+                <div class="pnl" style="flex:1;text-align:center;padding:3% 1%"><div class="card-sub" style="font-size:1.6em">生命</div><div style="font-size:2.8em;color:var(--jade)">739</div></div>
+                <div class="pnl" style="flex:1;text-align:center;padding:3% 1%"><div class="card-sub" style="font-size:1.6em">攻击</div><div style="font-size:2.8em;color:var(--vermilion)">183.4</div></div>
+                <div class="pnl" style="flex:1;text-align:center;padding:3% 1%"><div class="card-sub" style="font-size:1.6em">防御</div><div style="font-size:2.8em;color:var(--indigo)">38</div></div>
+              </div>
+              <div class="pnl" style="margin:2% 4%;padding:2.5% 4%"><div class="card-title" style="font-size:2em">战法 · 特性</div><div class="card-sub" style="font-size:1.6em;color:var(--vermilion)">破阵冲锋</div><div class="card-sub" style="font-size:1.5em;color:var(--ink-300)">连续未受击移动累计 3 格后冲锋，速度 ×2，普攻 5 倍伤害</div></div>
+              <div class="pnl" style="margin:2% 4%;padding:2.5% 4%"><div class="card-title" style="font-size:2em">合成</div><div class="card-sub" style="font-size:1.7em">现有 虎豹骑 Lv6：<b style="color:var(--gold)">1/2</b> 个（含本体）</div></div>
+              <div class="big-btn ghost" style="margin:2% 4%;font-size:2.2em;opacity:.55">材料不足</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 战败结算 -->
+      <div class="phone-wrap">
+        <div class="phone-label">13 · 战败结算</div>
+        <div class="phone">
+          <div class="screen">
+            <div class="sc-top"><span class="coin"><i></i>98081</span></div>
+            <div class="sc-body" style="align-items:center">
+              <div style="font-family:var(--serif);font-size:6em;color:var(--vermilion);letter-spacing:6px;text-shadow:0 0 30px rgba(200,71,62,.5);margin-top:6%">战斗失败</div>
+              <div class="card-sub" style="font-size:2em;color:var(--ink-200)">第 350 关 · 宛城</div>
+              <div class="pnl" style="margin:4% 6%;padding:4% 4%;text-align:center">
+                <div class="card-title" style="font-size:2.2em">没有损失任何资源或单位</div>
+                <div style="font-size:1.5em;color:var(--ink-300);margin-top:2%">兵种克制环 · 顺时针克制，逆时针被克</div>
+                <div style="font-size:2.4em;color:var(--gold);margin:5% 0">盾 → 弓 → 枪 → 骑 → 盾</div>
+                <div style="font-size:1.5em;color:var(--ink-300)">近战放前排先接敌，弓兵放后排靠 14 格射程输出</div>
+              </div>
+              <div class="pnl" style="margin:0 6%;padding:2% 3%;display:flex;align-items:center;justify-content:space-between"><span style="font-size:1.9em;color:var(--gold)">宝箱兵种等级 +2</span><span style="font-size:1.6em;color:var(--jade)">已过 349 关</span></div>
+              <div class="progress" style="margin:2% 6%;height:.9em"><i style="width:87%;background:var(--gold)"></i></div>
+              <div class="big-btn gold" style="margin:2% 6%;font-size:2.6em">重新挑战</div>
+              <div class="big-btn ghost" style="margin:0 6%;font-size:1.9em">观看广告立即获得 ×1</div>
+              <div class="pill" style="margin-top:2%;font-size:1.7em">返回关卡进度</div>
+            </div>
+            <div class="sc-footer">汉末行伍征战记</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="compare">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">05 / BEFORE &amp; AFTER</div>
+      <h2>新旧对比</h2>
+      <p>同样的数据、同样的功能，规范之后的变化是「系统性的」而非「装饰性的」。</p>
+    </div>
+    <div class="compare">
+      <div class="cmp-col cmp-old">
+        <div class="cmp-head">现在 · 冷蓝工具感</div>
+        <div class="cmp-body">
+          <div class="cmp-item"><span class="x">✕</span><span>金色满屏泛滥，货币/标题/描边/强调混为一色</span></div>
+          <div class="cmp-item"><span class="x">✕</span><span>单一黑体，字号零散无层级，题材感靠立绘独撑</span></div>
+          <div class="cmp-item"><span class="x">✕</span><span>所有区块都是同一种深灰描边卡，主次不分</span></div>
+          <div class="cmp-item"><span class="x">✕</span><span>颜色硬编码在 40+ 文件，改一处要翻全项目</span></div>
+          <div class="cmp-item"><span class="x">✕</span><span>按钮仅两态，缺少按下/加载等反馈</span></div>
+        </div>
+      </div>
+      <div class="cmp-col cmp-new">
+        <div class="cmp-head">改后 · 汉帛朱金</div>
+        <div class="cmp-body">
+          <div class="cmp-item"><span class="v">✓</span><span>朱砂=行动、鎏金=货币、竹青=收益，色各司其职</span></div>
+          <div class="cmp-item"><span class="v">✓</span><span>宋体标题 + 黑体正文 + 8 级字号阶梯</span></div>
+          <div class="cmp-item"><span class="v">✓</span><span>三级表面层次 + 8pt 网格，朱砂主按钮聚焦视线</span></div>
+          <div class="cmp-item"><span class="v">✓</span><span>tokens.js 单一数据源，换肤/改色一处生效</span></div>
+          <div class="cmp-item"><span class="v">✓</span><span>组件含完整状态，交互反馈一致且可访问</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="roadmap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-num">06 / ROADMAP</div>
+      <h2>落地路径与改造范围</h2>
+      <p>「先看方案再决定」——若通过，以下是我建议的分阶段实施方式，纯表现层改造，不动任何游戏逻辑与数值。</p>
+    </div>
+    <div class="roadmap">
+      <div class="phase">
+        <div class="phase-n">阶段一</div>
+        <div class="phase-body">
+          <h4>建立设计 Token 基座</h4>
+          <p>新建 <code>src/render/tokens.js</code>，导出色彩、字号、间距、圆角常量；扩展 <code>draw.js</code> 的 <code>THEME</code> 与 <code>setFont</code>，加入宋体展示字体与完整字号阶梯。此阶段界面外观不变，为后续替换做准备。</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">阶段二</div>
+        <div class="phase-body">
+          <h4>升级公共组件层</h4>
+          <p>在 <code>draw.js</code> 中增强 <code>button / panel / bar / chip</code> 等函数，支持新的状态（press/loading）与语义色参数；新增稀有度描边、宋体大标题等绘制助手。所有页面无需改逻辑即可调用。</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">阶段三</div>
+        <div class="phase-body">
+          <h4>逐屏替换硬编码色值</h4>
+          <p>按「首页 → 关卡 → 商城 → 战斗 → 结算 → 布阵 → 其余」顺序，把各 screen 内的 <code>#hex</code> 替换为 token 引用，接入新按钮与标题。每完成一屏跑一次冒烟测试，确保零行为回归。</p>
+        </div>
+      </div>
+      <div class="phase">
+        <div class="phase-n">阶段四</div>
+        <div class="phase-body">
+          <h4>视觉走查与可访问性校准</h4>
+          <p>统一截图走查、对比度检测（正文 ≥4.5:1）、触控热区核对；更新备案截图。产出一份「设计规范 + 组件用法」文档，供后续迭代遵循。</p>
+        </div>
+      </div>
+    </div>
+
+    <table class="effect-table">
+      <thead><tr><th>维度</th><th>改造前</th><th>改造后</th><th>风险</th></tr></thead>
+      <tbody>
+        <tr><td>游戏逻辑 / 数值</td><td>—</td><td>完全不动</td><td>无</td></tr>
+        <tr><td>涉及文件</td><td>40+ 文件散落色值</td><td>集中在 tokens.js + draw.js</td><td>低</td></tr>
+        <tr><td>视觉效果</td><td>冷蓝工具感</td><td>暖墨书卷气</td><td>需你确认</td></tr>
+        <tr><td>414 / 微信小游戏双端</td><td>共用 draw.js</td><td>继续共用，无额外适配</td><td>低</td></tr>
+        <tr><td>回滚成本</td><td>—</td><td>token 集中，可快速切回旧色板</td><td>低</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="decision" id="decision">
+  <div class="wrap">
+    <h2>请你定夺</h2>
+    <p>这份是「先看方案」的设计提案，我没有改动任何游戏代码。告诉我你的选择，我再决定是否落地。</p>
+    <div class="opts">
+      <div class="opt reco">
+        <span class="badge">推荐 · 完整落地</span>
+        <h4>按方案全量实施</h4>
+        <p>按四阶段路径完成 token 基座到逐屏替换，交付全新视觉与规范文档。</p>
+      </div>
+      <div class="opt">
+        <span class="badge">渐进 · 先基座</span>
+        <h4>先做阶段一、二</h4>
+        <p>先建设计系统与组件层，外观暂不大变，后续再逐屏切换，风险最低。</p>
+      </div>
+      <div class="opt">
+        <span class="badge">调整方向</span>
+        <h4>先改设计方向</h4>
+        <p>保留冷蓝色系但套用本规范结构，或调整朱砂/鎏金配色，我再出新版方案。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="foot">汉末行伍征战记 · UI 重设计方案 v1.0 · 设计基准 750×1334 · 本页为设计提案，未改动游戏源码</div>
+
+<script>
+(function(){
+  var neutral=[
+    ['ink-900','#100D0A','背景',1],['ink-800','#1C1813','表面1',1],['ink-700','#262019','表面2',1],
+    ['ink-600','#332A20','表面3',1],['ink-500','#4A3E31','描边',1],['ink-400','#6B5B49','弱描边',1],
+    ['ink-300','#9A8B75','次要字',0],['ink-200','#C9BCA6','正文',0],['ink-100','#F2E9D8','标题',0]
+  ];
+  var brand=[
+    ['朱砂 500','#C8473E','行动/危险',0],['朱砂 300','#E8948A','浅态',0],
+    ['鎏金 500','#D9A441','货币/尊贵',0],['鎏金 300','#EBD191','浅态',0],
+    ['竹青','#6E9B72','成功/收益',0],['靛青','#5B7C99','信息/敌方',0],['紫檀','#A06BB5','稀有',0]
+  ];
+  function swatch(el,arr){
+    el.innerHTML=arr.map(function(c){
+      return '<div class="sw'+(c[3]?' dark':'')+'" style="background:'+c[1]+'"><div class="sw-lbl"><b>'+c[0]+'</b>'+c[1]+'<br>'+c[2]+'</div></div>';
+    }).join('');
+  }
+  swatch(document.getElementById('neutralSw'),neutral);
+  swatch(document.getElementById('brandSw'),brand);
+
+  var rar=[
+    ['凡品','#9A8B75','#r1'],['良品','#6E9B72','#r2'],['珍品','#5B7C99','#r3'],
+    ['极品','#A06BB5','#r4'],['传说','#D9A441','#r5'],['神品','#C8473E','#r6']
+  ];
+  document.getElementById('rarityRow').innerHTML=rar.map(function(r){
+    return '<div class="rar"><div class="dot" style="background:'+r[1]+'"></div><div class="nm">'+r[0]+'</div><div class="cd">'+r[1]+'</div></div>';
+  }).join('');
+
+  var type=[
+    ['Display','宋体 700','64 / 1.2','胜利、页面主标题',64,'serif'],
+    ['H1','宋体 700','48 / 1.25','模块大标题、数字',48,'serif'],
+    ['H2','宋体 600','36 / 1.3','卡片标题',36,'serif'],
+    ['H3','黑体 600','30 / 1.4','区块小标题',30,'sans'],
+    ['Body-LG','黑体 400','28 / 1.6','主要正文',28,'sans'],
+    ['Body','黑体 400','24 / 1.6','常规正文、数值',24,'sans'],
+    ['Caption','黑体 400','20 / 1.5','辅助说明',20,'sans'],
+    ['Micro','黑体 400','18 / 1.4','角标、标签',18,'sans']
+  ];
+  document.getElementById('typeScale').innerHTML=type.map(function(t){
+    var f=t[5]==='serif'?'var(--serif)':'var(--sans)';
+    var fs=Math.max(16,Math.min(t[4],40));
+    return '<div class="type-row"><div class="meta"><b>'+t[0]+'</b> · '+t[1]+'<br>'+t[2]+'</div><div class="sample" style="font-family:'+f+';font-size:'+fs+'px">汉末行伍征战记 123</div><div class="meta" style="text-align:right;min-width:auto">'+t[3]+'</div></div>';
+  }).join('');
+
+  var spaces=[['space-1',8],['space-2',16],['space-3',24],['space-4',32],['space-5',48],['space-6',64]];
+  document.getElementById('spaceList').innerHTML=spaces.map(function(s){
+    return '<div class="space-item"><span style="width:64px">'+s[0]+'</span><span class="space-bar" style="width:'+s[1]*2+'px"></span><span>'+s[1]+'px</span></div>';
+  }).join('');
+})();
+</script>
+
+</body>
+</html>

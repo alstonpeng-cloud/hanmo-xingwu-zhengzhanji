@@ -1,0 +1,265 @@
+﻿  ✓ 加载后未点击时 BGM 静默（等首次手势才起播）
+首次流程：序章
+  ✓ 首次进入落在序章布阵页
+  ✓ 首次进入是「还没打董卓」的存档
+  ✓ 开始页有一条「拖到另一队」箭头
+  ✓ 序章双方精锐：我方 12 队全部上阵
+  ✓ 序章敌方 17 支（16 兵种 + 董卓），实测 17
+  截图 00a_first_start.png
+  ✓ 换位教学做一次后标记已看（只触发一次）
+  截图 00b_prologue_teach.png
+  ✓ 合成教学做一次后标记已看（只触发一次）
+  ✓ 合成后兵牌 12 → 11（实测 11）
+  ✓ 点开始第一战进入序章战场
+  ✓ 序章锁定 1 倍速
+  ✓ 主线 19 关仍是 1 倍速（禁用加速）
+  ✓ 主线 20 关恢复加速（默认 2 倍速）
+  截图 00c_prologue_battle.png
+  ✓ 序章必败并进入结算（645 帧）
+  ✓ 结算页 = 东山再起
+  截图 00d_prologue_defeat.png
+  ✓ 战败后进入首页
+  ✓ 开场剧情已完成，重进不再播
+  ✓ 兵牌复位：回到第 1 关、4 张初始兵牌
+  ✓ 初始兵牌已重新上阵
+  ✓ 两条教学已看记录保留，老号不重播
+  截图 00e_after_reset_home.png
+开始冒烟测试
+  截图 01_home.png
+  截图 01b_home_level_one.png
+  截图 02_levels.png
+  关卡窗口：第 1~25 关，节点 5 行
+  截图 02b_levels_info.png
+  截图 03_deploy.png
+  布阵取景 61,254 ~ 689,856（面板 36,214 ~ 714,870）
+  截图 04_deploy_cleared.png
+  截图 05_deploy_dragged.png
+  截图 06_merge_hover_bad.png
+  截图 07_merge_bad.png
+  截图 08_merge_ok.png
+  截图 09_deploy_auto.png
+  截图 10_arena_opening.png
+  截图 11_arena_mid.png
+  截图 11a_cam_top_left.png
+  截图 11b_cam_top_right.png
+  截图 11c_cam_bottom_left.png
+  截图 11d_cam_bottom_right.png
+  截图 12_result.png
+  ✓ 胜利页「下一个解锁」指向 20 关青竹弓
+  截图 12a_result_unlock_bar.png（放大 2x）
+  截图 12b_chest_opened.png
+  截图 12b1_showcase.png
+  截图 13_result_back.png
+  截图 13b_back_home.png
+  截图 13c_audio_panel.png
+  截图 14_barracks.png
+  截图 15_merge_none.png
+  截图 16_drag_merge_hover.png
+  截图 17_drag_merge_ok.png
+  截图 18_unit_detail.png
+  截图 19_merge_short.png
+  截图 20_merge_ok.png
+  截图 21_unit_max.png
+  截图 22_merge_max.png
+  截图 23_dismiss_modal.png
+  截图 24_barracks_full.png
+  截图 25_barracks_scrolled.png
+  截图 25b_chests.png
+  截图 25c_chest_opened.png
+  截图 25d_chests_all_types.png
+  截图 25c2_showcase_epic.png
+  截图 25c2_showcase_legendary.png
+  截图 25e_chest_legendary_opened.png
+  截图 25f_daily_locked.png
+  截图 25g_daily.png
+  截图 25h_daily_signed.png
+  截图 25i_daily_task_claimed.png
+  截图 29_special_cards.png
+  边框配色 普通 50,62,82 / 稀有 91,136,192 / 史诗 168,116,200 / 传奇 216,180,106
+  截图 30_special_detail_legendary.png
+  截图 30b_special_detail_rare.png
+  截图 31_special_deploy.png
+  截图 26_shop.png
+  截图 27_shop_full.png
+  截图 28_shop_bought.png
+  截图 32_deploy_rarity_borders.png
+  布阵页方框配色 普通 88,160,107 / 稀有 91,136,192 / 史诗 168,116,200 / 传奇 216,180,106
+  截图 33_deploy_merge_hint.png
+  一键布阵：8 个单位 + 3 名英雄，均在同兵种线
+  截图 32c_deploy_auto_heroes.png
+  截图 34_deploy_auto_battle_on.png
+  截图 35_auto_result.png
+  截图 36_auto_next_level.png
+  截图 36b_auto_locked.png
+  截图 37_result_fail_counter_ring.png
+  ✓ 战败页「下一个解锁」指向 180 关虎豹骑
+  ✓ 战败页进度卡没有挤压克制圈 / 重挑战 / 广告按钮
+  截图 37a_result_fail_unlock_bar.png（放大 2x）
+  战败页克制环采样：金色像素 675（弧线 + 百分比可见）
+  克制环四个兵种建模节点均有可见像素
+  截图 37b_result_fail_ad_troop.png
+  截图 37c_result_fail_ad_troop_limit.png
+  第 380 关敌军立体：普通 66 / 稀有 21 / 史诗 10 / 传奇 4
+  截图 37_fx_auras.png
+  截图 39_fx_poison.png
+  截图 40_fx_poison_burst.png
+  截图 38_fx_charge_impact.png
+  截图 41_deploy_enemy_specials.png
+  截图 41b_deploy_enemy_specials_pan.png
+  第 380 关布阵：敌军 25 支（稀有 4 / 史诗 3 / 传奇 1）
+  截图 42_home_trial.png
+  截图 43_trial_stages.png
+  截图 43b_trial_stages_scrolled.png
+  截图 44_trial_deploy.png
+  截图 44b_trial_battle.png
+  截图 44c_trial_result.png
+  截图 45_shop_chests.png
+  截图 46_shop_chests_bought.png
+  截图 46b_shop_ad_chests.png
+  截图 47_shop_daily_entry.png
+  截图 47b_daily_shop.png
+  截图 47b1_daily_showcase.png
+  截图 47c_daily_shop_bought.png
+  截图 48_home_hero.png
+  截图 48b_hero_screen.png
+  截图 48c_hero_pull.png
+  截图 48c2_recruit_box.png
+  截图 48b2_hero_detail.png
+  截图 48d_hero_levelup.png
+  截图 48e_deploy_heroes.png
+  截图 48f_hero_detail.png
+  截图 48e2_hero_on_grid.png
+  截图 48g_battle_heroes.png
+  截图 49_home_hero_battle_locked.png
+  截图 49b_home_hero_battle.png
+  截图 49c_hero_battle_stages.png
+  英雄战列表：当前可见 30 张 · 已通关 6 / 可挑战 1 / 未解锁 23（共 150 关）
+  截图 49c2_hero_battle_stages_scrolled.png
+  截图 49d_hero_battle_deploy.png
+  截图 49e_hero_battle_boss.png
+  第 7 关 Boss：18030 血 / 精锐 2 队
+  截图 49e2_hero_battle_mid.png
+  Boss 金环采样命中 17 像素（屏幕 451,811）
+  截图 49g_hero_battle_final_three_bosses.png
+  终局 Boss 实体 3 名：liubei / guanyu / zhangfei
+  截图 49h_gauntlet_chapters.png
+  截图 49i_gauntlet_run.png
+  截图 49j_gauntlet_battle.png
+  斩将场出战兵牌 9 张
+  截图 49f_hero_battle_result.png
+  截图 50_deploy_hero_limit.png
+  截图 50d_deploy_hero_unit_swap.png
+  截图 50b_deploy_hero_limit_toast.png
+  截图 50f_deploy_hero_slots_399.png
+  截图 50g_deploy_hero_slots_400.png
+  截图 50h_deploy_hero_slots_600.png
+  截图 50i_merge_cap_toast.png
+  截图 51a_zhouyu_fire_zone.png（放大 2.2x）
+  截图 51b_guanyu_sector.png（放大 2.2x）
+  截图 51c_zhangfei_ring.png（放大 2.2x）
+  AOE 特效截图完成：51a_zhouyu_fire_zone / 51b_guanyu_sector / 51c_zhangfei_ring
+  截图 52_home_growth_entry.png
+  截图 52b_growth_road.png
+  成长之路视觉采样：金色 2427 / 首卡兵种图标 125
+  截图 52c_growth_scrolled.png
+  成长之路滚动：scrollY=500 / max=1230
+  截图 52d_growth_bottom.png
+  截图 53_barracks_locked_catalog.png
+  兵营图鉴：已解锁 8 个兵种，灰色节点显示解锁关卡
+  截图 54a_xiahouyuan_cavalry.png
+  截图 54a_xiahouyuan_cavalry_zoom.png（放大 1.8x）
+  截图 54b_guanyu_charge_sector.png
+  截图 54b_guanyu_charge_sector_zoom.png（放大 1.8x）
+  截图 54c_zhouyu_longshot.png
+  截图 54c_zhouyu_longshot_zoom.png（放大 1.4x）
+  截图 54d_caocao_convert_reflect.png
+  截图 54d_caocao_convert_reflect_zoom.png（放大 1.8x）
+  截图 54e_zhangjiao_arrow.png
+  截图 54e_zhangjiao_arrow_zoom.png（放大 1.6x）
+  截图 55a_liubei_heal_aura.png
+  截图 55a_liubei_heal_aura_zoom.png（放大 1.6x）
+  刘备淡绿光环像素：圈内绿度 7.8 > 圈外 2.7
+  截图 55b_caocao_detail_values.png
+  截图 55c_hero_battle_stats_all.png
+  截图 55d_hero_battle_stats_taken.png
+  截图 55e_recruit_pool_no_dup.png
+  截图 56a_deploy_before_open_all.png
+  ✓ 一键开启：5 个箱全开、兵牌 4→9
+  截图 56b_deploy_after_open_all.png
+  截图 56c_barracks_codex_available.png
+  ✓ 图鉴可获得：qingzhou / baier / xianzhen
+  截图 56d_barracks_view_only.png
+  ✓ 仅查看模式：按住 0.5s 也不会拿起兵牌
+  截图 57a_deploy_empty_slots.png
+  ✓ 空场地：画出 25 个白色空位框
+  截图 57b_deploy_one_unit.png
+  ✓ 放 1 个兵：白框数 = 总格数 - 1
+  截图 57c_deploy_full.png
+  ✓ 放满 25 个：不再画白框
+  ✓ 按钮文案含「宝箱」：一键开启宝箱 3
+  截图 57d_dev_home.png
+  截图 57e_dev_heroes.png
+  截图 57f_dev_barracks.png
+  ✓ 开发版保留 DEV 入口（玩家版会剥离）
+
+-- 新手引导 --
+  截图 58a_tutorial_deploy_strong.png
+  ✓ 首次为关卡布阵弹出手势引导
+  ✓ 布阵引导只有「拖到白框」一句指令 + 拖拽手势图标
+  ✓ 强引导高亮空上阵白框
+  ✓ 点遮罩空白处不会跳过强引导
+  ✓ 点「出战」完成布阵引导并写入存档
+  截图 58b_tutorial_merge_strong.png
+  ✓ 有两个可合成兵牌时弹合成引导
+  ✓ 合成引导同时高亮两张兵牌
+  ✓ 真的合成一次后合成引导完成
+  截图 58c_tutorial_merge_done.png
+  截图 58d_tutorial_chest_strong.png
+  ✓ 有箱可开时弹开箱引导
+  ✓ 开箱成功后开箱引导完成
+  ✓ 开完箱不再补说明卡（规则统一收进「!」）
+  ✓ 商城不再弹说明卡
+  ✓ 每日商城不再弹说明卡
+  ✓ 首页不再弹玩法预告卡
+  ✓ 强引导带「跳过」按钮
+  ✓ 跳过一次后全局不再弹强引导
+  截图 58e_tutorial_help.png
+  ✓ 帮助页可以重看手势引导
+  截图 58f_tutorial_help_replay.png
+  截图 59d_result_unlock_achieved.png
+  ✓ 20 关结算显示青竹弓已解锁（不是还差 0 关）
+  截图 59e_result_unlock_hidden.png
+  ✓ 全部目标解锁后进度卡整块隐藏（不留空壳）
+  截图 59a_home_idle_chest_ready.png
+  ✓ 挂机宝箱：250 关为银箱，第 1 个到点可领
+  ✓ 点击挂机宝箱领取后进入宝箱仓库
+  ✓ 领取后自动开始第 2 个的链式计时
+  截图 59b_home_idle_chest_next_wait.png
+  截图 59c_home_idle_chest_done.png
+  ✓ 领完 8 个后显示今日已领完
+  ✓ 已领完后点击不会重复发箱
+  ✓ 150 关同时解锁白马义从 + 演武：教学队列两条都排队
+  ✓ 教学队列按解锁顺序逐条播放
+  截图 59f_unlock_teaching_0_troop.png
+  截图 59f_unlock_teaching_1_feature.png
+  ✓ 队列播完后回调结算页逻辑一次
+  ✓ 教学全部播完，不会重复弹出
+  截图 60_battlefield_huangjin.png
+  ✓ 第 1 关战场主题 = huangjin
+  截图 60_battlefield_dongzhuo.png
+  ✓ 第 401 关战场主题 = dongzhuo
+  截图 60_battlefield_warlords.png
+  ✓ 第 801 关战场主题 = warlords
+  截图 60_battlefield_chibi.png
+  ✓ 第 1201 关战场主题 = chibi
+  截图 60_battlefield_threekingdoms.png
+  ✓ 第 1701 关战场主题 = threekingdoms
+  截图 60_battlefield_jin.png
+  ✓ 第 2201 关战场主题 = jin
+  截图 61_level_select_ch4.png
+  截图 62_chest_level_bonus.png
+
+—— 门禁汇总（冒烟测试）——
+  断言执行 64 条 / 截图 172 张（校验通过 172 张）
+
+冒烟测试通过，截图在 assets/_smoke/

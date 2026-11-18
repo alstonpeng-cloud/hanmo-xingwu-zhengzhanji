@@ -1,0 +1,189 @@
+{
+  "frameWidth": 96,
+  "frameHeight": 96,
+  "cols": 4,
+  "rows": [
+    "idle",
+    "attack",
+    "hit",
+    "death"
+  ],
+  "sheets": {
+    "shield_1": {
+      "troop": "shield",
+      "tier": 1,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/shield_1.png"
+    },
+    "shield_3": {
+      "troop": "shield",
+      "tier": 3,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/shield_3.png"
+    },
+    "shield_6": {
+      "troop": "shield",
+      "tier": 6,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/shield_6.png"
+    },
+    "shield_9": {
+      "troop": "shield",
+      "tier": 9,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/shield_9.png"
+    },
+    "archer_1": {
+      "troop": "archer",
+      "tier": 1,
+      "frames": {
+        "idle": 2,
+        "attack": 4,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/archer_1.png"
+    },
+    "archer_3": {
+      "troop": "archer",
+      "tier": 3,
+      "frames": {
+        "idle": 2,
+        "attack": 4,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/archer_3.png"
+    },
+    "archer_6": {
+      "troop": "archer",
+      "tier": 6,
+      "frames": {
+        "idle": 2,
+        "attack": 4,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/archer_6.png"
+    },
+    "archer_9": {
+      "troop": "archer",
+      "tier": 9,
+      "frames": {
+        "idle": 2,
+        "attack": 4,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/archer_9.png"
+    },
+    "spear_1": {
+      "troop": "spear",
+      "tier": 1,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/spear_1.png"
+    },
+    "spear_3": {
+      "troop": "spear",
+      "tier": 3,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/spear_3.png"
+    },
+    "spear_6": {
+      "troop": "spear",
+      "tier": 6,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/spear_6.png"
+    },
+    "spear_9": {
+      "troop": "spear",
+      "tier": 9,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/spear_9.png"
+    },
+    "cavalry_1": {
+      "troop": "cavalry",
+      "tier": 1,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/cavalry_1.png"
+    },
+    "cavalry_3": {
+      "troop": "cavalry",
+      "tier": 3,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/cavalry_3.png"
+    },
+    "cavalry_6": {
+      "troop": "cavalry",
+      "tier": 6,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/cavalry_6.png"
+    },
+    "cavalry_9": {
+      "troop": "cavalry",
+      "tier": 9,
+      "frames": {
+        "idle": 2,
+        "attack": 3,
+        "hit": 2,
+        "death": 2
+      },
+      "file": "assets/sprites/cavalry_9.png"
+    }
+  }
+}

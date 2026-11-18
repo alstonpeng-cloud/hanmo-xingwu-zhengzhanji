@@ -1,0 +1,32 @@
+{
+  "name": "hanmo-xingwu-zhengzhanji",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "汉末行伍征战记 —— 单机试玩版（Canvas，后续移植微信小游戏）",
+  "scripts": {
+    "start": "node tools/serve.mjs",
+    "test": "node tools/test.mjs",
+    "sim": "node tools/sim.mjs",
+    "sprites": "node tools/gen-sprites.mjs",
+    "gen:audio": "node tools/gen-audio.mjs",
+    "bgm:encode": "node tools/encode-bgm.mjs",
+    "map:preview": "node tools/gen-battle-map.mjs",
+    "smoke": "node tools/smoke.mjs",
+    "build:html": "node tools/build-html.mjs",
+    "build:wx": "node tools/build-wx.mjs",
+    "wx:release": "node tools/release-wx.mjs",
+    "code-fortify": "minigame-code-fortify-cli-package-run"
+  },
+  "minigame_code_fortify_cli": {
+    "workDir": "./wechat",
+    "outputDir": "./dist/fortify",
+    "secretConfig": ".",
+    "timeout_minute": 30
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.1.0",
+    "ffmpeg-static": "^5.3.0",
+    "minigame-code-fortify-cli": "^0.1.8"
+  }
+}

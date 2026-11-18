@@ -1,0 +1,17 @@
+# 敏感：游戏深度保护的 RSA 密钥（公钥请配到 MP 后台，私钥只留本地）
+id_rsa
+id_rsa.pub
+id_rsa.conf
+
+# 依赖与构建产物
+node_modules/
+dist/
+wechat/
+assets/_smoke/
+
+# 个人备案材料（身份证等，不入库）
+assets/_beian/
+docs/*备案*.docx
+
+# 本地源码备份（改版前快照，不入库）
+_backup_src_*/

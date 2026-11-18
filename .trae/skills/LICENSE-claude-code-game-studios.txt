@@ -1,0 +1,35 @@
+Claude-Code-Game-Studios
+仓库：https://github.com/Donchitos/Claude-Code-Game-Studios
+版本：v1.2.0（2026-10-19，"studio scaffold"）
+作者：Donchitos
+
+本目录下 balance-check / quick-design / design-review / asset-spec 四个技能的
+SKILL.md，以及 balance-check/templates/ 下两个模板，均改写自上述仓库的同名技能。
+改写内容：移除 Claude Code 专属机制（斜杠命令预执行、AskUserQuestion、subagent_type、
+CLAUDE_SKILL_DIR、yaml-helper / review-receipts 脚本），路径改为本仓库实际结构，
+补充本项目（微信小游戏《汉末行伍征战记》，原生 JS + Canvas）的约束与数据源。
+未改动其方法论与结论枚举。
+
+原始许可（MIT）全文如下，依据 MIT 要求保留：
+
+MIT License
+
+Copyright (c) 2026 Donchitos
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

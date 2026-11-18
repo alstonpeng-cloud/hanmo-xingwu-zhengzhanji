@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>汉帛·朱金 —— UI 视觉方案（图解）</title>
+<style>
+:root{
+  --ink:#100D0A;--ink2:#1C1813;--ink3:#262019;--line:#332A20;
+  --gold:#D9A441;--gold-lt:#EBD191;--red:#C8473E;--jade:#6E9B72;--indigo:#5B7C99;--purple:#A06BB5;
+  --paper:#F2E9D8;--mut:#9A8B75;
+  --serif:"Songti SC","SimSun","Noto Serif CJK SC",serif;
+  --sans:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--paper);font-family:var(--sans);overflow-x:hidden}
+.wrap{max-width:1240px;margin:0 auto;padding:0 28px}
+
+.top{padding:54px 0 30px;text-align:center;border-bottom:1px solid var(--line)}
+.top .k{color:var(--gold);letter-spacing:6px;font-size:12px}
+.top h1{font-family:var(--serif);font-size:clamp(40px,7vw,72px);letter-spacing:6px;margin:14px 0 6px;color:var(--paper)}
+.top h1 em{color:var(--red);font-style:normal}
+.top .s{color:var(--mut);font-family:var(--serif);font-size:16px;letter-spacing:3px}
+
+/* 设计语言：色点 + 字体，纯视觉 */
+.lang{display:flex;justify-content:center;align-items:center;gap:30px;flex-wrap:wrap;padding:26px 0;border-bottom:1px solid var(--line)}
+.lang .set{display:flex;align-items:center;gap:9px}
+.lang .dot{width:20px;height:20px;border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.08)}
+.lang .nm{font-size:12px;color:var(--mut)}
+.lang .font{font-family:var(--serif);font-size:26px;color:var(--gold)}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:30px;padding:40px 0}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--ink2);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.card-hd{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--line)}
+.card-hd .no{font-family:var(--serif);color:var(--gold);font-size:14px;letter-spacing:2px}
+.card-hd .nm{font-family:var(--serif);color:var(--paper);font-size:19px;letter-spacing:2px}
+.shot{position:relative;line-height:0;background:#000}
+.shot img{width:100%;height:auto;display:block}
+.pin{
+  position:absolute;width:24px;height:24px;border-radius:50%;
+  background:var(--red);color:#fff;border:2px solid #fff;
+  font-family:var(--sans);font-size:12px;font-weight:600;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(0,0,0,.5);line-height:1;
+}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;padding:14px 18px}
+.legend span{font-size:12px;color:var(--paper);display:flex;align-items:center;gap:7px}
+.legend i{
+  font-style:normal;width:18px;height:18px;border-radius:50%;
+  background:var(--red);color:#fff;font-size:10px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.legend b{font-weight:500}
+
+.btm{text-align:center;padding:20px 0 70px;border-top:1px solid var(--line)}
+.btm .hint{color:var(--mut);font-size:13px;margin-bottom:20px}
+.btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btns a{
+  text-decoration:none;padding:13px 30px;border-radius:4px;font-size:14px;
+  font-family:var(--serif);letter-spacing:2px;transition:transform .2s;
+}
+.btns a:hover{transform:translateY(-3px)}
+.a-main{background:var(--red);color:#fff;border:1px solid #e8948a}
+.a-ghost{background:transparent;color:var(--gold);border:1px solid var(--gold-dk,#8C6422)}
+.foot{text-align:center;color:#6B5B49;font-size:11px;padding:30px 0 50px;letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top">
+    <div class="k">VISUAL PROPOSAL · 图解版</div>
+    <h1>汉帛<em>·</em>朱金</h1>
+    <div class="s">汉末行伍征战记 —— 界面重塑视觉方案</div>
+  </div>
+
+  <div class="lang">
+    <div class="set"><span class="dot" style="background:#C8473E"></span><span class="nm">朱砂 · 行动</span></div>
+    <div class="set"><span class="dot" style="background:#D9A441"></span><span class="nm">鎏金 · 尊贵</span></div>
+    <div class="set"><span class="dot" style="background:#6E9B72"></span><span class="nm">竹青 · 收益</span></div>
+    <div class="set"><span class="dot" style="background:#5B7C99"></span><span class="nm">靛青 · 敌方</span></div>
+    <div class="set"><span class="dot" style="background:#A06BB5"></span><span class="nm">紫檀 · 稀有</span></div>
+    <div class="set"><span class="font">汉末行伍</span><span class="nm">宋体标题</span></div>
+  </div>
+
+  <div class="grid">
+
+    <!-- 首页 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">01</span><span class="nm">首页</span></div>
+      <div class="shot">
+        <img src="ui-images/01_首页_带挑战按钮.png" alt="首页重设计" />
+        <div class="pin" style="left:9%;top:25%">1</div>
+        <div class="pin" style="left:9%;top:39%">1</div>
+        <div class="pin" style="left:42%;top:19%">2</div>
+        <div class="pin" style="left:47%;top:37%">3</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>左侧挑战圆钮·光晕+红点</b></span>
+        <span><i>2</i><b>宋体书法标题</b></span>
+        <span><i>3</i><b>朱砂主按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 关卡 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">02</span><span class="nm">关卡选择</span></div>
+      <div class="shot">
+        <img src="ui-images/02_关卡.png" alt="关卡重设计" />
+        <div class="pin" style="left:36%;top:5%">1</div>
+        <div class="pin" style="left:10%;top:20%">2</div>
+        <div class="pin" style="left:8%;top:52%">3</div>
+        <div class="pin" style="left:40%;top:82%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>竹青进度条</b></span>
+        <span><i>3</i><b>鎏金描边强调</b></span>
+        <span><i>4</i><b>朱砂主按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 商城 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">03</span><span class="nm">商城</span></div>
+      <div class="shot">
+        <img src="ui-images/03_商城.png" alt="商城重设计" />
+        <div class="pin" style="left:44%;top:5%">1</div>
+        <div class="pin" style="left:8%;top:32%">2</div>
+        <div class="pin" style="left:10%;top:59%">3</div>
+        <div class="pin" style="left:8%;top:73%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>兵种卡片</b></span>
+        <span><i>3</i><b>鎏金购买按钮</b></span>
+        <span><i>4</i><b>次要信息降噪</b></span>
+      </div>
+    </div>
+
+    <!-- 战斗 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">04</span><span class="nm">战斗</span></div>
+      <div class="shot">
+        <img src="ui-images/04_战斗.png" alt="战斗重设计" />
+        <div class="pin" style="left:34%;top:5%">1</div>
+        <div class="pin" style="left:6%;top:16%">2</div>
+        <div class="pin" style="left:40%;top:50%">3</div>
+        <div class="pin" style="left:8%;top:90%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>比分聚焦</b></span>
+        <span><i>2</i><b>半透明数据浮层</b></span>
+        <span><i>3</i><b>暖金战场</b></span>
+        <span><i>4</i><b>状态栏清晰</b></span>
+      </div>
+    </div>
+
+    <!-- 结算 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">05</span><span class="nm">胜利结算</span></div>
+      <div class="shot">
+        <img src="ui-images/05_结算.png" alt="结算重设计" />
+        <div class="pin" style="left:40%;top:9%">1</div>
+        <div class="pin" style="left:36%;top:23%">2</div>
+        <div class="pin" style="left:8%;top:37%">3</div>
+        <div class="pin" style="left:38%;top:73%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>书法大字</b></span>
+        <span><i>2</i><b>鎏金数值</b></span>
+        <span><i>3</i><b>鎏金选中态</b></span>
+        <span><i>4</i><b>朱砂主按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 布阵 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">06</span><span class="nm">布阵</span></div>
+      <div class="shot">
+        <img src="ui-images/06_布阵.png" alt="布阵重设计" />
+        <div class="pin" style="left:38%;top:5%">1</div>
+        <div class="pin" style="left:10%;top:26%">2</div>
+        <div class="pin" style="left:8%;top:79%">3</div>
+        <div class="pin" style="left:42%;top:91%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>敌我战力对比</b></span>
+        <span><i>2</i><b>布阵网格</b></span>
+        <span><i>3</i><b>稀有度描边</b></span>
+        <span><i>4</i><b>朱砂主按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 每周挑战 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">07</span><span class="nm">每周挑战</span></div>
+      <div class="shot">
+        <img src="ui-images/07_每周挑战.png" alt="每周挑战重设计" />
+        <div class="pin" style="left:9%;top:10%">1</div>
+        <div class="pin" style="left:8%;top:17%">2</div>
+        <div class="pin" style="left:10%;top:79%">3</div>
+        <div class="pin" style="left:66%;top:89%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>双页签·档位选择</b></span>
+        <span><i>3</i><b>本周积分</b></span>
+        <span><i>4</i><b>朱砂扫荡按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 每日挑战 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">08</span><span class="nm">每日挑战</span></div>
+      <div class="shot">
+        <img src="ui-images/08_每日挑战.png" alt="每日挑战重设计" />
+        <div class="pin" style="left:42%;top:5%">1</div>
+        <div class="pin" style="left:8%;top:16%">2</div>
+        <div class="pin" style="left:10%;top:36%">3</div>
+        <div class="pin" style="left:40%;top:91%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>今日进度条</b></span>
+        <span><i>3</i><b>史诗/传奇稀有度</b></span>
+        <span><i>4</i><b>朱砂主按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 招募 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">09</span><span class="nm">招募</span></div>
+      <div class="shot">
+        <img src="ui-images/09_招募.png" alt="招募重设计" />
+        <div class="pin" style="left:38%;top:5%">1</div>
+        <div class="pin" style="left:9%;top:22%">2</div>
+        <div class="pin" style="left:9%;top:57%">3</div>
+        <div class="pin" style="left:40%;top:82%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>传奇描边武将卡</b></span>
+        <span><i>3</i><b>紫檀稀有度</b></span>
+        <span><i>4</i><b>鎏金十连按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 宝箱 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">10</span><span class="nm">宝箱</span></div>
+      <div class="shot">
+        <img src="ui-images/10_宝箱.png" alt="宝箱重设计" />
+        <div class="pin" style="left:38%;top:5%">1</div>
+        <div class="pin" style="left:8%;top:22%">2</div>
+        <div class="pin" style="left:72%;top:29%">3</div>
+        <div class="pin" style="left:8%;top:62%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>鎏金分组标题</b></span>
+        <span><i>3</i><b>开箱按钮态</b></span>
+        <span><i>4</i><b>稀有度分组降噪</b></span>
+      </div>
+    </div>
+
+    <!-- 兵营 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">11</span><span class="nm">兵营</span></div>
+      <div class="shot">
+        <img src="ui-images/11_兵营.png" alt="兵营重设计" />
+        <div class="pin" style="left:38%;top:5%">1</div>
+        <div class="pin" style="left:8%;top:23%">2</div>
+        <div class="pin" style="left:8%;top:70%">3</div>
+        <div class="pin" style="left:32%;top:84%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>宋体标题</b></span>
+        <span><i>2</i><b>稀有度色标卡</b></span>
+        <span><i>3</i><b>信息降噪说明</b></span>
+        <span><i>4</i><b>鎏金/幽灵按钮</b></span>
+      </div>
+    </div>
+
+    <!-- 兵种详情 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">12</span><span class="nm">兵种详情</span></div>
+      <div class="shot">
+        <img src="ui-images/12_兵种详情.png" alt="兵种详情重设计" />
+        <div class="pin" style="left:8%;top:18%">1</div>
+        <div class="pin" style="left:50%;top:44%">2</div>
+        <div class="pin" style="left:8%;top:57%">3</div>
+        <div class="pin" style="left:50%;top:82%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>鎏金英雄面板</b></span>
+        <span><i>2</i><b>三属性色值区分</b></span>
+        <span><i>3</i><b>战法信息块</b></span>
+        <span><i>4</i><b>禁用态清晰</b></span>
+      </div>
+    </div>
+
+    <!-- 战败结算 -->
+    <div class="card">
+      <div class="card-hd"><span class="no">13</span><span class="nm">战败结算</span></div>
+      <div class="shot">
+        <img src="ui-images/13_战败结算.png" alt="战败结算重设计" />
+        <div class="pin" style="left:50%;top:10%">1</div>
+        <div class="pin" style="left:50%;top:38%">2</div>
+        <div class="pin" style="left:8%;top:62%">3</div>
+        <div class="pin" style="left:50%;top:77%">4</div>
+      </div>
+      <div class="legend">
+        <span><i>1</i><b>朱砂书法大字</b></span>
+        <span><i>2</i><b>克制关系图</b></span>
+        <span><i>3</i><b>鎏金进度条</b></span>
+        <span><i>4</i><b>鎏金主按钮</b></span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="btm">
+    <div class="hint">十三屏统一「汉帛·朱金」设计语言 · 首页左侧含每周/每日挑战圆形入口（呼吸光晕 + 红点提醒）· 演武/英雄战/每日商店复用关卡与商城范式 · 图片为视觉概念稿，落地以代码绘制为准</div>
+    <div class="btns">
+      <a class="a-main" href="UI重设计方案.html">查看完整文字规范版</a>
+      <a class="a-ghost" href="UI重设计方案.html#decision">去决策</a>
+    </div>
+  </div>
+
+  <div class="foot">汉末行伍征战记 · UI 视觉方案（图解） · 本页未改动游戏源码</div>
+</div>
+
+</body>
+</html>
