@@ -280,12 +280,10 @@ export function createWebPlatform(canvas) {
         }
       };
     },
-    // null = 使用游戏内置的"模拟激励视频"（真机上换成 wx.createRewardedVideoAd）
+    // null = 游戏已移除广告奖励入口（1.2.9），rewardedAd 接口仅保留给 core 遗留逻辑
     rewardedAd: null,
-    // 浏览器环境没有微信分享：直接走 fail（结算页会提示「分享未完成」）
-    share(opts = {}) {
-      if (opts.fail) opts.fail({ errMsg: 'share:fail unsupported' });
-    },
+    // 浏览器没有微信分享：不调起任何面板；奖励已在结算页 shareNow 里发放
+    share() {},
     audio: createWebAudio(),
     vibrate() {},
   };

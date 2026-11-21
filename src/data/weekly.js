@@ -14,6 +14,36 @@ export function weeklyTierName(tier) {
   return TIER_LABELS[t - 1];
 }
 
+/* ---------- 1.2.8 · 按档发放积分（开局少 + 每通一档递增） ---------- */
+
+// 周初起始积分
+export function weeklyStartPoints() {
+  return CONFIG.weekly.startPoints;
+}
+
+function clampTierLocal(tier) {
+  return Math.max(1, Math.min(CONFIG.weekly.tiers, Math.floor(Number(tier) || 1)));
+}
+
+// 通关第 tier 档大关的积分赏（tierGrants[tier-1]）
+export function weeklyTierGrant(tier) {
+  return CONFIG.weekly.tierGrants[clampTierLocal(tier) - 1] || 0;
+}
+
+// 开打第 tier 档时应持有的积分预算：起始 + 之前各档大赏（决定敌方锚点）
+export function weeklyBudgetForTier(tier) {
+  let b = weeklyStartPoints();
+  const t = clampTierLocal(tier);
+  for (let i = 1; i < t; i++) b += weeklyTierGrant(i);
+  return b;
+}
+
+// 全周可获积分总额（起始 + 各档大赏）
+export function weeklyTotalPoints() {
+  return weeklyStartPoints()
+    + CONFIG.weekly.tierGrants.reduce((a, b) => a + b, 0);
+}
+
 /* ---------- 积分定价 ----------
  * 单价模型：等级 L 的兵牌「买断价」= base[rarity] × 1.45^(L-1)。
  * 升级只补差价（升级花费 = 买断价L+1 − 买断价L），卖出全额退买断价 ——

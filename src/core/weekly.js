@@ -1,6 +1,7 @@
 // 周常挑战（1.2.5）：每周积分 draft 选兵 + 5 档 × 10 小关。
 // 换周（北京周一起算）由 ensureWeekly 整域重建：积分 / 兵牌 / 进度全部归零。
-// 难度模型：敌方目标战力 = draftCapPower(1600 分贪心满编上限) × 档位倍率 × 小关递增，
+// 1.2.8 · 积分改为按档发放：开局 320 分，每通一档大关 +240~400（逐档递增）；
+// 难度模型：敌方目标战力 = draftCapPower(该档开战预算) × 档位倍率 × 小关递增，
 // 用 def.difficulty（hp/atk 倍数）把 levelDef 锚点关校准到目标 —— 差额只能靠
 // 玩家的英雄 / 器械 / 兵书真实练度补，正是五档的养成门槛设计。
 import { CONFIG } from '../data/config.js';
@@ -14,6 +15,7 @@ import { formationCell } from './formation.js';
 import {
   weeklyTierName, weeklyStageCoins, weeklyStageChest, weeklyTierBonusCoins,
   weeklyTroopCost, weeklyTroopUpgradeCost,
+  weeklyStartPoints, weeklyTierGrant, weeklyBudgetForTier, weeklyTotalPoints,
 } from '../data/weekly.js';
 
 export function weeklyUnlocked(state) {
@@ -23,19 +25,21 @@ export function weeklyUnlocked(state) {
 function emptyWeekly(key) {
   return {
     key,
-    points: CONFIG.weekly.points,
+    points: weeklyStartPoints(),
     roster: [],
     form: [],
     tier: 1,
     nextId: 1,
     cleared: Array(CONFIG.weekly.tiers).fill(0),
     firstClear: Array(CONFIG.weekly.tiers).fill(0),
+    granted: 0,        // 档位积分已发放掩码（5 位，每档一发）
+    seen: false,       // 1.2.8 · 本周是否已点进面板（红点呼吸提醒用）
     sweepDay: '',
     sweepCount: 0,
   };
 }
 
-// 每周进入时调用：key 不一致 → 整域重建（积分全额回归 1600）；扫荡次数单独按天重置
+// 每周进入时调用：key 不一致 → 整域重建（积分回归开局 320）；扫荡次数单独按天重置
 export function ensureWeekly(state, now = clockNow()) {
   if (!state.weekly || typeof state.weekly !== 'object') state.weekly = emptyWeekly('');
   const s = state.weekly;
@@ -46,7 +50,7 @@ export function ensureWeekly(state, now = clockNow()) {
     return fresh;
   }
   // 结构护栏（脏数据不炸界面）
-  s.points = Number.isFinite(s.points) ? Math.max(0, Math.floor(s.points)) : CONFIG.weekly.points;
+  s.points = Number.isFinite(s.points) ? Math.max(0, Math.floor(s.points)) : weeklyStartPoints();
   s.tier = Math.max(1, Math.min(CONFIG.weekly.tiers, Math.floor(Number(s.tier) || 1)));
   if (!Array.isArray(s.roster)) s.roster = [];
   if (!Array.isArray(s.form)) s.form = [];
@@ -58,6 +62,18 @@ export function ensureWeekly(state, now = clockNow()) {
   if (!Array.isArray(s.firstClear) || s.firstClear.length !== CONFIG.weekly.tiers) {
     s.firstClear = Array(CONFIG.weekly.tiers).fill(0);
   }
+  if (!Number.isInteger(s.granted)) s.granted = 0;
+  if (s.seen !== true) s.seen = false;
+  // 档位积分回填：已通完但掩码未置的档（含 1.2.8 前的老存档）补发一次，幂等
+  const prevMask = (1 << CONFIG.weekly.stagesPerTier) - 1;
+  for (let t = 1; t <= CONFIG.weekly.tiers; t++) {
+    const gbit = 1 << (t - 1);
+    if (!(s.granted & gbit) && (s.cleared[t - 1] & prevMask) === prevMask) {
+      s.granted |= gbit;
+      s.points += weeklyTierGrant(t);
+    }
+  }
+  s.points = Math.min(s.points, weeklyTotalPoints());
   // 扫荡次数按天重置
   const today = dateKey(now);
   if (s.sweepDay !== today) {
@@ -67,6 +83,15 @@ export function ensureWeekly(state, now = clockNow()) {
   s.sweepCount = Number.isFinite(s.sweepCount)
     ? Math.max(0, Math.min(CONFIG.weekly.sweepDailyLimit, Math.floor(s.sweepCount))) : 0;
   return s;
+}
+
+// 首页圆钮未读：未解锁不显示；本周没点进过面板 → 呼吸红点（点进即消，下周重显）
+export function weeklyOrbUnread(state, now = clockNow()) {
+  if (!weeklyUnlocked(state)) return false;
+  const w = state.weekly;
+  if (!w || typeof w !== 'object') return true;
+  if (w.key !== weekKey(now)) return true;
+  return w.seen !== true;
 }
 
 /* ---------- draft 选兵 ---------- */
@@ -79,10 +104,10 @@ export function weeklyAvailableTroops(state) {
     .map((t) => t.id);
 }
 
-// 1600 积分贪心买满的理论战力上限（不含英雄 / 器械 / 兵书 —— 纯 draft 标尺）
+// 预算贪心买满的理论战力上限（不含英雄 / 器械 / 兵书 —— 纯 draft 标尺）
 // 贪心按「战力 / 积分」比值取牌，同牌可重复买（布阵 25 格上限），确定性可断言。
-export function draftCapPower(state) {
-  const W = CONFIG.weekly;
+// 1.2.8 · 预算参数化：档位锚点传该档开战预算，展示口径传全周总额。
+export function draftCapPower(state, budget = weeklyTotalPoints()) {
   const pool = weeklyAvailableTroops(state);
   const options = [];
   for (const id of pool) {
@@ -93,7 +118,7 @@ export function draftCapPower(state) {
     }
   }
   options.sort((a, b) => (b.power / b.cost) - (a.power / a.cost));
-  let pts = W.points;
+  let pts = Math.max(0, Math.floor(budget));
   const slots = CONFIG.formation.cols * CONFIG.formation.rows;
   let sum = 0;
   for (let i = 0; i < slots; i++) {
@@ -251,7 +276,9 @@ export function weeklyLevelDef(state, tier, stage) {
     enemies[i] = out;
   });
 
-  const cap = draftCapPower(state);
+  // 1.2.8 · 敌方锚点按「该档开战预算」的纯兵上限：预算 320→1520 逐档抬升，绝对战力飙升
+  const budget = weeklyBudgetForTier(t);
+  const cap = draftCapPower(state, budget);
   const target = Math.round(
     cap * (W.tierMult[t - 1] || 1) * (1 + (W.stageGrowth || 0) * (st - 1)),
   );
@@ -270,7 +297,7 @@ export function weeklyLevelDef(state, tier, stage) {
     engine: def.engine || null,
     difficulty,
     name: `周常 · ${weeklyTierName(t)} 档 · 第 ${st} 关`,
-    desc: `1600 积分选兵对抗：敌方战力 ${target}（你的纯兵上限 ${cap} × ${W.tierMult[t - 1]}）`,
+    desc: `开战预算 ${budget} 积分：敌方战力 ${target}（纯兵上限 ${cap} × ${W.tierMult[t - 1]}）`,
     weekly: { tier: t, stage: st },
     targetPower: target,
     draftCap: cap,
@@ -287,7 +314,10 @@ export function recordWeeklyClear(state, tier, stage, addChestFn) {
   const t = Math.max(1, Math.min(CONFIG.weekly.tiers, Math.floor(Number(tier) || 1)));
   const st = Math.max(1, Math.min(CONFIG.weekly.stagesPerTier, Math.floor(Number(stage) || 1)));
   const bit = 1 << (st - 1);
-  const out = { firstClear: false, coins: 0, chest: null, tierDone: false, tierCoins: 0, tierChest: null };
+  const out = {
+    firstClear: false, coins: 0, chest: null,
+    tierDone: false, tierCoins: 0, tierChest: null, tierPoints: 0,
+  };
   if (s.cleared[t - 1] & bit) return out;
   s.cleared[t - 1] |= bit;
   s.firstClear[t - 1] |= bit;
@@ -300,14 +330,35 @@ export function recordWeeklyClear(state, tier, stage, addChestFn) {
   out.coins = coins;
   out.chest = weeklyStageChest(t, st);
   if (out.chest && addChestFn) addChestFn(out.chest, 1);
-  // 档位第 10 关 = 档位完成大赏
+  // 档位第 10 关 = 档位完成：铜钱大赏 + 1.2.8 档位积分赏（逐档递增，掩码保证只发一次）
   if (st === CONFIG.weekly.stagesPerTier) {
     const bonus = weeklyTierBonusCoins(t);
     state.coins += bonus;
     out.tierDone = true;
     out.tierCoins = bonus;
+    const gbit = 1 << (t - 1);
+    if (!Number.isInteger(s.granted)) s.granted = 0;
+    if (!(s.granted & gbit)) {
+      s.granted |= gbit;
+      const grant = weeklyTierGrant(t);
+      s.points += grant;
+      out.tierPoints = grant;
+    }
   }
   return out;
+}
+
+// 结算页「下一关」推进（1.2.8 修：旧实现 stage=10 时把 11 clamp 成 10 后查位恒真 →
+// 打完第 10 关还出现「第 11 关」；第 5 档后还会推出不存在的第 6 档）：
+// 档内还有下一关 → 下一关；档末且后面还有档 → 下一档第 1 关；全部通关 → null
+export function weeklyNextStage(state, tier, stage) {
+  const t = Math.max(1, Math.min(CONFIG.weekly.tiers, Math.floor(Number(tier) || 1)));
+  const st = Math.max(1, Math.min(CONFIG.weekly.stagesPerTier, Math.floor(Number(stage) || 1)));
+  if (st < CONFIG.weekly.stagesPerTier) {
+    return weeklyStageUnlocked(state, t, st + 1) ? [t, st + 1] : null;
+  }
+  if (t < CONFIG.weekly.tiers && weeklyTierUnlocked(state, t + 1)) return [t + 1, 1];
+  return null;
 }
 
 // 扫荡：只扫本周已通关的小关，每日 6 次，拿该关首通铜钱的 60%，不给宝箱

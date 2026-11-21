@@ -15,8 +15,10 @@ const ROW_X = 24;
 const ROW_W = 702;
 
 export const ACHIEVEMENT_LAYOUT = {
-  tabs: { y: 136, h: 54, x0: 27, w: 132, gap: 9 },
-  view: { x: 24, y: 200, w: 702, h: 950 },
+  // 1.2.8 · 6 个页签全部放进 750 宽屏内（6×110 + 5×8 = 700，右缘 724）：
+  // 旧值 x0=27/w=132 总宽 837，「经济」被右边缘裁掉且无法拖动看到
+  tabs: { y: 136, h: 56, x0: 24, w: 110, gap: 8 },
+  view: { x: 24, y: 204, w: 702, h: 946 },
   row: { h: ROW_H, gap: ROW_GAP, x: ROW_X, w: ROW_W },
   infoRect: { x: 652, y: 40, w: 64, h: 64 },
   backRect: { x: 36, y: 44, w: 124, h: 64 },
@@ -99,7 +101,7 @@ export class AchievementsScreen {
     const W = g.W;
     const claimable = claimableCount(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '成 就 系 统', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -177,7 +179,7 @@ export class AchievementsScreen {
       if (allDone) {
         button(ctx, btnRect, '已达成', { size: 20, disabled: true });
       } else if (claimable) {
-        button(ctx, btnRect, '领 取', { size: 22, fill: 'rgba(58,46,22,0.9)', stroke: THEME.gold, textColor: THEME.gold });
+        button(ctx, btnRect, '领 取', { size: 22, fill: 'rgba(39,48,56,0.9)', stroke: THEME.gold, textColor: THEME.gold });
         this.claimRects.push({ rect: btnRect, id: a.id, index: next.index });
       } else {
         button(ctx, btnRect, `差 ${next.n - next.progress}`, { size: 18, disabled: true });
@@ -193,7 +195,7 @@ export class AchievementsScreen {
       const ratio = V.h / (V.h + max);
       const bh = Math.max(26, (V.h - 4) * ratio);
       const by = V.y + 2 + (V.h - 4 - bh) * (this.scrollY / max);
-      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     if (this.infoOpen) this.drawInfo(ctx, W);

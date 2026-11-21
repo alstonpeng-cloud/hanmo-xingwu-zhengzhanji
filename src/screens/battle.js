@@ -34,9 +34,10 @@ import { ChallengeResultScreen } from './challengeResult.js';
 import { DailyChallengeScreen } from './dailyChallenge.js';
 import {
   ensureWeekly, weeklyLevelDef, recordWeeklyClear, weeklySweep,
-  weeklyStageUnlocked, weeklyTierClearedCount, weeklyClearedTotal, draftActiveFormation,
+  weeklyTierClearedCount, weeklyClearedTotal, draftActiveFormation,
+  weeklyNextStage,
 } from '../core/weekly.js';
-import { weeklyStageCoins } from '../data/weekly.js';
+import { weeklyStageCoins, weeklyTotalPoints, weeklyTierGrant } from '../data/weekly.js';
 import { WeeklyChallengeScreen } from './weekly.js';
 import { gauntletStageDef, gauntletChapterIndex } from '../data/gauntlet.js';
 import { gauntletRunSquads, applyGauntletReport, completeGauntletChapter, failGauntletRun } from '../core/gauntlet.js';
@@ -564,9 +565,8 @@ export class BattleScreen {
       let rec = null;
       if (win) rec = recordWeeklyClear(st, tier, stage, (id) => addChest(st, id, 1));
       const s = ensureWeekly(st);
-      const nextStage = weeklyStageUnlocked(st, tier, stage + 1)
-        ? [tier, stage + 1]
-        : weeklyStageUnlocked(st, tier + 1, 1) ? [tier + 1, 1] : null;
+      // 1.2.8 修：档内 stage+1 只在未到档末时推进（旧实现把 11 clamp 成 10 恒真 → 第 11 关）
+      const nextStage = weeklyNextStage(st, tier, stage);
       const sweepCoins = Math.round(weeklyStageCoins(tier) * CONFIG.weekly.sweepRatio);
       const sweepLeft = CONFIG.weekly.sweepDailyLimit - s.sweepCount;
       const rewardLines = [];
@@ -574,6 +574,9 @@ export class BattleScreen {
         rewardLines.push({ text: `首通奖励：铜钱 +${rec.coins}` });
         if (rec.chest) rewardLines.push({ text: `${chestLabel(rec.chest)}已入仓`, dim: true });
         if (rec.tierDone) rewardLines.push({ text: `档位通关大赏：铜钱 +${rec.tierCoins}` });
+        if (rec.tierDone && rec.tierPoints > 0) {
+          rewardLines.push({ text: `档位通关积分 +${rec.tierPoints}` });
+        }
       } else if (win && sweepLeft > 0) {
         rewardLines.push({ text: `重复胜利 · 可扫荡：铜钱 +${sweepCoins}` });
         rewardLines.push({ text: `今日扫荡剩 ${sweepLeft} / ${CONFIG.weekly.sweepDailyLimit} 次（无宝箱）`, dim: true });
@@ -593,7 +596,8 @@ export class BattleScreen {
         subtitle: `敌方战力 ${formatPower(this.def.targetPower || 0)} · 你的纯兵上限 ${formatPower(this.def.draftCap || 0)}`,
         infoLines: [
           `战斗用时 ${Math.round(this.battle.time || 0)} 秒 · 总进度 ${weeklyClearedTotal(st)} / ${CONFIG.weekly.tiers * CONFIG.weekly.stagesPerTier} 关`,
-          `剩余积分 ${s.points} / ${CONFIG.weekly.points} · 档位进度 ${weeklyTierClearedCount(st, tier)} / ${CONFIG.weekly.stagesPerTier}`,
+          `剩余积分 ${s.points}/${weeklyTotalPoints()}${tier < CONFIG.weekly.tiers
+            ? ` · 下档通关 +${weeklyTierGrant(tier + 1)}` : ''} · 档位进度 ${weeklyTierClearedCount(st, tier)} / ${CONFIG.weekly.stagesPerTier}`,
         ],
         rewardLines,
         win,
@@ -914,7 +918,7 @@ export class BattleScreen {
     const aliveE = this.battle.aliveCount('enemy');
 
     // 顶栏
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.92)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.92)', stroke: THEME.line, r: 0, lw: 0 });
     const heroBoss = this.heroBattle ? heroById(this.heroBattle.hero) : null;
     // 英雄战标题缩短，避免和中间的「我方 / 敌军」人数叠在一起
     text(ctx, this.prologue ? '序章 · 董卓'
@@ -996,7 +1000,7 @@ export class BattleScreen {
       const a = Math.min(1, this.supportStoryT / 0.6);
       const by = ARENA_VIEW.y + ARENA_VIEW.h - 250;
       panel(ctx, 46, by, ARENA_VIEW.w - 92, 108, {
-        fill: 'rgba(8,12,18,0.93)', stroke: 'rgba(232,196,112,0.78)', r: 20, lw: 2, alpha: a,
+        fill: 'rgba(8,12,18,0.93)', stroke: 'rgba(248,225,172,0.78)', r: 20, lw: 2, alpha: a,
       });
       text(ctx, SUPPORT_TITLE, 76, by + 36, {
         size: 26, weight: '700', color: '#ffe0a0', alpha: a,
@@ -1069,7 +1073,7 @@ export class BattleScreen {
       drawEngineFigure(ctx, eng.engineId, {
         x: p.x, y: p.y, size: 3.3 * zoom * ds,
         flip: eng.side === 'player', t: this.idleClock,
-        color: eng.side === 'player' ? '#6e9b72' : '#b85f58',
+        color: eng.side === 'player' ? '#6e9b72' : '#c0392b',
         // 霹雳车开火动画进度：0 = 开火当帧（甩臂甩满）→ 1 回摆结束
         fire: eng.engineId === 'thunder'
           ? Math.min(1, (eng.fireT ?? 999) / CONFIG.battle.attackAnimTime) : 0,
@@ -1616,7 +1620,7 @@ export class BattleScreen {
     const ratio = Math.max(0, Math.min(1, hp / Math.max(1, maxHp)));
     const boss = bosses[0];
     const hero = heroById(boss.hero);
-    const tierColor = boss.heroTier === 'legendary' ? '#b3934f' : '#6f5b7d';
+    const tierColor = boss.heroTier === 'legendary' ? '#b88a32' : '#7556a6';
     const tierName = bosses.length > 1
       ? `三英 · ${bosses.map((e) => (heroById(e.hero) || {}).name || '').join('/')}`
       : `${boss.heroTier === 'legendary' ? '传奇' : '史诗'} · ${hero ? hero.name : 'Boss'}`;
@@ -1704,7 +1708,7 @@ export class BattleScreen {
     }
     const sum = sumTotal || rows.reduce((n, r) => n + r.dealt, 0);
     const rowH = 41;
-    const rankColors = ['#ffd86c', '#c0c6d0', '#c87a3d'];
+    const rankColors = ['#f8e1ac', '#c0c6d0', '#c87a3d'];
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
       const ry = y + 42 + i * rowH;
@@ -1717,7 +1721,7 @@ export class BattleScreen {
       } else if (r.engine) {
         drawEngineFigure(ctx, r.troop, {
           x: x + 50, y: ry + rowH - 4, size: 34, t: 0.4,
-          color: side === 'player' ? '#6e9b72' : '#b85f58',
+          color: side === 'player' ? '#6e9b72' : '#c0392b',
         });
       } else {
         drawFrame(ctx, sheetFor(r.troop, spriteTierFor(r.level)), 'idle', 0,
@@ -1727,7 +1731,7 @@ export class BattleScreen {
       const hero = r.hero ? heroById(r.hero) : null;
       const name = r.engine ? engineName(r.troop) : hero ? hero.name : unitName(r.troop, r.level);
       text(ctx, name, x + 74, cy, {
-        size: 17, color: hero ? '#c2b3c9' : THEME.text, maxWidth: 104,
+        size: 17, color: hero ? '#d9c4f2' : THEME.text, maxWidth: 104,
       });
 
       // 柱状条 + 条上百分比
@@ -1736,7 +1740,7 @@ export class BattleScreen {
       const barW = 84;
       const barH = 19;
       bar(ctx, barX, cy - barH / 2, barW, barH, pct, {
-        fill: side === 'player' ? THEME.green : THEME.red, stroke: '#4a3a24', r: 5,
+        fill: side === 'player' ? THEME.green : THEME.red, stroke: '#36404a', r: 5,
       });
       text(ctx, `${Math.round(pct * 100)}%`, barX + barW / 2, cy, {
         size: 13, weight: '600', align: 'center', color: '#f4efe2',
@@ -1749,7 +1753,7 @@ export class BattleScreen {
   drawBottomBar(ctx, aliveP, aliveE) {
     const W = this.game.W;
     const top = ARENA_VIEW.y + ARENA_VIEW.h;
-    panel(ctx, 0, top, W, 1334 - top, { fill: 'rgba(23,18,12,0.94)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, top, W, 1334 - top, { fill: 'rgba(12,16,19,0.94)', stroke: THEME.line, r: 0, lw: 0 });
     text(ctx, `${this.battle.time.toFixed(1)} 秒`, 40, top + 42, { size: 22, weight: '600' });
     text(ctx, `我方 ${aliveP} / ${this.totalPlayer}`, 180, top + 42, { size: 21, color: THEME.green });
     text(ctx, `敌军 ${aliveE} / ${this.totalEnemy}`, 380, top + 42, { size: 21, color: '#e0a19a' });

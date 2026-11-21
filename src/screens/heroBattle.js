@@ -101,7 +101,7 @@ export class HeroBattleScreen {
     const cleared = Math.max(0, Math.min(CONFIG.heroBattles.total, st.heroBattleCleared || 0));
     const unlockedAll = (st.maxCleared || 0) >= CONFIG.heroBattles.unlockLevel;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '英 雄 战', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -131,7 +131,7 @@ export class HeroBattleScreen {
       const aura = hero ? heroAuraColor(hero) : THEME.gold;
       const tierName = hero && hero.tier === 'legendary' ? '传奇' : '史诗';
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: done ? 'rgba(58,46,22,0.82)' : unlocked ? '#2b2217' : '#1c1610',
+        fill: done ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
         stroke: done ? THEME.gold : current ? aura : THEME.line,
         r: 12, lw: current ? 2 : 1,
       });
@@ -176,7 +176,7 @@ export class HeroBattleScreen {
       const ratio = V.h / (V.h + max);
       const h = Math.max(26, (V.h - 4) * ratio);
       const sy = V.y + 2 + (V.h - 4 - h) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     if (!unlockedAll) {
@@ -201,6 +201,6 @@ export class HeroBattleScreen {
 }
 
 function tierColorFor(hero, done) {
-  if (hero && hero.tier === 'legendary') return done ? THEME.gold : '#b3934f';
+  if (hero && hero.tier === 'legendary') return done ? THEME.gold : '#b88a32';
   return done ? THEME.gold : '#b3a1c2';
 }

@@ -36,6 +36,7 @@ import { startGauntletRun, gauntletRunSquads } from '../src/core/gauntlet.js';
 import { gauntletStageDef } from '../src/data/gauntlet.js';
 import { HEROES, heroStatsFor, heroById } from '../src/data/heroes.js';
 import { HeroScreen, HERO_LAYOUT } from '../src/screens/heroes.js';
+import { HERO_AURA } from '../src/render/heroArt.js';
 import { heroDeploySlots, pendingRecruitBoxes } from '../src/core/heroes.js';
 import { ARENA_VIEW } from '../src/screens/battle.js';
 import { BarracksScreen } from '../src/screens/barracks.js';
@@ -95,8 +96,8 @@ const platform = {
   onTap: (cb) => { tapCb = cb; },
   onPinch: (cb) => { pinchCb = cb; },
   rewardedAd: null,
-  // 分享桩：结算页分享按钮被模拟点击时直接走成功回调（发放入仓，不影响截图校验）
-  share(opts = {}) { if (opts.success) opts.success(); },
+  // 分享桩：结算页分享按钮被模拟点击时调起面板（发奖在 shareNow 里，不依赖回调）
+  share() {},
   audio: {
     createSound: (src) => ({
       play: () => audioPlayed.push(src),
@@ -819,7 +820,8 @@ if (screenName() === 'ResultScreen') {
     }
   }
   // 回归：结算后「返回关卡进度」，再从进度页点返回，应回到首页
-  tap(375, 1122);
+  shot('12c_result_share_btn');
+  tap(375, 1226);
   shot('13_result_back');
   tap(98, 76);
   shot('13b_back_home');
@@ -1526,12 +1528,10 @@ shot('32_deploy_rarity_borders');
   }
 }
 
-// ---------- 失败页：克制圆环 + 看广告立即得兵（档位随关卡 / 稀有未解锁回退） ----------
+// ---------- 失败页：克制圆环 + 分享按钮（原看广告按钮位） ----------
 {
   game.state.maxCleared = 160;
   game.state.coins = 1000;
-  game.state.adDay = '';
-  game.state.adTroopCount = 0;
   game.state.units = [
     { id: 'fa', troop: 'shield', level: 3 },
     { id: 'fb', troop: 'archer', level: 3 },
@@ -1553,8 +1553,8 @@ shot('32_deploy_rarity_borders');
     ok(!!card && card.focus.level === 180 && card.focus.troop === 'huhao',
       '战败页「下一个解锁」指向 180 关虎豹骑');
     const rects = game.screen;
-    ok(rects.unlockRect.y >= 760 && rects.primary.y >= 850 && rects.secondary.y >= 976,
-      '战败页进度卡没有挤压克制圈 / 重挑战 / 广告按钮');
+    ok(rects.unlockRect.y >= 760 && rects.primary.y >= 850 && rects.shareRect.y >= 976,
+      '战败页进度卡没有挤压克制圈 / 重挑战 / 分享按钮');
     shotZoom('37a_result_fail_unlock_bar', 375, 798, 2);
   }
   // 克制环像素校验：环弧 / 箭头 / 百分比用金色，中心与四角应有足够金色像素
@@ -1587,51 +1587,16 @@ shot('32_deploy_rarity_borders');
     }
   });
   console.log('  克制环四个兵种建模节点均有可见像素');
-  const ad = center(game.screen.secondary);
-  const shownTroop = game.screen.troopReward;
-  shot('37a_result_fail_ad_ready');
-  tap(ad.x, ad.y);
-  dismissShowcase('37b1_showcase_trial_unit');
-  shot('37b_result_fail_ad_troop');
-  const trialUnit = game.state.units.find((u) => u.trialLeft > 0);
-  if (game.state.adTroopCount !== 1 || game.state.units.length !== 5 || !trialUnit) {
+  // 原「看广告试用兵」按钮位已替换为亮绿分享按钮：点开面板即发奖
+  game.state.daily.shares = 0;
+  const shareBtn = center(game.screen.shareRect);
+  const chests0 = chestCount(game.state, 'gold');
+  tap(shareBtn.x, shareBtn.y);
+  shot('37b_result_fail_share');
+  if (chestCount(game.state, 'gold') !== chests0 + 1 || game.state.daily.shares !== 1) {
     errors++;
-    console.error(`  ✗ 第 160 关看广告应发 1 个试用兵（${shownTroop.troop} Lv${shownTroop.level}）`);
+    console.error(`  ✗ 战败页点分享应点开面板即发奖（金箱 ${chestCount(game.state, 'gold')} / 次数 ${game.state.daily.shares}）`);
   }
-  if (!trialUnit || trialUnit.trialLeft !== 5 || trialUnit.troop !== shownTroop.troop
-    || trialUnit.level !== shownTroop.level) {
-    errors++;
-    console.error('  ✗ 试用兵应带 5 回合倒计时，且就是按钮上展示的那一个');
-  }
-  // 按主线进度分档：1001 关前 160 关 → 史诗 Lv3 / 传奇 Lv2
-  const wantLevel = shownTroop.rarity === 'legendary' ? 2 : 3;
-  if (!['epic', 'legendary'].includes(shownTroop.rarity) || shownTroop.level !== wantLevel) {
-    errors++;
-    console.error(`  ✗ 160 关试用兵档位错误：${shownTroop.rarity} Lv${shownTroop.level}（应为 epic Lv3 / legendary Lv2）`);
-  }
-
-  // 同一次失败再点：按钮已灰，不能重复领
-  const afterClaim = game.state.units.length;
-  tap(ad.x, ad.y);
-  shot('37b2_result_fail_ad_used');
-  if (game.state.units.length !== afterClaim) {
-    errors++;
-    console.error('  ✗ 同一次失败第二次点广告不应再发兵（按钮应已置灰）');
-  }
-
-  game.state.adTroopCount = 10; // 当天次数用尽
-  const before = game.state.units.length;
-  tap(ad.x, ad.y);
-  shot('37c_result_fail_ad_troop_limit');
-  if (game.state.units.length !== before) {
-    errors++;
-    console.error('  ✗ 每日 10 次用完后看广告不应再发兵');
-  }
-  game.state.adDay = '';
-  game.state.adTroopCount = 0;
-  // 兵营里的试用兵兵牌：橙色「试用 N」角标
-  game.go(new BarracksScreen(game));
-  shot('37d_barracks_trial_card');
 }
 
 // ---------- 特殊兵种战法特效：冲锋拖影 / 撞击冲击波 / 毒矢 / 增益光环 ----------
@@ -1900,33 +1865,6 @@ shot('32_deploy_rarity_borders');
       console.error(`  ✗ 史诗宝箱购买失败（史诗 ${chestCount(game.state, 'epic')} / 铜钱 ${game.state.coins}）`);
     }
     shot('46_shop_chests_bought');
-
-    // 看广告领宝箱：小木5次/银箱2次（三通道独立计数）
-    game.state.adDay = '';
-    game.state.adWoodCount = 0;
-    game.state.adSilverCount = 0;
-    game.state.adCoinCount = 0;
-    const A = SHOP_LAYOUT.adRow;
-    const wood0 = chestCount(game.state, 'wood');
-    tap(A.x0 + A.w / 2, A.y + A.h / 2);
-    if (chestCount(game.state, 'wood') !== wood0 + 1 || game.state.adWoodCount !== 1) {
-      errors++;
-      console.error(`  ✗ 商店看广告应得小木箱 ×1（木箱 ${chestCount(game.state, 'wood')} / 小木次数 ${game.state.adWoodCount}）`);
-    }
-    const silver0 = chestCount(game.state, 'silver');
-    tap(A.x0 + A.w + A.gap + A.w / 2, A.y + A.h / 2);
-    if (chestCount(game.state, 'silver') !== silver0 + 1 || game.state.adSilverCount !== 1) {
-      errors++;
-      console.error(`  ✗ 商店看广告应得银箱 ×1（银箱 ${chestCount(game.state, 'silver')} / 银箱次数 ${game.state.adSilverCount}）`);
-    }
-    game.state.adWoodCount = 5; // 小木额度用尽后按钮不可用
-    const woodCap = chestCount(game.state, 'wood');
-    tap(A.x0 + A.w / 2, A.y + A.h / 2);
-    shot('46b_shop_ad_chests');
-    if (chestCount(game.state, 'wood') !== woodCap) {
-      errors++;
-      console.error('  ✗ 小木广告次数用完后商店不应再发宝箱');
-    }
   }
 }
 
@@ -1976,8 +1914,6 @@ shot('32_deploy_rarity_borders');
   game.state.heroTickets = 10;
   game.state.heroes = { guanping: 5 };
   game.state.heroLevelRewards = { 250: 'guanping' };  // 250 关赠将已领，避免弹窗挡住按钮
-  game.state.heroAdDay = '';
-  game.state.heroAdCount = 0;
   game.state.dailyShop = { day: '', sold: [] };
   game.save();
   tick(200);
@@ -1990,14 +1926,6 @@ shot('32_deploy_rarity_borders');
     errors++;
     console.error(`  ✗ 首页「英雄」入口没有打开英雄页（当前 ${screenName()}）`);
   } else {
-    // 广告领招募券（需先通关至少 1 场英雄战）
-    game.state.heroBattleCleared = Math.max(1, game.state.heroBattleCleared || 0);
-    const t0 = game.state.heroTickets;
-    tap(601, 167);
-    if (game.state.heroTickets !== t0 + 1 || game.state.heroAdCount !== 1) {
-      errors++;
-      console.error(`  ✗ 看广告应领 1 张招募券（券 ${game.state.heroTickets} / 次数 ${game.state.heroAdCount}）`);
-    }
     // 招募 ×1
     const tickets1 = game.state.heroTickets;
     tap(218, 1002);
@@ -2048,9 +1976,12 @@ shot('32_deploy_rarity_borders');
       const dd = Math.abs(c[0] - CARD_FILL[0]) + Math.abs(c[1] - CARD_FILL[1]) + Math.abs(c[2] - CARD_FILL[2]);
       if (dd > heroBest) { heroBest = dd; heroBorder = c; }
     }
-    if (gpCardLs && Math.abs(heroBorder[0] - 111) + Math.abs(heroBorder[1] - 91) + Math.abs(heroBorder[2] - 125) > 70) {
+    // 边框色随主题令牌（HERO_AURA.epic），不写死 RGB，换肤后断言依旧有效
+    const epicHex = HERO_AURA.epic.replace('#', '');
+    const epicRgb = [0, 2, 4].map((i) => parseInt(epicHex.slice(i, i + 2), 16));
+    if (gpCardLs && Math.abs(heroBorder[0] - epicRgb[0]) + Math.abs(heroBorder[1] - epicRgb[1]) + Math.abs(heroBorder[2] - epicRgb[2]) > 70) {
       errors++;
-      console.error(`  ✗ 英雄卡应为史诗紫边框（实测 ${heroBorder}）`);
+      console.error(`  ✗ 英雄卡应为史诗紫边框（实测 ${heroBorder}，期望 ${epicRgb}）`);
     }
 
     // 列表 → 点建模 → 详情页（按排序后关平卡的实际坐标）
@@ -3481,7 +3412,8 @@ shot('32_deploy_rarity_borders');
   game.go(new WeeklyChallengeScreen(game));
   shot('65a_weekly_stages');
   ok(game.screen.constructor.name === 'WeeklyChallengeScreen'
-    && game.state.weekly.points === 1600, `周常关卡页（积分 ${game.state.weekly.points}）`);
+    && game.state.weekly.points === CONFIG.weekly.startPoints,
+    `周常关卡页（开局积分 ${game.state.weekly.points}/${CONFIG.weekly.points} 总额）`);
 
   // ④ 积分选兵页签：连点 3 张兵牌买断
   const tb = WEEKLY_LAYOUT.tabs[1];

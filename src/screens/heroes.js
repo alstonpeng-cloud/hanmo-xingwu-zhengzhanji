@@ -1,15 +1,15 @@
 // 英雄页：两级结构
 //   列表页：只展示「等级 + 将领建模 + 史诗边框」，点卡片（建模）进入详情；
 //   详情页：生命 / 攻击 / 防御 / 战力、战法说明与升级按钮。
-// 招募入口仍在列表页底部；看广告领券在列表页右上角。
-import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal } from '../render/draw.js';
+// 招募入口仍在列表页底部。
+import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal, roundRectPath } from '../render/draw.js';
 import { now as clockNow } from '../core/clock.js';
 import { CONFIG } from '../data/config.js';
 import { HEROES, HERO_MAX_LEVEL, heroById, heroStatsFor, heroSkillSummary } from '../data/heroes.js';
 import { drawHeroFigure, drawHeroAura, drawHeroHalo, heroAuraColor, heroNameColor } from '../render/heroArt.js';
 import {
   heroLevel, heroLevelCap, ownsHero, unlockedHeroes, heroTickets, pullHeroes,
-  upgradeHero, heroUpgradeCost, heroAdLeft, claimHeroAdTicket, heroPower,
+  upgradeHero, heroUpgradeCost, heroPower,
   pendingLevelHeroReward, claimLevelHeroReward,
   pendingRecruitBoxes, claimRecruitBox, recruitBoxChoices,
 } from '../core/heroes.js';
@@ -20,9 +20,9 @@ import { troopById, rarityInfo, unitName, spriteTierFor } from '../core/units.js
 import { drawFrame, sheetFor } from '../render/sprites.js';
 import { playSfx } from '../core/audio.js';
 
-// 史诗紫 / 传奇金：卡边框与光环都按品级走（上一轮“全史诗”已扩展为双品级）
-export const HERO_EPIC_BORDER = '#6f5b7d';
-const HERO_EPIC_TEXT = '#c2b3c9';
+// 品级色单一来源：史诗紫气 / 传奇鎏金，与 CONFIG.rarity 全局一致（「墨韵丹符」）
+export const HERO_EPIC_BORDER = CONFIG.rarity.epic.color;
+const HERO_EPIC_TEXT = '#d9c4f2';
 
 // 招募概率展示：直接读 CONFIG 权重表，保证玩家看到的就是实际概率
 const RARITY_LABEL = { common: '普通', rare: '稀有', epic: '史诗', legendary: '传奇' };
@@ -54,7 +54,6 @@ export const HERO_LAYOUT = {
   cardY0: CARD_Y0, cardRowGap: CARD_ROW_GAP, view: VIEW,
   // 详情页的升级按钮（列表页不再放升级键）
   detailUpRect: { x: 120, y: 1128, w: 510, h: 76 },
-  adRect: { x: 466, y: 128, w: 264, h: 46 },
   // #dev-only:start
   // 开发者通道：右下角不显眼的小入口，明确标注 DEV
   devRect: { x: 638, y: 92, w: 72, h: 30 },
@@ -244,7 +243,6 @@ export class HeroScreen {
     // #dev-only:start
     if (hit(HERO_LAYOUT.devRect, x, y)) { this.devOpen = true; return; }
     // #dev-only:end
-    if (hit(HERO_LAYOUT.adRect, x, y)) return this.watchAd();
     if (hit(HERO_LAYOUT.pullRect, x, y)) return this.pull(1);
     if (hit(HERO_LAYOUT.tenRect, x, y)) return this.pull(CONFIG.heroes.tenPull);
     // 列表页：点卡片（将军建模）进入详情页（只认视口内、未滚出的卡片）
@@ -252,21 +250,6 @@ export class HeroScreen {
       if (c.rect.y + c.rect.h < VIEW.y || c.rect.y > VIEW.y + VIEW.h) continue;
       if (hit(c.rect, x, y)) { this.detailId = c.id; this.nowMs = clockNow(); return; }
     }
-  }
-
-  watchAd() {
-    const g = this.game;
-    const r = claimHeroAdTicket(g.state, this.nowMs);
-    if (!r.ok) {
-      playSfx('error', { volume: 0.7 });
-      g.toast(r.reason === 'locked'
-        ? '先通关 1 场英雄战，广告招募券才会开放'
-        : '今日广告招募券已领完，明天再来');
-      return;
-    }
-    g.save();
-    playSfx('reward');
-    g.toast('广告奖励：招募券 +1');
   }
 
   pull(count) {
@@ -337,7 +320,7 @@ export class HeroScreen {
     const W = g.W;
     const detail = this.detailId ? heroById(this.detailId) : null;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, detail ? '英雄详情' : '招 募 系 统', W / 2 + 20, 76, {
       size: 34, weight: '600', align: 'center',
@@ -350,24 +333,13 @@ export class HeroScreen {
     }
 
     const owned = unlockedHeroes(st).length;
-    const ticketLocked = Math.max(0, Math.floor(st.heroBattleCleared || 0)) <= 0;
     text(ctx, `招募券 ×${heroTickets(st)}`, 44, 160, { size: 28, color: THEME.gold });
     text(ctx, `已拥有 ${owned} / ${HEROES.length}`, 44, 196, { size: 20, color: THEME.textDim });
 
-    // 看广告领招募券：招募券只服务于英雄战，先通关 1 场英雄战才开放
-    const left = heroAdLeft(st, this.nowMs);
-    button(ctx, HERO_LAYOUT.adRect, ticketLocked ? '先通关 1 场英雄战'
-      : left > 0 ? '看广告 · +1 券' : '广告券已领完', {
-      size: 18,
-      fill: !ticketLocked && left > 0 ? '#2a2416' : THEME.panel,
-      stroke: !ticketLocked && left > 0 ? THEME.goldDim : THEME.line,
-      textColor: !ticketLocked && left > 0 ? THEME.gold : THEME.textWeak,
-      disabled: ticketLocked || left <= 0,
-    });
     // #dev-only:start
     // 开发者通道：小型 DEV 入口，点击后弹明确标注的调试面板
     button(ctx, HERO_LAYOUT.devRect, 'DEV', {
-      size: 13, fill: 'rgba(40,32,20,0.5)', stroke: '#8a6a34', textColor: '#c9a35a',
+      size: 13, fill: 'rgba(27,34,39,0.5)', stroke: '#8a6420', textColor: '#e8b44c',
     });
     // #dev-only:end
 
@@ -396,11 +368,11 @@ export class HeroScreen {
       const ratio = VIEW.h / (VIEW.h + max);
       const hh = Math.max(26, (VIEW.h - 8) * ratio);
       const sy = VIEW.y + 4 + (VIEW.h - 8 - hh) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, hh, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, hh, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     // 底部：招募入口（说明收进右上角「!」）
-    panel(ctx, 70, 850, 610, 226, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 850, 610, 226, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 18 });
     text(ctx, `1 券 1 抽 · ${CONFIG.heroes.recruit.pity} 抽必出传奇`, 375, 900, {
       size: 28, align: 'center', color: THEME.text,
     });
@@ -408,14 +380,14 @@ export class HeroScreen {
     const tickets = heroTickets(st);
     button(ctx, HERO_LAYOUT.pullRect, `招募 ×1（${CONFIG.heroes.pullCost} 券）`, {
       size: 26,
-      fill: tickets >= 1 ? '#332c1d' : THEME.panel,
+      fill: tickets >= 1 ? '#273038' : THEME.panel,
       stroke: tickets >= 1 ? HERO_EPIC_BORDER : THEME.line,
       textColor: tickets >= 1 ? HERO_EPIC_TEXT : THEME.textWeak,
       disabled: tickets < 1,
     });
     button(ctx, HERO_LAYOUT.tenRect, `十连招募（${CONFIG.heroes.tenPull} 券）`, {
       size: 24,
-      fill: tickets >= 10 ? '#332c1d' : THEME.panel,
+      fill: tickets >= 10 ? '#273038' : THEME.panel,
       stroke: tickets >= 10 ? HERO_EPIC_BORDER : THEME.line,
       textColor: tickets >= 10 ? HERO_EPIC_TEXT : THEME.textWeak,
       disabled: tickets < 10,
@@ -432,7 +404,7 @@ export class HeroScreen {
         `1 券 1 抽，${CONFIG.heroes.recruit.pity} 抽必出传奇（自选箱也计入保底）。`,
         ...recruitPoolLines(),
         '已拥有的英雄不会重复进入招募池。',
-        '招募券来源：英雄战每 5 关首通 +1；主线 200 关后每 10 关 +1（需先通关 1 场英雄战）；每日广告 +1；演武首通 +1。',
+        '招募券来源：英雄战每 5 关首通 +1；主线 200 关后每 10 关 +1（需先通关 1 场英雄战）；演武首通 +1。',
         `重复获得英雄会折算铜钱与招募券；点英雄建模进入详情，可花铜钱升级（满级 ${HERO_MAX_LEVEL}）。`,
         '上下滑动可浏览全部英雄；传奇在前，同品级按等级排序。',
       ]);
@@ -451,7 +423,7 @@ export class HeroScreen {
     ctx.restore();
     const p = BOX_LAYOUT.panel;
     panel(ctx, p.x, p.y, p.w, p.h, {
-      fill: 'rgba(33,26,18,0.98)', stroke: rar.color, r: 22, lw: 2,
+      fill: 'rgba(27,34,39,0.98)', stroke: rar.color, r: 22, lw: 2,
     });
     text(ctx, '自 选 箱', W / 2, p.y + 50, { size: 28, align: 'center', color: rar.color });
     text(ctx, `${rar.name}兵自选箱 · Lv${box.level}`, W / 2, p.y + 92, {
@@ -490,18 +462,18 @@ export class HeroScreen {
     ctx.fillStyle = 'rgba(6,9,14,0.72)';
     ctx.fillRect(0, 0, W, this.game.H);
     ctx.restore();
-    panel(ctx, 135, 430, 480, 360, { fill: 'rgba(43,34,23,0.98)', stroke: '#d8b46a', r: 22, lw: 3 });
-    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#d8b46a' });
+    panel(ctx, 135, 430, 480, 360, { fill: 'rgba(27,34,39,0.98)', stroke: '#e8b44c', r: 22, lw: 3 });
+    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#e8b44c' });
     const rewardId = pendingLevelHeroReward(this.game.state, this.claimLevel) || 'guanping';
     const rewardHero = heroById(rewardId);
     text(ctx, (rewardHero ? rewardHero.name : '关平').split('').join(' '), W / 2, 558, {
-      size: 48, weight: '700', align: 'center', color: '#d8b46a',
+      size: 48, weight: '700', align: 'center', color: '#e8b44c',
     });
     text(ctx, `${rewardHero && rewardHero.tier === 'legendary' ? '传奇' : '史诗'}英雄 · 第 ${this.claimLevel} 关首通奖励（仅可领取一次）`, W / 2, 600, {
       size: 17, align: 'center', color: THEME.textDim,
     });
     button(ctx, HERO_LAYOUT.claimRect, `领 取 ${rewardHero ? rewardHero.name : '关平'}`, {
-      size: 28, fill: '#332c1d', stroke: '#d8b46a', textColor: '#f2d894',
+      size: 28, fill: '#273038', stroke: '#e8b44c', textColor: '#f8e1ac',
     });
     text(ctx, '点空白处稍后再领', W / 2, 810, {
       size: 14, align: 'center', color: THEME.textWeak,
@@ -515,8 +487,8 @@ export class HeroScreen {
     ctx.fillStyle = 'rgba(6,9,14,0.78)';
     ctx.fillRect(0, 0, W, this.game.H);
     ctx.restore();
-    panel(ctx, 100, 420, 550, 460, { fill: 'rgba(30,24,16,0.98)', stroke: '#8a6a34', r: 22, lw: 2 });
-    text(ctx, '开发者通道 · 英雄', W / 2, 468, { size: 26, align: 'center', color: '#d9b46a' });
+    panel(ctx, 100, 420, 550, 460, { fill: 'rgba(18,23,27,0.98)', stroke: '#8a6420', r: 22, lw: 2 });
+    text(ctx, '开发者通道 · 英雄', W / 2, 468, { size: 26, align: 'center', color: '#e8b44c' });
     text(ctx, '仅用于调试 / 体验，不属于正常玩家功能', W / 2, 506, {
       size: 15, align: 'center', color: THEME.textWeak,
     });
@@ -529,7 +501,7 @@ export class HeroScreen {
       });
     } else {
       button(ctx, { x: 160, y: 640, w: 430, h: 74 }, '一键获得全部英雄', {
-        size: 24, fill: '#332c1d', stroke: '#d8b46a', textColor: '#f2d894',
+        size: 24, fill: '#273038', stroke: '#e8b44c', textColor: '#f8e1ac',
       });
       text(ctx, '已拥有的英雄不会重复升级', W / 2, 730, {
         size: 15, align: 'center', color: THEME.textDim,
@@ -542,19 +514,65 @@ export class HeroScreen {
   // #dev-only:end
 
   // 列表卡片：品级 + 名字 + 等级 + 专属建模 + 品级光环
+  // 「墨韵丹符」质感：冷玄墨卡面 + 品级色晕染 + 双描边 + 顶部高光 + 传奇四角金饰
   drawCard(ctx, h, x, y) {
     const st = this.game.state;
     const lv = heroLevel(st, h.id);
     const cap = heroLevelCap(st);
     const owned = lv > 0;
+    const legendary = h.tier === 'legendary';
     const tierColor = heroAuraColor(h);
-    const tierName = h.tier === 'legendary' ? '传奇' : '史诗';
+    const tierName = legendary ? '传奇' : '史诗';
+    // 品级色 RGB（用于渐变），传奇=鎏金 史诗=紫气
+    const rgb = legendary ? '232,180,76' : '155,119,207';
 
-    panel(ctx, x, y, CARD_W, CARD_H, {
-      fill: owned ? '#2b2217' : 'rgba(33,26,18,0.85)',
-      stroke: tierColor, r: 18, lw: 2,
-    });
-    panel(ctx, x + 12, y + 12, 62, 26, { fill: 'rgba(0,0,0,0.3)', stroke: tierColor, r: 8, lw: 1 });
+    ctx.save();
+    // ① 卡面：冷玄墨底 + 品级色径向晕染（上亮下暗，营造立体）
+    roundRectPath(ctx, x, y, CARD_W, CARD_H, 18);
+    const bg = ctx.createLinearGradient(x, y, x, y + CARD_H);
+    bg.addColorStop(0, owned ? '#232d34' : '#1b2227');
+    bg.addColorStop(1, owned ? '#141a1f' : '#0f1418');
+    ctx.fillStyle = bg; ctx.fill();
+    // 品级晕染（顶部一圈柔光）
+    const glow = ctx.createRadialGradient(x + CARD_W / 2, y + 96, 8, x + CARD_W / 2, y + 120, CARD_W * 0.86);
+    glow.addColorStop(0, `rgba(${rgb},${owned ? 0.20 : 0.11})`);
+    glow.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = glow; ctx.fill();
+    ctx.restore();
+
+    // ② 外描边（品级色）
+    panel(ctx, x, y, CARD_W, CARD_H, { fill: null, stroke: tierColor, r: 18, lw: legendary ? 2.5 : 2 });
+    // ③ 内圈细描边（史诗双线 / 传奇金线）——方案里"史诗紫内圈双描边、传奇四角金线"
+    ctx.save();
+    roundRectPath(ctx, x + 5, y + 5, CARD_W - 10, CARD_H - 10, 14);
+    ctx.strokeStyle = `rgba(${rgb},0.42)`; ctx.lineWidth = 1; ctx.stroke();
+    ctx.restore();
+    // ④ 顶部高光条（金属质感）
+    ctx.save();
+    roundRectPath(ctx, x + 9, y + 9, CARD_W - 18, 3, 2);
+    const hi = ctx.createLinearGradient(x, 0, x + CARD_W, 0);
+    hi.addColorStop(0, `rgba(${rgb},0)`); hi.addColorStop(0.5, `rgba(${rgb},0.55)`); hi.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = hi; ctx.fill();
+    ctx.restore();
+    // ⑤ 传奇四角金饰（L 形角线）
+    if (legendary) {
+      ctx.save();
+      ctx.strokeStyle = '#f8e1ac'; ctx.lineWidth = 2.2; ctx.lineCap = 'round';
+      const m = 9, len = 18;
+      const corners = [
+        [x + m, y + m, 1, 1], [x + CARD_W - m, y + m, -1, 1],
+        [x + m, y + CARD_H - m, 1, -1], [x + CARD_W - m, y + CARD_H - m, -1, -1],
+      ];
+      for (const [cx, cy, sx, sy] of corners) {
+        ctx.beginPath();
+        ctx.moveTo(cx + sx * len, cy); ctx.lineTo(cx, cy); ctx.lineTo(cx, cy + sy * len);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // 品级角标
+    panel(ctx, x + 12, y + 12, 62, 26, { fill: 'rgba(12,16,19,0.7)', stroke: tierColor, r: 8, lw: 1 });
     text(ctx, tierName, x + 43, y + 25, { size: 14, align: 'center', color: tierColor });
 
     text(ctx, h.name, x + 14, y + 56, {
@@ -652,7 +670,7 @@ export class HeroScreen {
     } else {
       button(ctx, HERO_LAYOUT.detailUpRect, `升级 ${cost} 铜钱 → Lv${lv + 1}`, {
         size: 22,
-        fill: affordable ? '#332c1d' : THEME.panel,
+        fill: affordable ? '#273038' : THEME.panel,
         stroke: affordable ? HERO_EPIC_BORDER : THEME.line,
         textColor: affordable ? THEME.gold : THEME.textWeak,
         disabled: !affordable,
@@ -706,7 +724,7 @@ export class HeroScreen {
     const gold = r.rarity === 'legendary';
     return {
       label: `${gold ? '传奇' : '史诗'}英雄 · ${h ? h.name : r.hero}`,
-      color: gold ? '#b3934f' : (h ? h.color : THEME.text),
+      color: gold ? '#b88a32' : (h ? h.color : THEME.text),
       note: r.owned
         ? `已拥有 · +${r.coins} 铜钱${r.tickets ? ` +${r.tickets} 券` : ''}`
         : 'NEW · 获得新英雄',

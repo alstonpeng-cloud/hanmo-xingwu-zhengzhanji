@@ -9,7 +9,7 @@ import { ensureIdleAt, idleAccrued, claimIdle } from '../core/idle.js';
 import { idleChestState, claimIdleChest, ensureIdleChest, formatIdleCountdown } from '../core/idleChest.js';
 import { drawChest } from '../render/chest.js';
 import { drawGameTitle } from '../render/title.js';
-import { dailyUnlocked, ensureDaily, canClaimLogin, taskState } from '../core/daily.js';
+import { dailyUnlocked, ensureDaily, canClaimLogin, taskState, dateKey } from '../core/daily.js';
 import { isAudioEnabled, setAudioEnabled, playSfx, getBgmVolume, getSfxVolume, setBgmVolume, setSfxVolume } from '../core/audio.js';
 import { LevelSelectScreen } from './levels.js';
 import { BarracksScreen } from './barracks.js';
@@ -24,12 +24,10 @@ import { GauntletScreen } from './gauntlet.js';
 import { WeeklyChallengeScreen } from './weekly.js';
 import { DailyChallengeScreen } from './dailyChallenge.js';
 import { AchievementsScreen } from './achievements.js';
-import { ensureWeekly, weeklyClearedTotal } from '../core/weekly.js';
+import { ensureWeekly, weeklyOrbUnread } from '../core/weekly.js';
 import { claimableCount } from '../core/achievements.js';
 import { ACHIEVEMENTS } from '../data/achievements.js';
-import {
-  dailyUnlocked as dailyChallengeUnlocked, dailyClearedCount, dailyTotal,
-} from '../data/dailyChallenge.js';
+import { dailyUnlocked as dailyChallengeUnlocked, dailyChallengeOrbUnread } from '../data/dailyChallenge.js';
 import { GrowthScreen } from './growth.js';
 import { HelpScreen } from './help.js';
 import { GROWTH_NODES, growthStatus } from '../data/growth.js';
@@ -311,6 +309,11 @@ export class HomeScreen {
     }
     this.clearGuideIfTarget('weekly');
     ensureWeekly(st, this.nowMs);
+    // 1.2.8 · 点进面板即视为已读：本周红点消失，下周重建后重显
+    if (st.weekly && st.weekly.seen !== true) {
+      st.weekly.seen = true;
+      g.save();
+    }
     return g.push(new WeeklyChallengeScreen(g));
   }
 
@@ -324,6 +327,13 @@ export class HomeScreen {
       return;
     }
     this.clearGuideIfTarget('dailyChallenge');
+    // 1.2.8 · 点进面板即视为已读：当日红点消失，次日 0 点重显
+    if (!st.dailyChallenge) st.dailyChallenge = { progress: Array(CONFIG.dailyChallenge.total).fill(0), seenDay: '' };
+    const dk = dateKey(this.nowMs);
+    if (st.dailyChallenge.seenDay !== dk) {
+      st.dailyChallenge.seenDay = dk;
+      g.save();
+    }
     return g.push(new DailyChallengeScreen(g));
   }
 
@@ -333,7 +343,7 @@ export class HomeScreen {
     const W = g.W;
 
     // 顶部信息条
-    panel(ctx, 40, 40, 670, 74, { fill: 'rgba(43,34,23,0.75)', stroke: THEME.line, r: 18 });
+    panel(ctx, 40, 40, 670, 74, { fill: 'rgba(27,34,39,0.75)', stroke: THEME.line, r: 18 });
     text(ctx, '铜钱', 74, 77, { size: 24, color: THEME.textDim });
     coinBadge(ctx, 138, 77, st.coins, { size: 26 });
 
@@ -343,7 +353,7 @@ export class HomeScreen {
       size: 21,
       sub: dailyUnlocked(st) ? '签到 · 任务 · 7 日登录' : `通关 ${CONFIG.daily.unlockLevel} 关开放`,
       subSize: 14,
-      fill: dailyReady ? '#332c1d' : THEME.panel,
+      fill: dailyReady ? '#273038' : THEME.panel,
       stroke: dailyReady ? THEME.goldDim : THEME.line,
       textColor: dailyReady ? THEME.gold : THEME.textDim,
     });
@@ -379,7 +389,7 @@ export class HomeScreen {
         : `主线 ${CONFIG.heroBattles.unlockLevel} 关解锁`,
       subSize: 16,
       fill: hbOpen ? '#3a241e' : THEME.panel,
-      stroke: hbOpen ? '#c8473e' : THEME.line,
+      stroke: hbOpen ? '#c0392b' : THEME.line,
       textColor: hbOpen ? '#e8a094' : THEME.textWeak,
     });
 
@@ -399,7 +409,7 @@ export class HomeScreen {
       size: 26,
       sub: `节点 ${growthDone}/${GROWTH_NODES.length}`,
       subSize: 16,
-      fill: growthDone >= GROWTH_NODES.length ? '#332c1d' : THEME.panel,
+      fill: growthDone >= GROWTH_NODES.length ? '#273038' : THEME.panel,
       stroke: growthDone >= GROWTH_NODES.length ? THEME.goldDim : THEME.line,
       textColor: growthDone >= GROWTH_NODES.length ? THEME.gold : THEME.text,
     });
@@ -410,7 +420,7 @@ export class HomeScreen {
       size: 21,
       sub: soundOn ? 'BGM · 音效 设置' : '已静音',
       subSize: 14,
-      fill: this.audioOpen || soundOn ? '#332c1d' : THEME.panel,
+      fill: this.audioOpen || soundOn ? '#273038' : THEME.panel,
       stroke: this.audioOpen || soundOn ? THEME.goldDim : THEME.line,
       textColor: this.audioOpen || soundOn ? THEME.gold : THEME.textWeak,
     });
@@ -452,43 +462,43 @@ export class HomeScreen {
       subSize: 17,
     });
     const heroOpen = st.maxCleared >= CONFIG.heroes.unlockLevel;
+    // 「墨韵丹符」色相即导航：招募/宝箱=紫气（珍藏），商城=青蚨（交易）
     button(ctx, r.hero, '招 募 系 统', {
       sub: heroOpen
         ? `招募券 ${heroTickets(st)} · 已拥有 ${unlockedHeroes(st).length}/${HEROES.length}`
         : `通关 ${CONFIG.heroes.unlockLevel} 关开放`,
       size: 27, subSize: heroOpen ? 19 : 16,
-      fill: heroOpen ? '#2f2438' : THEME.panel2,
-      stroke: heroOpen ? '#8a6a9c' : THEME.line,
-      textColor: heroOpen ? '#c9a8d8' : THEME.textWeak,
+      fill: heroOpen ? '#241d33' : THEME.panel2,
+      stroke: heroOpen ? THEME.treasure : THEME.line,
+      textColor: heroOpen ? THEME.treasure : THEME.textWeak,
     });
     button(ctx, r.chests, '宝 箱', {
       size: 34,
-      fill: chests > 0 ? '#332c1d' : THEME.panel2,
-      stroke: chests > 0 ? THEME.goldDim : THEME.line,
-      textColor: chests > 0 ? THEME.gold : THEME.text,
+      fill: chests > 0 ? '#241d33' : THEME.panel2,
+      stroke: chests > 0 ? THEME.treasure : THEME.line,
+      textColor: chests > 0 ? THEME.treasure : THEME.text,
     });
     button(ctx, r.shop, '商 城', {
-      size: 34, fill: THEME.panel2, stroke: THEME.line,
+      size: 34, fill: THEME.panel2, stroke: THEME.shop, textColor: THEME.shop,
     });
 
     // 挂机收益（离线 / 在线都在累积，封顶 8 小时）
     this.drawIdle(ctx);
 
     // 左侧悬浮挑战圆钮（汉帛·朱金）：呼吸光晕 + 漂浮粒子 + 红点角标
-    // 角标 = 还剩多少关可打，打完即熄灭
+    // 1.2.8 · 角标 = 纯色呼吸点（不带数字）：本周/当日没点进过面板就亮，点进即消
     const orbWeeklyOpen = (st.maxCleared || 0) >= CONFIG.weekly.unlockLevel;
     const orbDailyOpen = dailyChallengeUnlocked(st);
-    const weeklyTotal = CONFIG.weekly.tiers * CONFIG.weekly.stagesPerTier;
-    const weeklyLeft = Math.max(0, weeklyTotal - weeklyClearedTotal(st));
-    const dailyLeft = Math.max(0, dailyTotal() - dailyClearedCount(st));
+    const weeklyUnread = orbWeeklyOpen && weeklyOrbUnread(st, this.nowMs) ? 1 : 0;
+    const dailyUnread = orbDailyOpen && dailyChallengeOrbUnread(st, this.nowMs) ? 1 : 0;
     eventOrb(ctx, r.weeklyOrb.x + r.weeklyOrb.w / 2, r.weeklyOrb.y + r.weeklyOrb.h / 2,
       r.weeklyOrb.w / 2 - 4, '每周', {
-        t: this.t, badge: orbWeeklyOpen ? Math.min(weeklyLeft, 99) : 0,
+        t: this.t, badge: weeklyUnread,
         active: orbWeeklyOpen, phase: 0, color: THEME.gold,
       });
     eventOrb(ctx, r.dailyOrb.x + r.dailyOrb.w / 2, r.dailyOrb.y + r.dailyOrb.h / 2,
       r.dailyOrb.w / 2 - 4, '每日', {
-        t: this.t, badge: orbDailyOpen ? Math.min(dailyLeft, 99) : 0,
+        t: this.t, badge: dailyUnread,
         active: orbDailyOpen, phase: 1.6, color: THEME.gold,
       });
 
@@ -501,7 +511,7 @@ export class HomeScreen {
         ? (claimable > 0 ? `可领取 ${claimable} 项奖励` : `已解锁 ${ACHIEVEMENTS.length} 条成就`)
         : `通关 ${CONFIG.achievements.unlockLevel} 关开放`,
       subSize: 15,
-      fill: claimable > 0 ? '#332c1d' : THEME.panel2,
+      fill: claimable > 0 ? '#273038' : THEME.panel2,
       stroke: claimable > 0 ? THEME.goldDim : THEME.line,
       textColor: claimable > 0 ? THEME.gold : achOpen ? THEME.text : THEME.textWeak,
     });
@@ -521,7 +531,7 @@ export class HomeScreen {
     });
     button(ctx, r.reset, '重置存档', { size: 22, fill: THEME.panel, stroke: THEME.redDim, textColor: THEME.textDim });
     button(ctx, r.devTest, '开发者测试场', {
-      size: 22, fill: '#2a2416', stroke: THEME.goldDim, textColor: THEME.gold,
+      size: 22, fill: '#1b2227', stroke: THEME.goldDim, textColor: THEME.gold,
     });
     text(ctx, '以上按钮为开发者通道，正式版会移除', W / 2, 1364, { size: 18, align: 'center', color: THEME.textWeak });
     // #dev-only:end
@@ -581,7 +591,7 @@ export class HomeScreen {
     text(ctx, '声音 / 震动总开关', 130, 570, { size: 22, color: THEME.text });
     button(ctx, L.master, on ? '开 启' : '已 关 闭', {
       size: 22,
-      fill: on ? '#332c1d' : THEME.panel2,
+      fill: on ? '#273038' : THEME.panel2,
       stroke: on ? THEME.goldDim : THEME.line,
       textColor: on ? THEME.gold : THEME.textWeak,
     });
@@ -589,7 +599,7 @@ export class HomeScreen {
     // 音量滑条：点击轨道直接设置，圆点显示当前位置
     const drawSlider = (b, ratio, color, label, yText) => {
       text(ctx, label, 130, yText, { size: 22, color: THEME.text });
-      bar(ctx, b.x, b.y, b.w, b.h, ratio, { fill: color, stroke: '#4a3a24', r: 9 });
+      bar(ctx, b.x, b.y, b.w, b.h, ratio, { fill: color, stroke: '#36404a', r: 9 });
       ctx.save();
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -631,13 +641,13 @@ export class HomeScreen {
     const r = this.rects.idleClaim;
     const coins = idleAccrued(st, this.nowMs);
 
-    panel(ctx, 70, 842, 610, 138, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 842, 610, 138, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 18 });
 
     // 左半：只留一个大的铜钱图标 + 当前可领取数量（不写任何说明小字）
     coinBadge(ctx, 100, 882, coins, { size: 42 });
     button(ctx, r, coins > 0 ? '领 取' : '暂无可领', {
       size: 24,
-      fill: coins > 0 ? '#332c1d' : THEME.panel,
+      fill: coins > 0 ? '#273038' : THEME.panel,
       stroke: coins > 0 ? THEME.goldDim : THEME.line,
       textColor: coins > 0 ? THEME.gold : THEME.textWeak,
       disabled: coins <= 0,

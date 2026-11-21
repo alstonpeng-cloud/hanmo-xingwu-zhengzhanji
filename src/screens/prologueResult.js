@@ -35,7 +35,7 @@ export class PrologueResultScreen {
       size: 28, align: 'center', color: THEME.textDim,
     });
     button(ctx, this.primary, '从第 1 关开始', {
-      size: 32, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
+      size: 32, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
     });
   }
 }

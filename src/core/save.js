@@ -10,6 +10,7 @@ import { unlockNodeIds, seedUnlockSeen } from './unlocks.js';
 import { TRIAL_ROUNDS } from './trialTroop.js';
 import { AUTO_MERGE_MIN_UNITS } from './merge.js';
 import { dateKey } from './daily.js';
+import { weeklyTotalPoints } from '../data/weekly.js';
 import { CLOCK_ROLLBACK_TOLERANCE_MS } from './idle.js';
 import { now as clockNow } from './clock.js';
 
@@ -278,12 +279,14 @@ function sanitizeHeroes(raw) {
 }
 
 // 每日挑战：30 位首通进度（0/1）；缺档/脏档直接补 0（首通奖励按位判重）
+// seenDay：1.2.8 首页红点已读标记（当日日期串，跨天重显）
 function sanitizeDailyChallenge(raw) {
   const total = CONFIG.dailyChallenge.total;
-  const out = { progress: Array(total).fill(0) };
+  const out = { progress: Array(total).fill(0), seenDay: '' };
   if (!raw || typeof raw !== 'object') return out;
   const src = Array.isArray(raw.progress) ? raw.progress : [];
   for (let i = 0; i < total; i++) out.progress[i] = Number(src[i]) ? 1 : 0;
+  out.seenDay = typeof raw.seenDay === 'string' ? raw.seenDay : '';
   return out;
 }
 
@@ -292,11 +295,14 @@ function sanitizeWeekly(raw) {
   const cells = CONFIG.formation.cols * CONFIG.formation.rows;
   const out = {
     key: '', points: 0, roster: [], form: [], tier: 1, nextId: 1,
-    cleared: [], firstClear: [], sweepDay: '', sweepCount: 0,
+    cleared: [], firstClear: [], granted: 0, seen: false,
+    sweepDay: '', sweepCount: 0,
   };
   if (!raw || typeof raw !== 'object') return out;
   out.key = typeof raw.key === 'string' ? raw.key : '';
-  out.points = clampInt(raw.points, CONFIG.weekly.points);
+  out.points = clampInt(raw.points, weeklyTotalPoints());
+  out.granted = clampInt(raw.granted, (1 << CONFIG.weekly.tiers) - 1);
+  out.seen = raw.seen === true;
   out.tier = Math.max(1, Math.min(CONFIG.weekly.tiers, Math.floor(Number(raw.tier) || 1)));
   out.nextId = clampInt(raw.nextId, 1e6) || 1;
   out.sweepDay = typeof raw.sweepDay === 'string' ? raw.sweepDay : '';

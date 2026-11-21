@@ -282,8 +282,8 @@ function drawClassicChest(ctx, cx, cy, s, { color, open, glow }) {
 
   if (glow) {
     const g = ctx.createRadialGradient(cx, cy + h * 0.1, 2 * s, cx, cy + h * 0.1, w * 0.72);
-    g.addColorStop(0, 'rgba(216,180,106,0.45)');
-    g.addColorStop(1, 'rgba(216,180,106,0)');
+    g.addColorStop(0, 'rgba(232,180,76,0.45)');
+    g.addColorStop(1, 'rgba(232,180,76,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(cx, cy + h * 0.1, w * 0.72, 0, Math.PI * 2);

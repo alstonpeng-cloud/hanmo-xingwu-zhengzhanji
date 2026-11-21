@@ -4,7 +4,6 @@ import { now as clockNow } from '../core/clock.js';
 import { CONFIG } from '../data/config.js';
 import { rosterSlots, shopPrice, buyUnit } from '../core/levels.js';
 import { addChest, chestType, chestTotal } from '../core/chests.js';
-import { adsLeft, shopAdsState, claimAdChest } from '../core/ads.js';
 import { drawChest } from '../render/chest.js';
 import { unitName, statsFor, spriteTierFor } from '../core/units.js';
 import { drawFrame, sheetFor } from '../render/sprites.js';
@@ -34,8 +33,6 @@ export const SHOP_LAYOUT = {
   chestIconX: 112, chestIconS: 0.62,
   chestTextX: 168, chestPriceX: 500,
   chestBtn: { w: 112, h: 52, x: 552, offsetY: -4 },
-  adNoteY: 1024,
-  adRow: { x0: 82, y: 1034, w: 286, h: 50, gap: 12 },
 };
 
 export class ShopScreen {
@@ -47,7 +44,6 @@ export class ShopScreen {
     this.tabRects = [];
     this.cardRects = [];
     this.chestRects = [];
-    this.adChestRects = [];
     this.level = CONFIG.shop.levels[0];
     // 每日商店入口（100 关解锁，每天刷新 6 个栏位）
     this.dailyRect = { x: 44, y: 138, w: 262, h: 64 };
@@ -93,25 +89,6 @@ export class ShopScreen {
     g.toast(`已购买 ${type.name} ×1（宝箱仓库 ${chestTotal(st)}）`);
   }
 
-  // 看广告换宝箱：两个独立通道（木5/银2），各自独立计数
-  adChest(id) {
-    const g = this.game;
-    const st = g.state;
-    const offer = CONFIG.ads.shopOffers.find((o) => o.id === id);
-    const r = claimAdChest(st, id);
-    if (!r.ok) {
-      playSfx('error', { volume: 0.7 });
-      g.toast(r.reason === 'limit'
-        ? `今日「${offer ? offer.name : '广告宝箱'}」已领完，明天再来`
-        : '这个广告宝箱暂时拿不到');
-      return;
-    }
-    g.save();
-    playSfx('buy');
-    const type = chestType(r.offer.chest);
-    g.toast(`广告奖励 ${type ? type.name : '宝箱'} ×${r.offer.count}`);
-  }
-
   tap(x, y) {
     const g = this.game;
     if (this.infoOpen) { this.infoOpen = false; return; }
@@ -143,12 +120,6 @@ export class ShopScreen {
         return;
       }
     }
-    for (const c of this.adChestRects) {
-      if (hit(c.rect, x, y)) {
-        this.adChest(c.id);
-        return;
-      }
-    }
   }
 
   draw(ctx) {
@@ -158,9 +129,10 @@ export class ShopScreen {
     const slots = rosterSlots(st.maxCleared);
     const full = st.units.length >= slots.unlocked;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
-    text(ctx, '商 城', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
+    // 青蚨绿为商城系统色，标题与一级入口用色相承担导航
+    text(ctx, '商 城', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center', color: THEME.shop, serif: true });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
 
     // 每日商店入口
@@ -170,9 +142,9 @@ export class ShopScreen {
       : 0;
     button(ctx, this.dailyRect, dailyOn ? '每 日 商 店' : '每日商店 · 100关解锁', {
       size: dailyOn ? 26 : 20,
-      fill: dailyOn ? '#2a2416' : THEME.panel,
-      stroke: dailyOn ? THEME.goldDim : THEME.line,
-      textColor: dailyOn ? THEME.gold : THEME.textWeak,
+      fill: dailyOn ? '#1b2227' : THEME.panel,
+      stroke: dailyOn ? THEME.shop : THEME.line,
+      textColor: dailyOn ? THEME.shop : THEME.textWeak,
       disabled: !dailyOn,
     });
     if (dailyOn) {
@@ -195,9 +167,9 @@ export class ShopScreen {
       const on = this.level === lv;
       button(ctx, rect, `Lv${lv}`, {
         size: 26,
-        fill: on ? '#332c1d' : THEME.panel,
-        stroke: THEME.line,
-        textColor: on ? THEME.gold : THEME.text,
+        fill: on ? '#273038' : THEME.panel,
+        stroke: on ? THEME.shop : THEME.line,
+        textColor: on ? THEME.shop : THEME.text,
         active: on,
       });
     });
@@ -214,7 +186,7 @@ export class ShopScreen {
       const buyRect = { x: x + 16, y: y + SHOP_LAYOUT.buyOffsetY, w: CARD_W - 32, h: BUY_H };
       this.cardRects.push({ rect: buyRect, troop: t.id });
 
-      panel(ctx, x, y, CARD_W, CARD_H, { fill: '#2b2217', stroke: THEME.line, r: 18 });
+      panel(ctx, x, y, CARD_W, CARD_H, { fill: '#1b2227', stroke: THEME.line, r: 18 });
 
       text(ctx, t.name, x + CARD_W / 2, y + 32, { size: 28, weight: '600', align: 'center' });
       text(ctx, unitName(t.id, this.level), x + CARD_W / 2, y + 66, {
@@ -238,16 +210,16 @@ export class ShopScreen {
       const canBuy = affordable && !full;
       button(ctx, buyRect, full ? '兵营已满' : affordable ? '购 买' : '铜钱不足', {
         size: 24,
-        fill: canBuy ? '#332c1d' : THEME.panel,
+        fill: canBuy ? '#273038' : THEME.panel,
         stroke: canBuy ? THEME.goldDim : THEME.line,
         textColor: canBuy ? THEME.gold : THEME.textWeak,
       });
     });
 
-    // 特殊宝箱：稀有 / 史诗铜钱直购；木箱 ×3、银箱 ×1 看广告获取（共用每日额度）
+    // 特殊宝箱：稀有 / 史诗铜钱直购（广告宝箱入口已于 1.2.9 移除）
     const P = SHOP_LAYOUT.chestPanel;
-    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 18 });
-    text(ctx, '特殊宝箱 · 铜钱直购 / 看广告领取', 100, P.y + 30, {
+    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 18 });
+    text(ctx, '特殊宝箱 · 铜钱直购', 100, P.y + 30, {
       size: 26, color: THEME.goldDim,
     });
     this.chestRects = [];
@@ -268,30 +240,10 @@ export class ShopScreen {
       this.chestRects.push({ rect: btn, id: item.id });
       button(ctx, btn, affordable ? '购 买' : '铜钱不足', {
         size: 22,
-        fill: affordable ? '#332c1d' : THEME.panel,
+        fill: affordable ? '#273038' : THEME.panel,
         stroke: affordable ? THEME.goldDim : THEME.line,
         textColor: affordable ? THEME.gold : THEME.textWeak,
         disabled: !affordable,
-      });
-    });
-
-    // 广告宝箱：两个并排按钮，只显示按钮本身（不暴露剩余次数/上限）
-    const state = shopAdsState(st);
-    this.adChestRects = [];
-    (CONFIG.ads.shopOffers || []).forEach((offer, i) => {
-      const A = SHOP_LAYOUT.adRow;
-      const rect = {
-        x: A.x0 + i * (A.w + A.gap), y: A.y, w: A.w, h: A.h,
-      };
-      const channel = offer.limitKey;
-      const left = adsLeft(st, channel);
-      this.adChestRects.push({ rect, id: offer.id });
-      button(ctx, rect, left > 0 ? `广告 · ${offer.name}` : `${offer.name} 已领完`, {
-        size: 18,
-        fill: left > 0 ? '#2a2416' : THEME.panel,
-        stroke: left > 0 ? THEME.goldDim : THEME.line,
-        textColor: left > 0 ? THEME.gold : THEME.textWeak,
-        disabled: left <= 0,
       });
     });
 
@@ -306,7 +258,6 @@ export class ShopScreen {
           const t = chestType(c.id);
           return t ? `${t.name}：${t.desc}` : '';
         }).filter(Boolean),
-        '商店广告：小木箱、银箱都可以看广告领取，领完明天再来。',
         '铜钱来自关卡首通 + 首页挂机收益（重复挑战不产出）。',
       ];
       infoModal(ctx, W, g.H, '商 城 说 明', lines);

@@ -103,7 +103,7 @@ export class DailyScreen {
     const slots = rosterSlots(st.maxCleared);
     const total = chestTotal(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '每日 · 签到与任务', W / 2 + 20, 76, { size: 32, weight: '600', align: 'center' });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
@@ -127,12 +127,12 @@ export class DailyScreen {
     const st = this.game.state;
     const unlock = CONFIG.daily.unlockLevel;
     const left = Math.max(0, unlock - st.maxCleared);
-    panel(ctx, 70, 170, 610, 420, { fill: 'rgba(33,26,18,0.8)', stroke: THEME.line, r: 20 });
+    panel(ctx, 70, 170, 610, 420, { fill: 'rgba(27,34,39,0.8)', stroke: THEME.line, r: 20 });
     text(ctx, '每日系统尚未开放', W / 2, 250, { size: 34, align: 'center', color: THEME.text });
     text(ctx, `通关 ${unlock} 关后开放：每日任务、每日签到、7 日登录`, W / 2, 310, {
       size: 23, align: 'center', color: THEME.textDim, maxWidth: 560,
     });
-    bar(ctx, 135, 366, 480, 24, st.maxCleared / unlock, { fill: THEME.green, stroke: '#4a3a24' });
+    bar(ctx, 135, 366, 480, 24, st.maxCleared / unlock, { fill: THEME.green, stroke: '#36404a' });
     text(ctx, `已通关 ${st.maxCleared} / ${unlock} 关（还差 ${left} 关）`, W / 2, 424, {
       size: 24, align: 'center', color: THEME.gold,
     });
@@ -147,7 +147,7 @@ export class DailyScreen {
     const chest = CONFIG.daily.signInChest || 'rare';
     const type = chestType(chest);
     panel(ctx, 40, 134, 670, 148, {
-      fill: 'rgba(58,46,30,0.72)', stroke: type?.color || THEME.line, r: 20,
+      fill: 'rgba(39,48,56,0.72)', stroke: type?.color || THEME.line, r: 20,
     });
     drawChest(ctx, 110, 208, 0.62, { color: type?.color || THEME.gold, kind: type?.id || '', glow: !s.signed });
     text(ctx, '每日签到', 170, 178, { size: 28, weight: '600', color: THEME.text });
@@ -172,7 +172,7 @@ export class DailyScreen {
     const claimed = (st.daily && st.daily.loginDays) || 0;
     const canClaim = canClaimLogin(st);
 
-    panel(ctx, 40, 300, 670, 216, { fill: 'rgba(43,34,23,0.86)', stroke: THEME.line, r: 20 });
+    panel(ctx, 40, 300, 670, 216, { fill: 'rgba(27,34,39,0.86)', stroke: THEME.line, r: 20 });
     text(ctx, '7 日登录', 66, 332, { size: 24, color: THEME.text });
     text(ctx, `已领 ${claimed} / ${days.length} 天 · 每天可领 1 天`, 686, 332, {
       size: 18, align: 'right', color: THEME.textDim,
@@ -184,8 +184,8 @@ export class DailyScreen {
       const done = i < claimed;
       const current = i === claimed;
       panel(ctx, chipX, 344, chipW, 90, {
-        fill: done ? '#202b22' : current ? '#2c2a1d' : 'rgba(30,24,16,0.9)',
-        stroke: done ? '#3d5442' : current ? THEME.goldDim : '#4a3a24',
+        fill: done ? '#202b22' : current ? '#2c2a1d' : 'rgba(18,23,27,0.9)',
+        stroke: done ? '#3d5442' : current ? THEME.goldDim : '#36404a',
         r: 12, lw: current ? 2.5 : 1.5,
       });
       text(ctx, `第 ${i + 1} 天`, chipX + chipW / 2, 362, { size: 14, align: 'center', color: done ? '#9fd0a8' : THEME.textDim });
@@ -237,8 +237,8 @@ export class DailyScreen {
       const done = state.done;
       const claimed = state.claimed;
       panel(ctx, 56, y, 638, TASK_ROW_H, {
-        fill: claimed ? '#202b22' : done ? '#2c2a1d' : 'rgba(33,26,18,0.9)',
-        stroke: claimed ? '#3d5442' : done ? THEME.goldDim : '#4a3a24',
+        fill: claimed ? '#202b22' : done ? '#2c2a1d' : 'rgba(27,34,39,0.9)',
+        stroke: claimed ? '#3d5442' : done ? THEME.goldDim : '#36404a',
         r: 14, lw: done && !claimed ? 2 : 1,
       });
       text(ctx, task.name, 78, y + 24, { size: 20, color: claimed ? THEME.textDim : THEME.text });

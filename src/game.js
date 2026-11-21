@@ -1,8 +1,8 @@
-// 游戏主循环 / 屏幕栈 / 提示 / 广告模拟
+// 游戏主循环 / 屏幕栈 / 提示
 import { CONFIG } from './data/config.js';
 import { initSprites, setTroopResolver } from './render/sprites.js';
 import { loadState, saveState, resetState, readLastSeen } from './core/save.js';
-import { setFont, text, panel, button, hit, bar, screenDim, THEME } from './render/draw.js';
+import { text, panel, THEME } from './render/draw.js';
 import { initAudio, unlockAudio, playSfx, setAudioEnabled, startBgm, stopBgm, setBgmVolume, setSfxVolume, suspendForVisibility, resumeForVisibility } from './core/audio.js';
 import { HomeScreen } from './screens/home.js';
 import { DeployScreen } from './screens/deploy.js';
@@ -13,8 +13,6 @@ import { pickTutorial, markTutorialSeen, skipTutorial, findStep, tutorialSeen } 
 import { drawTutorialOverlay, tutorialPointer } from './render/tutorialOverlay.js';
 import { initTitleImage } from './render/title.js';
 import { initClock, now as clockNow } from './core/clock.js';
-
-const AD_CLOSE_RECT = { x: 245, y: 792, w: 260, h: 78 };
 
 export class Game {
   constructor(canvas, ctx, platform) {
@@ -34,7 +32,6 @@ export class Game {
     this.toastT = 0;
     // 提示队列：同一帧内多条解锁/奖励提示排队播放，不互相吞
     this.toastQueue = [];
-    this.ad = null;
     this.screens = [];
     // 新手引导运行时：active = 当前展示的步骤；cardShown = 当前页面已经弹过提示卡
     this.tutorial = { active: null, cardShown: false, screenRef: null, nudge: 0 };
@@ -280,14 +277,6 @@ export class Game {
     return true;
   }
 
-  /* ---------- 激励视频（Web 用模拟；真机替换 platform.rewardedAd） ---------- */
-  playRewardedAd() {
-    if (this.platform.rewardedAd) return this.platform.rewardedAd();
-    return new Promise((resolve) => {
-      this.ad = { t: 0, dur: 3, closeable: false, resolve };
-    });
-  }
-
   handleTap(cssX, cssY) {
     // 兼容旧调用（冒烟测试直接喂点击）：等同按下
     this.handleDown(cssX, cssY);
@@ -302,14 +291,6 @@ export class Game {
     const { x, y } = this.toLogical(cssX, cssY);
     // 浏览器要求先有用户手势才允许出声：第一次按下时再启动 / 恢复 BGM
     unlockAudio();
-    if (this.ad) {
-      if (this.ad.closeable && hit(AD_CLOSE_RECT, x, y)) {
-        const ad = this.ad;
-        this.ad = null;
-        ad.resolve('interrupt');
-      }
-      return;
-    }
     // 新手引导：强引导只放行高亮区域；静态手势卡只响应关闭
     const tut = this.tutorial.active;
     if (tut) {
@@ -355,17 +336,12 @@ export class Game {
   }
 
   /* ---------- 帧级异常兜底 ---------- */
-  // 单帧 update/draw 出错不黑屏：清输入态、结束广告 Promise；连续失败 3 帧回首页重建页面
+  // 单帧 update/draw 出错不黑屏：清输入态；连续失败 3 帧回首页重建页面
   onFrameError(err, streak = 1) {
     try {
       if (typeof console !== 'undefined' && console.error) console.error('[frame]', err);
     } catch (e) {}
     this.pointer = null;
-    if (this.ad) {
-      const ad = this.ad;
-      this.ad = null;
-      try { ad.resolve('interrupt'); } catch (e) {}
-    }
     if (streak === 3) {
       this.tutorial.active = null;
       try { this.home(); } catch (e) {}
@@ -386,15 +362,6 @@ export class Game {
       tut.t += dt;
       // 提示卡不阻断操作，但也不能一直挂着：12 秒后自动收起并记为已看过
       if (tut.step.kind === 'card' && tut.t >= 12) this.dismissTutorial();
-    }
-    if (this.ad) {
-      this.ad.t += dt;
-      if (!this.ad.closeable && this.ad.t > 0.7) this.ad.closeable = true;
-      if (this.ad.t >= this.ad.dur) {
-        const ad = this.ad;
-        this.ad = null;
-        ad.resolve('finish');
-      }
     }
     if (this.screen && this.screen.update) this.screen.update(dt);
   }
@@ -420,17 +387,26 @@ export class Game {
     this.oy = (ch - this.H * scale) / 2;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#0d0a07';
+    ctx.fillStyle = '#080b0d';
     ctx.fillRect(0, 0, bw, bh);
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, this.ox * dpr, this.oy * dpr);
 
-    // 暖墨底（汉帛·朱金）
+    // 冷玄墨底（墨韵丹符）：冷青灰渐变 + 极淡的丹砂/鎏金角落辉光
     const g = ctx.createLinearGradient(0, 0, 0, this.H);
-    g.addColorStop(0, '#211a12');
-    g.addColorStop(0.55, '#17130e');
-    g.addColorStop(1, '#0f0b08');
+    g.addColorStop(0, '#12171b');
+    g.addColorStop(0.55, '#0c1013');
+    g.addColorStop(1, '#080b0d');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, this.W, this.H);
+    // 顶角丹砂 + 底角鎏金的极淡氛围光，克制不抢内容
+    const haloTop = ctx.createRadialGradient(this.W * 0.82, this.H * 0.06, 10, this.W * 0.82, this.H * 0.06, this.W * 0.95);
+    haloTop.addColorStop(0, 'rgba(192,57,43,0.055)');
+    haloTop.addColorStop(1, 'rgba(192,57,43,0)');
+    ctx.fillStyle = haloTop; ctx.fillRect(0, 0, this.W, this.H);
+    const haloBot = ctx.createRadialGradient(this.W * 0.12, this.H * 0.92, 10, this.W * 0.12, this.H * 0.92, this.W * 0.9);
+    haloBot.addColorStop(0, 'rgba(232,180,76,0.045)');
+    haloBot.addColorStop(1, 'rgba(232,180,76,0)');
+    ctx.fillStyle = haloBot; ctx.fillRect(0, 0, this.W, this.H);
 
     if (this.screen && this.screen.draw) this.screen.draw(ctx);
     // 页面已经切走：提示卡 / 强引导不能跟着漂到新页面上
@@ -447,7 +423,6 @@ export class Game {
     if (this.tutorial.active) {
       drawTutorialOverlay(ctx, this.tutorial.active, this.W, this.H, this.time);
     }
-    this.drawAd(ctx);
   }
 
   drawToast(ctx) {
@@ -462,25 +437,5 @@ export class Game {
     panel(ctx, x, y, w, 72, { fill: 'rgba(33,26,18,0.94)', stroke: THEME.goldDim, r: 14 });
     text(ctx, this.toastText, this.W / 2, y + 36, { size: 24, align: 'center', color: THEME.text, maxWidth: w - 24 });
     ctx.restore();
-  }
-
-  drawAd(ctx) {
-    if (!this.ad) return;
-    const t = this.ad.t;
-    screenDim(ctx, this.W, this.H, 0.82);
-    panel(ctx, 95, 470, 560, 420, { fill: THEME.panel, stroke: THEME.goldDim, r: 24 });
-    text(ctx, '激励视频广告（模拟）', this.W / 2, 545, { size: 34, weight: '600', align: 'center', color: THEME.gold });
-    text(ctx, '真机上线后此处为真实激励视频', this.W / 2, 592, { size: 22, align: 'center', color: THEME.textDim });
-
-    const left = Math.max(0, this.ad.dur - t);
-    text(ctx, `${left.toFixed(1)} 秒`, this.W / 2, 680, { size: 46, weight: '600', align: 'center', color: THEME.text });
-    bar(ctx, 155, 726, 440, 20, t / this.ad.dur, { fill: THEME.gold, r: 10 });
-
-    text(ctx, '完整播放后自动恢复等级', this.W / 2, 770, { size: 22, align: 'center', color: THEME.textDim });
-
-    const closeOpt = this.ad.closeable
-      ? { fill: THEME.panel2, stroke: THEME.line, textColor: THEME.textDim }
-      : { fill: THEME.panel2, stroke: THEME.line, textColor: THEME.textWeak, disabled: true };
-    button(ctx, AD_CLOSE_RECT, '关闭广告（模拟中断）', { size: 24, ...closeOpt });
   }
 }

@@ -66,7 +66,7 @@ export class HeroBattleResultScreen {
 
     screenDim(ctx, W, g.H, 0.72);
     panel(ctx, 70, 220, 610, 1010, {
-      fill: '#211a12', stroke: this.win ? THEME.gold : THEME.redDim, r: 24, lw: 3,
+      fill: '#12171b', stroke: this.win ? THEME.gold : THEME.redDim, r: 24, lw: 3,
     });
 
     text(ctx, `英 雄 战 · 第 ${this.stage} 关`, W / 2, 282, {
@@ -84,7 +84,7 @@ export class HeroBattleResultScreen {
     text(ctx, `${bossNames} · Boss 血量 ×${this.spec.hpMult} · ${(this.spec.squads || []).length} 队精锐`,
       W / 2, 458, { size: 18, align: 'center', color: '#e0a19a' });
 
-    panel(ctx, 120, 486, 510, 96, { fill: 'rgba(43,34,23,0.72)', stroke: THEME.line, r: 16 });
+    panel(ctx, 120, 486, 510, 96, { fill: 'rgba(27,34,39,0.72)', stroke: THEME.line, r: 16 });
     text(ctx, `战斗用时 ${Math.round(this.d.time || 0)} 秒 · 英雄战进度 ${cleared} / ${CONFIG.heroBattles.total}`, W / 2, 514, {
       size: 19, align: 'center', color: THEME.textDim,
     });
@@ -130,7 +130,7 @@ export class HeroBattleResultScreen {
     this.primary = { x: 175, y: 1080, w: 400, h: 80 };
     this.secondary = { x: 175, y: 1170, w: 400, h: 62 };
     button(ctx, this.primary, !this.win ? '重 新 布 阵' : next ? '下 一 关' : '返 回 英 雄 战', {
-      size: 28, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
+      size: 28, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
     });
     button(ctx, this.secondary, '返 回 英 雄 战', {
       size: 22, fill: THEME.panel, stroke: THEME.line, textColor: THEME.textDim,
@@ -141,7 +141,7 @@ export class HeroBattleResultScreen {
   drawStats(ctx, top) {
     const W = this.game.W;
     const p = { x: 70, y: top, w: 610, h: 330 };
-    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
     text(ctx, '战斗统计', W / 2, p.y + 26, { size: 18, align: 'center', color: THEME.gold });
 
     const TABS = [
@@ -163,7 +163,7 @@ export class HeroBattleResultScreen {
     for (const t of this.rankTabs) {
       const active = t.key === this.rankTab;
       panel(ctx, t.rect.x, t.rect.y, t.rect.w, t.rect.h, {
-        fill: active ? 'rgba(154,116,44,0.92)' : 'rgba(30,24,16,0.85)',
+        fill: active ? 'rgba(138,100,32,0.92)' : 'rgba(18,23,27,0.85)',
         stroke: active ? THEME.goldDim : THEME.line, r: 8, lw: active ? 2 : 1,
       });
       text(ctx, t.label, t.rect.x + t.rect.w / 2, t.rect.y + t.rect.h / 2, {
@@ -212,7 +212,7 @@ export class HeroBattleResultScreen {
       return;
     }
     const sum = Math.max(1, sumArg || rows.reduce((n, s) => n + (s[key] || 0), 0));
-    const rankColors = ['#ffd86c', '#c0c6d0', '#c87a3d'];
+    const rankColors = ['#f8e1ac', '#c0c6d0', '#c87a3d'];
     for (let i = 0; i < rows.length; i++) {
       const s = rows[i];
       const y = rowY + i * rowH;
@@ -224,7 +224,7 @@ export class HeroBattleResultScreen {
         : troop ? `${unitName(s.troop, s.level)} Lv${s.level}`
           : `${heroById(s.troop) ? heroById(s.troop).name : (s.troop || '单位')} Lv${s.level || 1}`;
       text(ctx, name, x0 + 26, y + 14, {
-        size: wide ? 16 : 13, color: hero ? '#c2b3c9' : THEME.text, maxWidth: wide ? 200 : 118,
+        size: wide ? 16 : 13, color: hero ? '#d9c4f2' : THEME.text, maxWidth: wide ? 200 : 118,
       });
       if (wide) {
         text(ctx, `${pct}%`, x0 + 26, y + 32, { size: 12, color: THEME.textDim });

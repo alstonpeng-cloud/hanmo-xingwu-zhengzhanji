@@ -317,18 +317,15 @@ export function createWxPlatform(options = {}) {
       }
     },
     rewardedAd,
-    // 主动分享：调起微信分享面板；success = 用户完成发送（回调里再发奖励）
+    // 主动分享：只调起分享面板。微信 2021-10 起 wx.shareAppMessage 不再回调
+    // success/fail/complete，奖励由结算页在点开面板时立即发放（shareNow）
     share(opts = {}) {
       try {
         wx.shareAppMessage({
           title: opts.title || '汉末行伍征战记：排兵布阵，征战天下',
           imageUrl: opts.imageUrl,
-          success: () => { if (opts.success) opts.success(); },
-          fail: (e) => { if (opts.fail) opts.fail(e); },
         });
-      } catch (e) {
-        if (opts.fail) opts.fail(e);
-      }
+      } catch (e) { /* 非微信环境静默：奖励已在调用前发放 */ }
     },
     audio: createWxAudio(),
     vibrate() {

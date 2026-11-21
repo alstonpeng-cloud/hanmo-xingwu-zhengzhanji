@@ -111,7 +111,7 @@
 | 敌方难度曲线（等级锚点 + 小队数） | `CONFIG.levelGen.levelAnchors / enemiesBase / enemiesPerLevel / enemiesMax`（`node tools/power-curve.mjs` 打印整条敌方总战力曲线） |
 | 克制系数 | `CONFIG.counters` |
 
-验证链：`node tools/troop-table.mjs`（重算本表）→ `node tools/duel.mjs`（品级阶梯）→ `npm test`（1395 项断言）→ `node tools/sim.mjs`（默认 1 seed + 每 20 关抽样；`--full` 跑 8 seed × 2600 关全量）→ `npm run smoke`（含演武奖励 / 自动战斗 30 关解锁 / 失败页看广告得兵 / 商城广告宝箱 / 兵种展示截图）。
+验证链：`node tools/troop-table.mjs`（重算本表）→ `node tools/duel.mjs`（品级阶梯）→ `npm test`（1625 项断言）→ `node tools/sim.mjs`（默认 1 seed + 每 20 关抽样；`--full` 跑 8 seed × 2600 关全量）→ `npm run smoke`（含演武奖励 / 自动战斗 30 关解锁 / 结算页亮绿分享按钮（1.2.9 起战败页广告位已换成分享、点开面板即发奖）/ 兵种展示截图）。
 
 敌方总战力锚点（`node tools/power-curve.mjs` 实测）：第 50 关 9,799（Lv1~2）/ 第 80 关 15,753（Lv2~3）/ 第 100 关 25,903（Lv2~3，23 支）/ 第 120 关 28,024（Lv3~4）/ 第 140 关 31,624（Lv3~5）/ 第 160 关 34,793（Lv4~5）/ 第 400 关 46,542（Lv4~5）/ 第 800 关 67,506（Lv5~6）；每关按 `levelAnchors` 线性插值出小数等级，小数部分决定这一关有多少比例的小队升 1 级（所以出征信息会显示 `Lv2~3`）。第 140 关附近用 `levelSpreadRanges`（136~140，spread 2）让部分小队一次 +2 级，做出 Lv3~5 的混编；`enemyCountAnchors` 把第 100 关压到 23 支小队（120 关恢复 25 支）。
 

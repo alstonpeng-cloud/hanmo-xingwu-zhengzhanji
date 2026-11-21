@@ -87,7 +87,7 @@ export class LevelSelectScreen {
     const city = cityOfLevel(cur);
     const { start, end } = this.computeWindow();
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, `征战 · ${chapter ? (chapter.name.split(' · ')[1] || chapter.name) : ''}`, W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
@@ -102,7 +102,7 @@ export class LevelSelectScreen {
       const diff = enemyScaleFor(next);
       const tag = cp ? ` ★ ${cp.label}` : diff > 1 ? ` · 强度 ${Math.round(diff * 100)}%` : '';
       button(ctx, this.challengeRect, `挑战第 ${next} 关`, {
-        size: 40, fill: '#332c1d', stroke: THEME.goldDim, textColor: THEME.gold,
+        size: 40, fill: '#273038', stroke: THEME.goldDim, textColor: THEME.gold,
         sub: `${city ? city.name : ''} · 敌军 ${enemyLvLabel(next)}${tag}`,
         subSize: 22,
       });
@@ -148,7 +148,7 @@ export class LevelSelectScreen {
     const bx = x + 26;
     const by = y + 82;
     const bw = w - 52;
-    bar(ctx, bx, by, bw, 22, chRatio, { fill: '#6f8f5f', stroke: '#4a3a24' });
+    bar(ctx, bx, by, bw, 22, chRatio, { fill: '#6f8f5f', stroke: '#36404a' });
     const cities = chapter?.cities || [];
     for (let i = 0; i < cities.length; i++) {
       const c = cities[i];
@@ -194,7 +194,7 @@ export class LevelSelectScreen {
     const y = 364;
     const w = 670;
     const h = 150;
-    panel(ctx, x, y, w, h, { fill: 'rgba(43,34,23,0.86)', stroke: THEME.line, r: 20 });
+    panel(ctx, x, y, w, h, { fill: 'rgba(27,34,39,0.86)', stroke: THEME.line, r: 20 });
 
     const list = milestones().filter((m) => m.chapter === chapter && (m.chests.length || (m.units || []).length));
     const gap = 10;
@@ -207,8 +207,8 @@ export class LevelSelectScreen {
       const primary = chestType(m.chests[0]);
       const color = unitReward ? (CONFIG.rarity[rarityOf(unitReward.unit)]?.color || THEME.gold) : (primary?.color || THEME.gold);
       panel(ctx, cx, cy, chipW, 126, {
-        fill: reached ? 'rgba(45,56,44,0.9)' : 'rgba(30,24,16,0.9)',
-        stroke: reached ? color : '#4a3a24',
+        fill: reached ? 'rgba(45,56,44,0.9)' : 'rgba(18,23,27,0.9)',
+        stroke: reached ? color : '#36404a',
         r: 14, lw: reached ? 2 : 1.5,
       });
 
@@ -218,7 +218,7 @@ export class LevelSelectScreen {
         ctx.save();
         ctx.beginPath();
         ctx.arc(cx + chipW / 2, iconY, 24, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(58,46,30,0.95)';
+        ctx.fillStyle = 'rgba(39,48,56,0.95)';
         ctx.fill();
         ctx.strokeStyle = color;
         ctx.lineWidth = 2;
@@ -260,7 +260,7 @@ export class LevelSelectScreen {
     const by = y + 58;
     const bw = w - 52;
     const ratio = Math.max(0, Math.min(1, (maxCleared - (start - 1)) / (end - start + 1)));
-    bar(ctx, bx, by, bw, 12, ratio, { fill: '#6f8f5f', stroke: '#4a3a24' });
+    bar(ctx, bx, by, bw, 12, ratio, { fill: '#6f8f5f', stroke: '#36404a' });
 
     // 5 个节点横排：节点宽 = 可用宽度均分，每个节点 = 5 关
     const gap = 10;
@@ -275,8 +275,8 @@ export class LevelSelectScreen {
       const done = maxCleared >= row.to;
 
       panel(ctx, nx, top, nodeW, nodeH, {
-        fill: active ? '#2c2a1d' : done ? '#202b22' : 'rgba(33,26,18,0.9)',
-        stroke: active ? THEME.gold : done ? '#3d5442' : '#4a3a24',
+        fill: active ? '#2c2a1d' : done ? '#202b22' : 'rgba(27,34,39,0.9)',
+        stroke: active ? THEME.gold : done ? '#3d5442' : '#36404a',
         r: 14, lw: active ? 2.5 : 1.5,
       });
       text(ctx, `${row.from}–${row.to}`, cx, top + 34, {

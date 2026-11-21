@@ -1,4 +1,5 @@
-// 周常挑战大厅（1.2.5）：5 档 × 10 小关 + 每周 1600 积分 draft 选兵。
+// 周常挑战大厅（1.2.5，1.2.8 改版）：5 档 × 10 小关 + 按档发放积分 draft 选兵。
+// 1.2.8：开局只发 320 分，每通一档大关 +240~400（逐档递增）；关卡格放大到 168×164。
 // 两个页签：「挑战关卡」（档位切换 + 10 个关卡格 + 奖励/难度说明）与「积分选兵」
 // （买兵 / 升级 / 卖出）；出战时进布阵页（DeployScreen weekly 模式），结算由 battle 页回收。
 import {
@@ -14,6 +15,7 @@ import {
 import {
   weeklyTierName, weeklyTroopCost, weeklyTroopUpgradeCost,
   weeklyStageCoins, weeklyStageChest, weeklyTierBonusCoins,
+  weeklyTotalPoints, weeklyBudgetForTier, weeklyStartPoints, weeklyTierGrant,
 } from '../data/weekly.js';
 import { engineStageFor } from '../core/siege.js';
 import { formatPower, troopPower } from '../core/power.js';
@@ -28,17 +30,18 @@ const TAB_DRAFT = 1;
 
 // 兵牌格（与兵营同尺寸 164×116）+ 下方操作条 30：4 列 × (164+10) = 686 ≤ 702
 const CELL = { w: 164, cardH: 116, stripH: 30, gapX: 10, gapY: 8, x0: 32 };
-const STAGE_CARD = { w: 128, h: 150, gapX: 8, gapY: 12, x0: 37 };
+// 1.2.8 · 关卡格放大（128×150 → 168×164，字号同步加大）：4 列 × (168+10) + 10 = 702
+const STAGE_CARD = { w: 168, h: 164, gapX: 10, gapY: 12, x0: 24 };
 
 export const WEEKLY_LAYOUT = {
   tabs: [
-    { x: 24, y: 172, w: 344, h: 56 },
-    { x: 382, y: 172, w: 344, h: 56 },
+    { x: 24, y: 172, w: 344, h: 60 },
+    { x: 382, y: 172, w: 344, h: 60 },
   ],
-  tier: { y: 238, h: 54, x0: 30, w: 132, gap: 9 },
-  stageView: { x: 24, y: 302, w: 702, h: 888 },
-  draftView: { x: 24, y: 238, w: 702, h: 952 },
-  stageCard: { ...STAGE_CARD, y0: 318 },
+  tier: { y: 240, h: 58, x0: 30, w: 132, gap: 9 },
+  stageView: { x: 24, y: 306, w: 702, h: 884 },
+  draftView: { x: 24, y: 240, w: 702, h: 950 },
+  stageCard: { ...STAGE_CARD, y0: 322 },
   cell: CELL,
   infoRect: { x: 652, y: 40, w: 64, h: 64 },
   backRect: { x: 36, y: 44, w: 124, h: 64 },
@@ -53,8 +56,8 @@ function chestName(id) {
 }
 
 function stageRect(i, scrollY = 0) {
-  const col = i % 5;
-  const row = Math.floor(i / 5);
+  const col = i % 4;
+  const row = Math.floor(i / 4);
   return {
     x: STAGE_CARD.x0 + col * (STAGE_CARD.w + STAGE_CARD.gapX),
     y: WEEKLY_LAYOUT.stageCard.y0 + row * (STAGE_CARD.h + STAGE_CARD.gapY) - scrollY,
@@ -299,17 +302,17 @@ export class WeeklyChallengeScreen {
     const unlockedAll = weeklyUnlocked(st);
     const s = unlockedAll ? ensureWeekly(st) : null;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '周 常 挑 战', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
 
-    // 状态行：积分 / 进度 / 今日扫荡 / 本周周次
-    text(ctx, `积分 ${s ? s.points : CONFIG.weekly.points} / ${CONFIG.weekly.points}`, 30, 152, {
+    // 状态行：积分 / 进度 / 今日扫荡 / 本周周次（1.2.8：总额 = 开局 + 各档大赏）
+    text(ctx, `积分 ${s ? s.points : weeklyStartPoints()} / ${weeklyTotalPoints()}`, 30, 152, {
       size: 24, weight: '600', color: THEME.gold,
     });
     text(ctx, `进度 ${unlockedAll ? weeklyClearedTotal(st) : 0} / ${CONFIG.weekly.tiers * CONFIG.weekly.stagesPerTier} 关`,
-      W / 2, 152, { size: 22, align: 'center', color: THEME.text, maxWidth: 260 });
+      W / 2, 152, { size: 22, align: 'center', color: THEME.text, maxWidth: 240 });
     text(ctx, `扫荡 ${s ? s.sweepCount : 0}/${CONFIG.weekly.sweepDailyLimit} · ${weekKey()}`,
       W - 30, 152, { size: 20, align: 'right', color: THEME.textDim, maxWidth: 300 });
 
@@ -317,7 +320,7 @@ export class WeeklyChallengeScreen {
     const tabs = [['挑 战 关 卡', '首通 / 扫荡拿奖励'], ['积 分 选 兵', '买兵 · 升级 · 卖出']];
     WEEKLY_LAYOUT.tabs.forEach((r, i) => {
       button(ctx, r, tabs[i][0], {
-        size: 26, sub: tabs[i][1], subSize: 15, active: this.tab === i,
+        size: 28, sub: tabs[i][1], subSize: 16, active: this.tab === i,
       });
     });
 
@@ -349,9 +352,9 @@ export class WeeklyChallengeScreen {
       const done = weeklyTierClearedCount(st, t);
       this.tierRects.push({ rect, tier: t });
       button(ctx, rect, `${weeklyTierName(t)} 档`, {
-        size: 23,
+        size: 25,
         sub: `${done}/${CONFIG.weekly.stagesPerTier}${locked ? ' · 锁' : ''}`,
-        subSize: 14,
+        subSize: 15,
         active: this.tier === t,
         disabled: locked,
       });
@@ -377,50 +380,50 @@ export class WeeklyChallengeScreen {
 
       const current = unlocked && !cleared;
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: cleared ? 'rgba(58,46,22,0.82)' : unlocked ? '#2b2217' : '#1c1610',
+        fill: cleared ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
         stroke: cleared ? THEME.gold : current ? THEME.green : THEME.line,
-        r: 12, lw: current ? 2 : 1,
+        r: 14, lw: current ? 2.5 : 1.5,
       });
-      text(ctx, `第 ${stage} 关`, rect.x + 10, rect.y + 20, {
-        size: 14, color: cleared ? THEME.gold : unlocked ? THEME.textDim : THEME.textWeak,
+      text(ctx, `第 ${stage} 关`, rect.x + 12, rect.y + 26, {
+        size: 18, weight: '600', color: cleared ? THEME.gold : unlocked ? THEME.text : THEME.textWeak,
       });
-      text(ctx, cleared ? '已通关' : current ? '可出战' : '未解锁', rect.x + rect.w - 10, rect.y + 20, {
-        size: 12, align: 'right', color: cleared ? THEME.gold : current ? THEME.green : THEME.textWeak,
+      text(ctx, cleared ? '已通关' : current ? '可出战' : '未解锁', rect.x + rect.w - 12, rect.y + 26, {
+        size: 14, align: 'right', color: cleared ? THEME.gold : current ? THEME.green : THEME.textWeak,
       });
 
       if (unlocked) {
-        text(ctx, `敌 ${formatPower(def.targetPower)}`, rect.x + rect.w / 2, rect.y + 52, {
-          size: 17, weight: '600', align: 'center',
+        text(ctx, `敌 ${formatPower(def.targetPower)}`, rect.x + rect.w / 2, rect.y + 74, {
+          size: 24, weight: '700', align: 'center',
           color: cleared ? THEME.gold : THEME.text, maxWidth: rect.w - 12,
         });
-        text(ctx, `你的上限 ${formatPower(def.draftCap)}`, rect.x + rect.w / 2, rect.y + 74, {
-          size: 12, align: 'center', color: THEME.textDim, maxWidth: rect.w - 12,
+        text(ctx, `你的上限 ${formatPower(def.draftCap)}`, rect.x + rect.w / 2, rect.y + 104, {
+          size: 14, align: 'center', color: THEME.textDim, maxWidth: rect.w - 12,
         });
         const chest = weeklyStageChest(tier, stage);
         const reward = `首通 ${weeklyStageCoins(tier)} 钱${chest ? ` · ${chestName(chest)}` : ''}`;
-        text(ctx, reward, rect.x + rect.w / 2, rect.y + 104, {
-          size: 11, align: 'center', color: cleared ? THEME.textWeak : THEME.gold, maxWidth: rect.w - 8,
+        text(ctx, reward, rect.x + rect.w / 2, rect.y + 130, {
+          size: 13, align: 'center', color: cleared ? THEME.textWeak : THEME.gold, maxWidth: rect.w - 8,
         });
         if (cleared) {
           const left = CONFIG.weekly.sweepDailyLimit - s.sweepCount;
-          text(ctx, left > 0 ? `点击扫荡 · 剩 ${left}` : '扫荡次数用完', rect.x + rect.w / 2, rect.y + 134, {
-            size: 13, align: 'center', color: left > 0 ? THEME.gold : THEME.textWeak, maxWidth: rect.w - 8,
+          text(ctx, left > 0 ? `点击扫荡 · 剩 ${left}` : '扫荡次数用完', rect.x + rect.w / 2, rect.y + 152, {
+            size: 16, align: 'center', color: left > 0 ? THEME.gold : THEME.textWeak, maxWidth: rect.w - 8,
           });
         } else {
-          text(ctx, '出 战', rect.x + rect.w / 2, rect.y + 134, {
-            size: 16, weight: '600', align: 'center', color: THEME.green,
+          text(ctx, '出 战', rect.x + rect.w / 2, rect.y + 152, {
+            size: 20, weight: '600', align: 'center', color: THEME.green,
           });
         }
       } else {
         text(ctx, !tierUnlocked ? `需通完第 ${tier - 1} 档` : `需通关第 ${stage - 1} 关`,
-          rect.x + rect.w / 2, rect.y + 90, {
-            size: 12, align: 'center', color: THEME.textWeak, maxWidth: rect.w - 8,
+          rect.x + rect.w / 2, rect.y + 96, {
+            size: 15, align: 'center', color: THEME.textWeak, maxWidth: rect.w - 8,
           });
       }
     }
 
-    // 档位奖励 + 难度说明两块面板
-    const y = WEEKLY_LAYOUT.stageCard.y0 + 2 * (STAGE_CARD.h + STAGE_CARD.gapY) + 10;
+    // 档位奖励 + 难度说明两块面板（3 行大卡后下移：322 + 3×176 + 6 = 856）
+    const y = WEEKLY_LAYOUT.stageCard.y0 + 3 * (STAGE_CARD.h + STAGE_CARD.gapY) + 6;
     const w = V.w - 12;
     const x = V.x + 6;
     const anchor = CONFIG.weekly.tierAnchors[tier - 1];
@@ -433,7 +436,7 @@ export class WeeklyChallengeScreen {
       `首通铜钱 ${weeklyStageCoins(tier)} / 关；第 5 关发${chestName(weeklyStageChest(tier, 5))}，第 10 关发${chestName(weeklyStageChest(tier, 10))} + 档位大赏 ${weeklyTierBonusCoins(tier)} 铜钱`,
       tier >= 3
         ? '敌军强度已越过纯兵上限：英雄、器械、兵书的练度就是通关钥匙'
-        : '靠 1600 积分合理选兵就有机会通关，先熟悉各兵种的性价比',
+        : `开局只发 ${weeklyStartPoints()} 分（传奇只够零星几张）：每通一档大关 +${CONFIG.weekly.tierGrants.join('/')} 分`,
       tier >= 4 ? '本档敌方出器械：记得带上你最好的攻城器械与站位' : '本档敌方无器械、无英雄，正面拼配置',
       `扫荡：本周已首通的关每天 ${CONFIG.weekly.sweepDailyLimit} 次，得首通铜钱的 ${Math.round(CONFIG.weekly.sweepRatio * 100)}%（不给宝箱）`,
     ];
@@ -450,7 +453,8 @@ export class WeeklyChallengeScreen {
     const V = WEEKLY_LAYOUT.draftView;
     const h = CELL.cardH + CELL.stripH;
     const troops = weeklyAvailableTroops(st);
-    const cap = draftCapPower(st);
+    // 1.2.8 · 理论上限按「当前档开战预算」算，与关卡格的「你的上限」同口径
+    const cap = draftCapPower(st, weeklyBudgetForTier(s.tier));
     const deployed = new Set(s.form.filter((v) => typeof v === 'string' && !v.startsWith('h:')));
 
     this.shopCells = [];
@@ -464,7 +468,7 @@ export class WeeklyChallengeScreen {
     const sy = this.scrollB;
 
     let y = V.y + 34 - sy;
-    text(ctx, `已购 ${s.roster.length}/${CONFIG.formation.cols * CONFIG.formation.rows} · 剩余积分 ${s.points} · 纯兵理论上限 ${formatPower(cap)}`,
+    text(ctx, `已购 ${s.roster.length}/${CONFIG.formation.cols * CONFIG.formation.rows} · 剩余积分 ${s.points} · 本档理论上限 ${formatPower(cap)}`,
       V.x + 8, y, { size: 20, weight: '600', color: THEME.gold, maxWidth: V.w - 16 });
 
     // 招兵区
@@ -542,7 +546,7 @@ export class WeeklyChallengeScreen {
       const ratio = V.h / (V.h + max);
       const bh = Math.max(26, (V.h - 4) * ratio);
       const by = V.y + 2 + (V.h - 4 - bh) * (this.scrollB / max);
-      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     text(ctx, '积分每周一 0 点归零重置 —— 买好的兵只在本周有效', 375, 1236, {
@@ -553,10 +557,11 @@ export class WeeklyChallengeScreen {
   drawInfo(ctx, W) {
     const cfg = CONFIG.weekly;
     infoModal(ctx, W, this.game.H, '周 常 挑 战 说 明', [
-      `主线 ${cfg.unlockLevel} 关后开放；每周一北京时间 0 点重置，积分 ${cfg.points} 分、兵牌与进度全部归零。`,
+      `主线 ${cfg.unlockLevel} 关后开放；每周一北京时间 0 点重置，积分、兵牌与进度全部归零。`,
+      `积分按档发放：开局只发 ${cfg.startPoints} 分（传奇只够零星几张），每通完一个大关 +${cfg.tierGrants.join('/')} 分（共 ${weeklyTotalPoints()} 分）。`,
       `用积分买兵（普通 ${cfg.costBase.common} 分起，升一级 ×${cfg.costGrowth}，越高等越贵），卖出全额退还；布阵上限 25 格。`,
-      `5 个档位 × 10 小关顺序解锁，通完上一档才开下一档；敌方战力 = 你的纯兵理论上限 × 档位倍率（×${cfg.tierMult.join(' / ')}）。`,
-      '第一档靠选兵就能过；第二档要在没有任何加成的条件下硬啃配置；第三档起必须英雄 + 器械配合；第四档起要兵书；第五档全养成都考。',
+      `5 个档位 × 10 小关顺序解锁，通完上一档才开下一档；敌方战力 = 该档开战预算的纯兵上限 × 档位倍率（×${cfg.tierMult.join(' / ')}），难度逐档飙升。`,
+      '第一档靠选兵就能过；第二档要硬啃配置；第三档起必须英雄 + 器械；第四档起要兵书；第五档全养成都考。',
       '你已解锁的英雄、器械、兵书在本模式全部生效（第 4 档起敌方也出器械），练度越高越稳。',
       `首通铜钱 500 × 档位 / 关，第 5 关银箱、第 10 关高品箱 + 档位大赏；已通关关卡每天扫荡 ${cfg.sweepDailyLimit} 次，得 ${Math.round(cfg.sweepRatio * 100)}% 铜钱、无宝箱。`,
     ]);

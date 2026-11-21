@@ -61,15 +61,18 @@ import {
   upgradeWeeklyTroop, removeWeeklyTroop, weeklyTierUnlocked, weeklyStageUnlocked,
   weeklyTierClearedCount, weeklyClearedTotal, recordWeeklyClear, weeklySweep,
   weeklyAvailableTroops, draftActiveFormation, draftDeployedIds,
+  weeklyNextStage, weeklyOrbUnread,
 } from '../src/core/weekly.js';
 import {
   weeklyCost, weeklyTroopCost, weeklyTroopUpgradeCost, weeklyStageCoins,
   weeklyStageChest, weeklyTierBonusCoins, weeklyTierName,
+  weeklyStartPoints, weeklyTierGrant, weeklyBudgetForTier, weeklyTotalPoints,
 } from '../src/data/weekly.js';
 import {
   dailyBattleDef, dailyHpMult, dailyHeroCount, dailyHeroes, dailyAnchor, dailyTotal,
   dailyUnlocked as dailyChallengeUnlocked, dailyClearedCount, dailyStageUnlocked,
   recordDailyClear, recordDailyRepeatWin, dailyFirstClearReward,
+  dailyChallengeOrbUnread,
 } from '../src/data/dailyChallenge.js';
 import { ACHIEVEMENTS, ACHIEVEMENT_CATS, achievementsOfCat, achievementRewardText } from '../src/data/achievements.js';
 import {
@@ -1542,7 +1545,7 @@ console.log('\n== 分享得宝箱 ==');
   const epic = claimShareReward(st2, day1);
   ok(epic.ok && epic.chest === 'epic' && chestCount(st2, 'epic') === 1, '200 关后分享：史诗箱 ×1 入仓');
 
-  // 结算页分享按钮：不与既有按钮重叠，点击调起平台分享，success 回调发奖
+  // 结算页分享按钮：不与既有按钮重叠，点击点开分享面板即发奖（微信无 success 回调）
   const overlap = (a, b) => a.x < b.x + b.w && a.x + a.w > b.x && a.y < b.y + b.h && a.y + a.h > b.y;
   const shareCalls = [];
   const stR = createNewState();
@@ -1556,22 +1559,38 @@ console.log('\n== 分享得宝箱 ==');
   const winR = new ResultScreen(stubGame, { win: true, levelN: 30, stats: [], chests: [] });
   const loseR = new ResultScreen(stubGame, { win: false, levelN: 30, stats: [], chests: [] });
   for (const r of [winR, loseR]) {
-    ok(!overlap(r.shareRect, r.primary) && !overlap(r.shareRect, r.secondary) && !overlap(r.shareRect, r.tertiary),
+    const others = [r.primary, r.tertiary, ...(r.secondary ? [r.secondary] : [])];
+    ok(others.every((b) => !overlap(r.shareRect, b)),
       `分享按钮与底部主按钮不重叠（${r.d.win ? '胜利' : '失败'}页）`);
+    ok(r.shareRect.w === 400 && r.shareRect.h === 96,
+      `分享按钮与主按钮同尺寸 400×96（${r.d.win ? '胜利' : '失败'}页）`);
   }
+  ok(loseR.secondary === null, '战败页不再有广告次按钮（原广告位并入分享按钮）');
   const cx = winR.shareRect.x + winR.shareRect.w / 2;
   const cy = winR.shareRect.y + winR.shareRect.h / 2;
   winR.tap(cx, cy);
   ok(shareCalls.length === 1, '点击分享按钮调起平台分享');
-  shareCalls[0].success();
   ok(chestCount(stR, 'gold') === 1 && stR.daily.shares === 1 && stubGame.saveCalled === 1,
-    '分享成功回调：黄金箱入仓 + 当日计数 +1 + 存档');
+    '点开分享面板即发奖：黄金箱入仓 + 当日计数 +1 + 存档');
+  ok(stubGame.msgs.some((m) => m.includes('已打开分享面板')), '提示已打开分享面板且宝箱入仓');
   winR.tap(cx, cy);
-  shareCalls[1].success();
-  ok(chestCount(stR, 'gold') === 2 && stR.daily.shares === 2, '第 2 次分享成功：额度用满');
+  ok(chestCount(stR, 'gold') === 2 && stR.daily.shares === 2 && shareCalls.length === 2, '第 2 次分享：额度用满');
   winR.tap(cx, cy);
   ok(shareCalls.length === 2 && stubGame.msgs.some((m) => m.includes('已领完')),
     '第 3 次点击不再调起分享，提示今日已领完');
+  // 战败页：点原广告按钮位（现为分享按钮）同样点开面板即发奖
+  const stL = createNewState();
+  stL.maxCleared = 30;
+  const loseGame = {
+    state: stL, msgs: [], saveCalled: 0,
+    toast(m) { this.msgs.push(m); },
+    save() { this.saveCalled += 1; },
+    platform: { share(opts) { shareCalls.push(opts); } },
+  };
+  const loseR2 = new ResultScreen(loseGame, { win: false, levelN: 30, stats: [], chests: [] });
+  loseR2.tap(loseR2.shareRect.x + loseR2.shareRect.w / 2, loseR2.shareRect.y + loseR2.shareRect.h / 2);
+  ok(shareCalls.length === 3 && chestCount(stL, 'gold') === 1 && stL.daily.shares === 1,
+    '战败页点分享：点开面板即发奖');
 }
 
 console.log('\n== 战斗力评定 / 本局最佳统计 ==');
@@ -4436,14 +4455,15 @@ console.log('\n== 序章 / 首次流程 / 加速锁 ==');
   const ctx = { screen: 'deploy', mode: 'battle', prologue: true, zoomDone: false, mergePair: null };
   ok(pickTutorial({ tutorial: emptyTutorial() }, ctx) === null, '缩放提示不弹遮罩、没有跳过入口');
 
-  // 文案清理：广告入口不再暴露剩余次数 / 上限，首页删掉说明小字（渲染文本无法反查，按源码断言）
+  // 文案清理：广告奖励入口已于 1.2.9 全部移除，首页删掉说明小字（渲染文本无法反查，按源码断言）
   const readSrc = (rel) => fs.readFileSync(path.resolve(rel), 'utf8');
   const screenNames = ['home', 'shop', 'result', 'heroes', 'chests', 'daily', 'dailyShop', 'gauntlet', 'trial', 'heroBattle', 'levels', 'barracks'];
   const allScreenSrc = screenNames.map((n) => readSrc(`src/screens/${n}.js`)).join('\n');
   ok(!/今日还剩|剩\s*\$\{left\}|今日剩余|每天最多|每日 \$\{CONFIG\.ads/.test(allScreenSrc),
     '全站广告入口不再出现「剩余次数 / 每日上限」文案');
-  ok(allScreenSrc.includes('广告 · ') && allScreenSrc.includes('看广告 · +1 券'),
-    '广告按钮本身保留');
+  ok(!allScreenSrc.includes('广告 · ') && !allScreenSrc.includes('看广告 · +1 券')
+    && !allScreenSrc.includes('watchTroopAd') && !allScreenSrc.includes('adChest('),
+    '广告奖励按钮已全部移除');
   const homeSrc = readSrc('src/screens/home.js');
   ok(!homeSrc.includes('武将位'), '首页不再出现「武将位未开放」提示');
   ok(!homeSrc.includes('每小时 +') && !homeSrc.includes('最多累计'), '挂机收益下方小字说明已删除');
@@ -4461,6 +4481,14 @@ console.log('\n== 序章 / 首次流程 / 加速锁 ==');
     '入口点击与解锁引导都指向左侧圆钮');
   ok(readSrc('src/render/draw.js').includes('圆钮外沿挂一把锁'),
     '未解锁的圆钮外侧绘制锁态');
+  // 1.2.8：红点去数字（纯色呼吸）+ 每日挑战卡面去英雄模型
+  const drawSrc = readSrc('src/render/draw.js');
+  ok(!drawSrc.includes('text(ctx, String(badge)'), '圆钮红点不再绘制数字（纯色呼吸角标）');
+  ok(drawSrc.includes('1.2.8 · 纯色呼吸角标'), '红点走呼吸缩放 + 透明度脉动');
+  const dailyChSrc = readSrc('src/screens/dailyChallenge.js');
+  ok(!dailyChSrc.includes('drawHeroFigure') && !dailyChSrc.includes('drawHeroAura')
+    && !dailyChSrc.includes('heroById'),
+    '每日挑战卡面不再画英雄模型 / 光环 / 将名');
 
   // 兵种 / 英雄文案：不出现设计口径与占位符，只写机制与数值
   const copySrc = ['src/data/traits.js', 'src/data/heroes.js', 'src/data/growth.js', 'src/screens/unitDetail.js']
@@ -4883,8 +4911,8 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
   wst.maxCleared = 40;
   ensureWeekly(wst);            // 首次：key 不一致 → 整域重建
   const wInit = ensureWeekly(wst);   // 同周再进：结构护栏补齐 25 格
-  ok(wInit.points === 1600 && wInit.key === weekKey(),
-    `周常初始化：积分 ${wInit.points} / 本周 key=${wInit.key}`);
+  ok(wInit.points === weeklyStartPoints() && wInit.key === weekKey(),
+    `周常初始化：开局积分 ${wInit.points}（weeklyStartPoints=${weeklyStartPoints()}） / 本周 key=${wInit.key}`);
   ok(wInit.form.length === 25 && wInit.form.every((v) => v === null),
     'form 补满 25 格空位');
   ok(wInit.cleared.length === 5 && wInit.cleared.every((v) => v === 0),
@@ -4944,19 +4972,24 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
   const wNew = ensureWeekly(wst, now2);
   ok(wNew.key === weekKey(now2) && wNew.key !== keyOld,
     `加 8 天换周：key ${keyOld} → ${wNew.key}`);
-  ok(wNew.points === 1600 && wNew.roster.length === 0 && wNew.cleared.every((v) => v === 0),
-    '换周后积分回 1600、兵牌 / 布阵 / 进度全部归零');
+  ok(wNew.points === weeklyStartPoints() && wNew.roster.length === 0 && wNew.cleared.every((v) => v === 0)
+    && wNew.granted === 0 && wNew.seen === false,
+    `换周后积分回开局 ${weeklyStartPoints()}、兵牌 / 布阵 / 进度 / 发赏掩码全部归零`);
 
   // ---- 3. 五档难度与结算 ----
   const st3 = createNewState();
   st3.maxCleared = 40;
   ensureWeekly(st3);
-  const cap3 = draftCapPower(st3);
   let defOk = true;
+  let budgetPrev = 0;
   for (let t = 1; t <= 5; t++) {
+    const capT = draftCapPower(st3, weeklyBudgetForTier(t));
+    if (weeklyBudgetForTier(t) <= budgetPrev) defOk = false;   // 开战预算逐档递增
+    budgetPrev = weeklyBudgetForTier(t);
     for (const s of [1, 5, 10]) {
       const d = weeklyLevelDef(st3, t, s);
-      const want = Math.round(cap3 * CONFIG.weekly.tierMult[t - 1] * (1 + 0.02 * (s - 1)));
+      const want = Math.round(capT * CONFIG.weekly.tierMult[t - 1]
+        * (1 + CONFIG.weekly.stageGrowth * (s - 1)));
       if (d.targetPower !== want) defOk = false;
       if (!d.weekly || d.weekly.tier !== t || d.weekly.stage !== s) defOk = false;
       if (d.bossCount !== 0 || d.heroBoss !== false) defOk = false;
@@ -4964,7 +4997,11 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
     }
   }
   ok(defOk,
-    `五档×(1/5/10) 关：targetPower=round(纯兵上限 ${cap3} × tierMult[t] × (1+0.02×(s−1)))，敌阵无 hero/boss、bossCount=0、weekly={tier,stage}`);
+    `五档×(1/5/10) 关：targetPower=round(该档预算 ${weeklyBudgetForTier(1)}→${weeklyBudgetForTier(5)} 的纯兵上限 × tierMult[t] × (1+${CONFIG.weekly.stageGrowth}×(s−1)))，预算逐档递增、敌阵无 hero/boss`);
+  ok(weeklyBudgetForTier(1) === weeklyStartPoints()
+    && weeklyTierGrant(1) < weeklyTierGrant(5)
+    && weeklyTotalPoints() === weeklyStartPoints() + CONFIG.weekly.tierGrants.reduce((a, b) => a + b, 0),
+    `按档发放：开局 ${weeklyStartPoints()}、第 1 档赏 ${weeklyTierGrant(1)} < 第 5 档赏 ${weeklyTierGrant(5)}、总额 ${weeklyTotalPoints()}`);
 
   let engLow = true;
   for (let t = 1; t <= 3; t++) if (weeklyLevelDef(st3, t, 1).engine !== null) engLow = false;
@@ -4988,6 +5025,9 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
   st3.weekly.cleared[0] |= 1;
   ok(weeklyStageUnlocked(st3, 1, 2) === true, '通掉第 1 档第 1 关 → 第 2 关解锁');
   st3.weekly.cleared[0] = 0;
+  // 上面把 cleared[0] 置满又清零的窗口里，ensureWeekly 回填已给第 1 档发过赏并置掩码 —— 复位后再断言逐档发放
+  st3.weekly.granted = 0;
+  st3.weekly.points = weeklyStartPoints();
 
   const add3 = (type, n) => addChest(st3, type, n);
   const coins30 = st3.coins;
@@ -5008,6 +5048,52 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
     `第 5 档第 10 关：档位大赏 ${c510.tierCoins} + legendary 箱`);
   ok(st3.counters.weeklyClears === 4,
     `counters.weeklyClears 累计 ${st3.counters.weeklyClears} 次首通`);
+
+  // 1.2.8 · 档位积分赏：第 1/5 档通关各发一笔、只发一次
+  const grantSum = weeklyStartPoints() + weeklyTierGrant(1) + weeklyTierGrant(5);
+  ok(c10.tierPoints === weeklyTierGrant(1) && c510.tierPoints === weeklyTierGrant(5)
+    && st3.weekly.points === grantSum,
+    `档位通关积分赏：+${c10.tierPoints} / +${c510.tierPoints}，累计积分 ${st3.weekly.points}（开局+两档=${grantSum}）`);
+  const c10b = recordWeeklyClear(st3, 1, 10, add3);
+  ok(c10b.tierPoints === 0 && st3.weekly.points === grantSum,
+    '档位积分赏幂等：重复通关第 10 关不补发');
+
+  // 1.2.8 · 「下一关」推进回归：第 10 关后不得出现第 11 关，第 5 档后不得出现第 6 档
+  const stN = createNewState();
+  stN.maxCleared = 40;
+  ensureWeekly(stN);
+  stN.weekly.cleared[0] = 0b1111111111;
+  ok(weeklyNextStage(stN, 1, 5) && weeklyNextStage(stN, 1, 5).join('-') === '1-6',
+    '档中推进：第 1 档第 5 关 → 第 1-6 关');
+  ok(weeklyNextStage(stN, 1, 10) && weeklyNextStage(stN, 1, 10).join('-') === '2-1',
+    '档末推进：打完第 1 档第 10 关 → 第 2 档第 1 关（不出第 11 关）');
+  stN.weekly.cleared = [0b1111111111, 0b1111111111, 0b1111111111, 0b1111111111, 0b1111111111];
+  ok(weeklyNextStage(stN, 5, 10) === null,
+    '全通回归：第 5 档第 10 关后返回 null（不出第 11 关 / 第 6 档）');
+  ok(weeklyNextStage(stN, 5, 1) && weeklyNextStage(stN, 5, 1).join('-') === '5-2',
+    '第 5 档档中推进仍在档内');
+
+  // 1.2.8 · 首页红点：点进即消、按周/日周期重显、未解锁恒不显示
+  const stR = createNewState();
+  stR.maxCleared = 40;
+  ok(weeklyOrbUnread(stR) === true, '周常红点：未建域（没点进过）→ 未读');
+  ensureWeekly(stR);
+  ok(weeklyOrbUnread(stR) === true, '周常红点：已建域但未点进 → 未读');
+  stR.weekly.seen = true;
+  ok(weeklyOrbUnread(stR) === false, '周常红点：点进面板后消失');
+  ok(weeklyOrbUnread(stR, Date.now() + 8 * 864e5) === true, '周常红点：跨周自动重显');
+  const stRL = createNewState();
+  stRL.maxCleared = 10;
+  ok(weeklyOrbUnread(stRL) === false, '周常红点：未解锁恒不显示');
+  const stD = createNewState();
+  stD.maxCleared = 40;
+  ok(dailyChallengeOrbUnread(stD) === true, '每日红点：当日未点进 → 未读');
+  stD.dailyChallenge = { progress: Array(CONFIG.dailyChallenge.total).fill(0), seenDay: dateKey() };
+  ok(dailyChallengeOrbUnread(stD) === false, '每日红点：点进面板后消失');
+  ok(dailyChallengeOrbUnread(stD, Date.now() + 864e5) === true, '每日红点：次日 0 点重显');
+  const stDL = createNewState();
+  stDL.maxCleared = 10;
+  ok(dailyChallengeOrbUnread(stDL) === false, '每日红点：未解锁恒不显示');
 
   const swNo = weeklySweep(st3, 1, 2);
   ok(!swNo.ok && swNo.reason === 'notCleared', '未首通的关不能扫荡（notCleared）');
@@ -5196,6 +5282,22 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
   ok(backC.counters.chestsOpened === 7 && backC.counters.sweeps === 3
     && backC.counters.weeklyClears === 2,
     'counters 存档往返保留（不随每日 / 每周重置）');
+  // 1.2.8 · 红点已读标记与档位发赏掩码进白名单
+  const stW8 = createNewState();
+  stW8.maxCleared = 40;
+  ensureWeekly(stW8);
+  stW8.weekly.seen = true;
+  stW8.weekly.granted = 0b00101;
+  stW8.weekly.points = weeklyTotalPoints();
+  stW8.dailyChallenge = { progress: Array(CONFIG.dailyChallenge.total).fill(1), seenDay: dateKey() };
+  saveState(gStore6, stW8);
+  const backW8 = loadState(gStore6);
+  ok(backW8.weekly.seen === true && backW8.weekly.granted === 0b00101
+    && backW8.weekly.points === weeklyTotalPoints(),
+    `存档往返保留周常 seen / granted 掩码 / 积分 ${backW8.weekly.points}`);
+  ok(backW8.dailyChallenge.seenDay === dateKey()
+    && backW8.dailyChallenge.progress.every((v) => v === 1),
+    '存档往返保留每日挑战 seenDay 与 30 位进度');
 
   // ---- 7. 三个新屏手势 ----
   const pushedW = [];
@@ -5268,6 +5370,10 @@ console.log('\n== 1.2.5：大戟士口径 / 周常挑战 / 每日挑战 / 成就
   aS.onDown(TA.x0 + 5, TA.y + 5);
   aS.onDown(TA.x0 + (TA.w + TA.gap) + 5, TA.y + 5);
   ok(aS.cat === 'battle', `点分类页签切换 → cat=${aS.cat}（ACHIEVEMENT_CATS[0]「征战」）`);
+  // 1.2.8：6 个页签（全部 + 5 类）必须全部落在 750 宽屏内（旧布局 837 宽，「经济」被右边缘裁掉）
+  const tabRight = TA.x0 + (ACHIEVEMENT_CATS.length + 1) * (TA.w + TA.gap) - TA.gap;
+  ok(tabRight <= 750,
+    `成就分类栏 6 页签右缘 ${tabRight} ≤ 750（x0=${TA.x0} w=${TA.w} gap=${TA.gap}，全部可见）`);
   const coinsA2 = gA.state.coins;
   aS.claimRects = [{ rect: { x: 200, y: 300, w: 140, h: 52 }, id: 'main_progress', index: 0 }];
   aS.onUp(260, 320);

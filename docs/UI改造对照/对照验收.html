@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>墨韵丹符 · UI 改造前后对照验收</title>
+<style>
+:root{--gold:#e8b44c;--violet:#9b77cf;--coin:#3e9a85;--red:#c0392b;--slate:#5b6b78;--ink:#0c1013;--panel:#1b2227;--line:#313c45;--text:#ecf1f4;--dim:#8c9ba7;--serif:"Songti SC","STSong","Noto Serif CJK SC",serif;--sans:"PingFang SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--text);font-family:var(--sans);line-height:1.7;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+header{padding:70px 0 46px;border-bottom:1px solid var(--line);background:radial-gradient(ellipse at 82% 10%,rgba(192,57,43,.10),transparent 45%),radial-gradient(ellipse at 12% 90%,rgba(232,180,76,.06),transparent 50%)}
+.eyebrow{color:var(--gold);letter-spacing:6px;font-size:12px;margin-bottom:18px}
+h1{font-family:var(--serif);font-size:clamp(38px,6vw,64px);letter-spacing:4px;color:var(--text)}
+h1 em{color:var(--red);font-style:normal}
+.sub{color:var(--dim);margin-top:14px;font-size:15px;max-width:720px;line-height:1.9}
+.keys{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.key{border:1px solid var(--line);border-radius:4px;padding:8px 15px;font-size:12.5px;display:flex;align-items:center;gap:8px}
+.key i{width:9px;height:9px;border-radius:50%;box-shadow:0 0 10px currentColor}
+.key b{color:var(--text);font-weight:500}
+section{padding:52px 0;border-bottom:1px solid var(--ink-850,var(--line))}
+.sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:26px}
+.sec-h .n{font-family:var(--serif);color:var(--red);font-size:14px;letter-spacing:2px}
+.sec-h h2{font-family:var(--serif);font-size:27px;letter-spacing:2px;font-weight:600}
+.sec-desc{color:var(--dim);font-size:13.5px;margin:-14px 0 24px;line-height:1.9}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:760px){.cmp{grid-template-columns:1fr}}
+.side-label{font-size:12px;letter-spacing:2px;margin-bottom:10px;display:flex;align-items:center;gap:8px;color:var(--dim)}
+.side-label.before:before{content:"";width:8px;height:8px;border-radius:50%;background:#7a6a52}
+.side-label.after:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.shot{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#000;display:flex;justify-content:center}
+.shot img{width:100%;max-width:400px;height:auto;display:block}
+.point{margin-top:12px;font-size:12.5px;color:var(--dim);line-height:1.8}
+.point b{color:var(--gold);font-weight:500}
+.status{display:inline-block;font-size:11px;padding:3px 10px;border-radius:3px;background:rgba(62,154,133,.14);color:#63bca6;border:1px solid rgba(62,154,133,.35);margin-left:8px}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line)}
+th{color:var(--dim);font-size:11.5px;letter-spacing:1px;font-weight:500}
+td{color:var(--text)}
+td .old{color:#7a6a52}.new{color:var(--gold)}
+footer{padding:44px 0 60px;text-align:center;color:var(--dim);font-size:12px;letter-spacing:1px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <div class="eyebrow">汉末行伍征战记 · UI 改造验收</div>
+  <h1>「<em>墨韵丹符</em>」落地对照</h1>
+  <p class="sub">左为改造前（旧版暖褐朱金），右为改造后（墨韵丹符）。所有画面均由游戏真实渲染截图，非设计稿。核心目标：色相即语义——鎏金=成功、玄铁=失败、青蚨=商城、紫气=宝箱。</p>
+  <div class="keys">
+    <span class="key"><i style="background:var(--gold);color:var(--gold)"></i><b>鎏金</b> 成功/凯旋</span>
+    <span class="key"><i style="background:var(--slate);color:var(--slate)"></i><b>玄铁+残赤</b> 失败</span>
+    <span class="key"><i style="background:var(--coin);color:var(--coin)"></i><b>青蚨</b> 商城</span>
+    <span class="key"><i style="background:var(--violet);color:var(--violet)"></i><b>紫气</b> 宝箱/招募</span>
+    <span class="key"><i style="background:var(--red);color:var(--red)"></i><b>丹砂</b> 品牌主按钮</span>
+  </div>
+</div></header>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">壹</span><h2>首页</h2><span class="status">✓ 达标</span></div>
+  <p class="sec-desc">冷玄墨底替代暖褐；闯关主按钮为丹砂渐变 + 金边；宝箱/招募入口切到紫气、商城切到青蚨，首页即建立颜色导航。</p>
+  <div class="cmp">
+    <div><div class="side-label before">改造前 · 暖褐朱金</div><div class="shot"><img src="before/01_home.png" alt="改前首页"></div></div>
+    <div><div class="side-label after">改造后 · 墨韵丹符</div><div class="shot"><img src="after/01_home.png" alt="改后首页"></div><div class="point"><b>变化：</b>背景冷灰蓝 · 四大入口语义色区分 · 丹砂主按钮</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">贰</span><h2>英雄 / 招募 <span style="font-size:13px;color:var(--dim);font-weight:400">（重点升级）</span></h2><span class="status">✓ 达标</span></div>
+  <p class="sec-desc">卡片升级为：冷玄墨卡面 + 品级色晕染 + 双描边 + 顶部高光；传奇卡新增四角金线。品级光环统一为紫气（史诗）/ 鎏金（传奇），与全局品级色单一来源对齐。</p>
+  <div class="cmp">
+    <div><div class="side-label before">改造前</div><div class="shot"><img src="before/48b_hero_screen.png" alt="改前英雄"></div></div>
+    <div><div class="side-label after">改造后</div><div class="shot"><img src="after/48b_hero_screen.png" alt="改后英雄"></div><div class="point"><b>变化：</b>四角金饰 · 品级晕染 · 传奇鎏金 / 史诗紫气 · 冷调卡面</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">叁</span><h2>商城 · 青蚨</h2><span class="status">✓ 达标</span></div>
+  <p class="sec-desc">商城标题、每日商店入口、等级切换全部改用青蚨绿，铜钱数字保留鎏金（货币通用色），功能一眼可辨。</p>
+  <div class="cmp">
+    <div><div class="side-label before">改造前</div><div class="shot"><img src="before/26_shop.png" alt="改前商城"></div></div>
+    <div><div class="side-label after">改造后</div><div class="shot"><img src="after/26_shop.png" alt="改后商城"></div><div class="point"><b>变化：</b>商城标题青蚨绿 · 卡片冷调 · 选中态青蚨描边</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">肆</span><h2>宝箱 · 紫气</h2><span class="status">✓ 达标</span></div>
+  <p class="sec-desc">宝箱标题改为紫气；各档宝箱行边框沿用自身品级色（木/银/金/稀有/史诗/传奇），统领色与品级色各司其职。</p>
+  <div class="cmp">
+    <div><div class="side-label before">改造前</div><div class="shot"><img src="before/25b_chests.png" alt="改前宝箱"></div></div>
+    <div><div class="side-label after">改造后</div><div class="shot"><img src="after/25b_chests.png" alt="改后宝箱"></div><div class="point"><b>变化：</b>标题紫气 · 面板冷调 · 品级边框保留</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">伍</span><h2>胜利 · 鎏金 / 失败 · 玄铁</h2><span class="status">✓ 达标</span></div>
+  <p class="sec-desc">胜利标题鎏金带柔光、主按钮金边；失败标题改残赤点睛、重新挑战按钮用玄铁冷调，形成明确的色温对立，避免"大红=失败"与国风喜庆红冲突。</p>
+  <div class="cmp">
+    <div><div class="side-label before">改造前 · 胜利</div><div class="shot"><img src="before/12_result.png" alt="改前胜利"></div></div>
+    <div><div class="side-label after">改造后 · 胜利</div><div class="shot"><img src="after/12_result.png" alt="改后胜利"></div><div class="point"><b>变化：</b>冷玄墨底 · 鎏金标题带光 · 统计条青蚨/残赤</div></div>
+  </div>
+  <div class="cmp" style="margin-top:26px">
+    <div><div class="side-label before">改造前 · 失败</div><div class="shot"><img src="before/37_result_fail_ad.png" alt="改前失败"></div></div>
+    <div><div class="side-label after">改造后 · 失败</div><div class="shot"><img src="after/37_result_fail.png" alt="改后失败"></div><div class="point"><b>变化：</b>残赤标题 · 玄铁重新挑战按钮 · 冷调面板</div></div>
+  </div>
+</div></section>
+
+<section><div class="wrap">
+  <div class="sec-h"><span class="n">陆</span><h2>令牌落地清单</h2></div>
+  <table>
+    <thead><tr><th>语义</th><th>改造前</th><th>改造后</th><th>落地位置</th></tr></thead>
+    <tbody>
+      <tr><td>画布基调</td><td class="old">#211a12 暖褐</td><td class="new">#12171b→#080b0d 冷玄墨</td><td>game.js 全局背景</td></tr>
+      <tr><td>面板 / 描边</td><td class="old">#2b2217 / #6b5636</td><td class="new">#1b2227 / #46535e</td><td>THEME 全局令牌（28 文件）</td></tr>
+      <tr><td>成功 / 货币</td><td class="old">#d9a441 暗金</td><td class="new">#e8b44c 鎏金</td><td>THEME.gold（280 处引用）</td></tr>
+      <tr><td>失败</td><td class="old">#c8473e 朱红</td><td class="new">#5b6b78 玄铁 + #a6433a 残赤</td><td>结算页标题/按钮</td></tr>
+      <tr><td>商城</td><td class="old">暗金（无区分）</td><td class="new">#3e9a85 青蚨</td><td>商城/首页入口</td></tr>
+      <tr><td>宝箱 / 招募</td><td class="old">暗金（无区分）</td><td class="new">#9b77cf 紫气</td><td>宝箱/招募/首页入口</td></tr>
+      <tr><td>英雄品级</td><td class="old">史诗 #6f5b7d / 传奇 #b3934f</td><td class="new">史诗 #9b77cf / 传奇 #e8b44c</td><td>HERO_AURA + CONFIG.rarity</td></tr>
+    </tbody>
+  </table>
+</div></section>
+
+<footer>验收口径：全部画面来自游戏真实渲染（node tools/smoke.mjs）· 逻辑测试 1625/0 · 冒烟 90 断言/196 截图 · 微信主包 3.60MB &lt; 4MB</footer>
+</body>
+</html>

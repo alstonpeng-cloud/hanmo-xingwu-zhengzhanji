@@ -76,9 +76,10 @@ export class ChestScreen {
     const full = st.units.length >= slots.unlocked;
     const total = chestTotal(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
-    text(ctx, '宝 箱', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
+    // 紫气为宝箱系统色，标题用色相承担导航
+    text(ctx, '宝 箱', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center', color: THEME.treasure, serif: true });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
 
     const late = st.maxCleared + 1 > 200;
@@ -137,7 +138,7 @@ export class ChestScreen {
     this.rows.push({ type, openRect: canOpen ? openRect : null });
 
     panel(ctx, x, y, ROW_W, ROW_H, {
-      fill: count > 0 ? 'rgba(58,46,30,0.72)' : 'rgba(33,26,18,0.6)',
+      fill: count > 0 ? 'rgba(39,48,56,0.72)' : 'rgba(27,34,39,0.6)',
       stroke: count > 0 ? type.color : THEME.line,
       r: 18,
       lw: count > 0 ? 2 : 1,

@@ -37,7 +37,7 @@ export class HelpScreen {
     const g = this.game;
     const WIDTH = g.W;
 
-    panel(ctx, 0, 0, WIDTH, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, WIDTH, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '引 导 手 册', WIDTH / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
 
@@ -69,7 +69,7 @@ export class HelpScreen {
       button(ctx, { x: rect.x + rect.w - 132, y: rect.y + 24, w: 112, h: 48 },
         seen ? '重 看' : '查 看', {
           size: 19,
-          fill: seen ? '#4a3a24' : '#332c1d',
+          fill: seen ? '#36404a' : '#273038',
           stroke: seen ? THEME.line : THEME.goldDim,
           textColor: seen ? THEME.textDim : THEME.gold,
         });

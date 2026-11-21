@@ -1,8 +1,6 @@
 import { THEME, text, panel, button, coinBadge, bar, hit } from '../render/draw.js';
 import { CONFIG } from '../data/config.js';
 import { levelTotal, rosterSlots, autoBattleUnlocked } from '../core/levels.js';
-import { adsLeft, rollDefeatTroop, claimDefeatTroop } from '../core/ads.js';
-import { trialUnits, TRIAL_ROUNDS } from '../core/trialTroop.js';
 import { chestType, openChest } from '../core/chests.js';
 import { cityOfLevel, chapterOfLevel, milestoneChestsAt } from '../core/chapters.js';
 import { noteChestOpened } from '../core/daily.js';
@@ -35,22 +33,18 @@ export class ResultScreen {
     // 胜利页要把「本场最佳」和「下一个解锁」都塞进统计区下方，按钮整体下移；失败页保持原布局
     const win = data.win === true;
     this.primary = win ? { x: 175, y: 976, w: 400, h: 96 } : { x: 175, y: 850, w: 400, h: 112 };
-    // 失败页：原来的「去兵营合成」改成「看广告立即得兵」，预览固定到本屏
-    this.secondary = win ? { x: 175, y: 1084, w: 400, h: 76 } : { x: 175, y: 976, w: 400, h: 96 };
-    this.tertiary = win ? { x: 275, y: 1170, w: 200, h: 52 } : { x: 275, y: 1108, w: 200, h: 56 };
-    // 分享得宝箱：底部按钮下方一排（胜利页 tertiary 止于 y1222 / 失败页止于 y1164，不重叠）
-    this.shareRect = win ? { x: 275, y: 1240, w: 200, h: 60 } : { x: 275, y: 1180, w: 200, h: 56 };
-    this.troopReward = win ? null : rollDefeatTroop(game.state, data.levelN);
-    // 每次失败只能看一次广告：领完立即置灰（重开这一关会重新给一次机会）
-    this.troopAdUsed = false;
+    // 分享得宝箱（亮绿大按钮，带回弹/抖动动效）：胜利页在主按钮下方，战败页占原广告按钮位
+    this.shareRect = win ? { x: 175, y: 1084, w: 400, h: 96 } : { x: 175, y: 976, w: 400, h: 96 };
+    // 胜利页次按钮（返回关卡进度）；战败页原广告按钮位已并入分享按钮
+    this.secondary = win ? { x: 175, y: 1188, w: 400, h: 76 } : null;
+    this.tertiary = win ? { x: 275, y: 1272, w: 200, h: 52 } : { x: 275, y: 1108, w: 200, h: 56 };
     this.chestRect = { x: 542, y: 290, w: 128, h: 50 };
     // 关卡赠将（250 关关平）：首通结算页弹一次领取卡，领完置 claimed 防重复
     this.heroRewardClaimed = null;
     this.heroClaimRect = { x: 195, y: 660, w: 360, h: 82 };
-    // 旧的失败页「看广告领铜钱」入口已移除（改为上面的广告得兵）
     this.autoTextY = win ? 962 : 838;
     this.bestRect = { x: 70, y: 372, w: 610, h: 508 };
-    // 「下一个解锁」进度卡：胜利页在统计区下方，失败页在克制面板与按钮之间（不挤压克制圈 / 广告键）
+    // 「下一个解锁」进度卡：胜利页在统计区下方，失败页在克制面板与按钮之间（不挤压克制圈 / 分享键）
     this.unlockRect = win ? { x: 70, y: 888, w: 610, h: 60 } : { x: 70, y: 768, w: 610, h: 60 };
     this.best = this.computeBest(data.stats);
     // 有解锁教学时先暂停自动战斗；教学结束后由玩家手动继续
@@ -92,31 +86,6 @@ export class ResultScreen {
   // 输出扛伤 Tab：综合 / 我方输出 / 敌方输出 / 我方承伤 / 敌方承伤
   get rankTab() { return this._rankTab ?? 'all'; }
   set rankTab(v) { this._rankTab = v; }
-
-  // 失败页看广告得兵：每次失败只能领一次（领完按钮置灰），发放「本屏已经展示」的那一个
-  watchTroopAd() {
-    const g = this.game;
-    if (this.troopAdUsed) {
-      playSfx('error', { volume: 0.7 });
-      g.toast('本次失败已领取试用兵，重开这一关再来');
-      return;
-    }
-    const r = claimDefeatTroop(g.state, this.troopReward);
-    if (!r.ok) {
-      playSfx('error', { volume: 0.7 });
-      if (r.reason === 'full') g.toast('兵营已满：先去兵营合成腾出格子');
-      else if (r.reason === 'limit') g.toast('今日广告奖励已领完，明天再来');
-      else g.toast('暂时不能领取广告奖励');
-      return;
-    }
-    g.save();
-    this.troopAdUsed = true;
-    playSfx('reward');
-    g.toast(`试用兵：${unitName(r.troop, r.level)} Lv${r.level}（可用 ${TRIAL_ROUNDS} 场主线）`);
-    if (g.showcaseUnit) g.showcaseUnit(r.unit);
-    // 下一次点击重新随机（史诗 / 传奇各半，等级按主线进度分档）
-    this.troopReward = rollDefeatTroop(g.state, this.d.levelN);
-  }
 
   // 本局最佳输出 / 最佳承伤（两侧各取第一名，并按本方总量算百分比）
   computeBest(stats) {
@@ -221,9 +190,8 @@ export class ResultScreen {
       }
       return;
     }
-    if (hit(this.secondary, x, y)) {
-      if (d.win) g.go(new LevelSelectScreen(g));
-      else this.watchTroopAd();
+    if (this.secondary && hit(this.secondary, x, y)) {
+      g.go(new LevelSelectScreen(g));
       return;
     }
     if (hit(this.tertiary, x, y)) {
@@ -239,8 +207,8 @@ export class ResultScreen {
     if (hit(this.shareRect, x, y)) this.shareNow();
   }
 
-  // 分享到微信群得宝箱：每天限 2 次，前 200 关黄金箱 / 200 关起史诗箱。
-  // 小游戏本地无法判定"发到了群"，以分享面板的完成回调（success）为准发奖
+  // 分享得宝箱：每天限 2 次，前 200 关黄金箱 / 200 关起史诗箱。
+  // 微信 2021-10 起 wx.shareAppMessage 不再回调 success/fail，改为「点开分享面板即发奖」
   shareNow() {
     const g = this.game;
     if (sharesLeft(g.state) <= 0) {
@@ -252,20 +220,41 @@ export class ResultScreen {
       g.toast('请在微信小游戏里分享');
       return;
     }
+    const r = claimShareReward(g.state);
+    if (!r.ok) {
+      playSfx('error', { volume: 0.7 });
+      g.toast('今日分享奖励已领完（每天 2 次，明天再来）');
+      return;
+    }
+    g.save();
+    playSfx('reward');
     g.platform.share({
       title: `我已在《汉末行伍征战记》通关第 ${Math.max(1, (g.state.maxCleared || 0) + 1)} 关，来布阵过关！`,
-      success: () => {
-        const r = claimShareReward(g.state);
-        if (!r.ok) {
-          g.toast('今日分享奖励已领完（每天 2 次，明天再来）');
-          return;
-        }
-        g.save();
-        playSfx('reward');
-        g.toast(`分享成功：${chestType(r.chest) ? chestType(r.chest).name : '宝箱'} ×1 已入宝箱仓库`);
-      },
-      fail: () => g.toast('分享未完成，未发放奖励'),
     });
+    const chestName = chestType(r.chest) ? chestType(r.chest).name : '宝箱';
+    g.toast(`已打开分享面板：${chestName} ×1 已入宝箱仓库`);
+  }
+
+  // 分享按钮（win/lose 共用）：亮绿大按钮 + 动效——周期回弹（1.00→1.04）与上下轻抖（±3px）；
+  // 命中区始终用原始 shareRect，动画只影响绘制，避免点不中
+  drawShareButton(ctx) {
+    const g = this.game;
+    const r = this.shareRect;
+    const on = sharesLeft(g.state) > 0;
+    const chest = shareRewardFor(g.state.maxCleared);
+    const chestName = chestType(chest) ? chestType(chest).name : '宝箱';
+    const pulse = on ? 1 + 0.04 * (0.5 + 0.5 * Math.sin(this.t * 3.0)) : 1;
+    const dy = on ? Math.sin(this.t * 6.28) * 3 : 0;
+    const cx = r.x + r.w / 2;
+    const cy = r.y + r.h / 2;
+    ctx.save();
+    ctx.translate(cx, cy + dy);
+    ctx.scale(pulse, pulse);
+    ctx.translate(-cx, -cy);
+    button(ctx, r, on ? `分享得${chestName}` : '今日已领完', {
+      size: 32, fill: '#07c160', stroke: '#059a4d', textColor: '#ffffff', disabled: !on,
+    });
+    ctx.restore();
   }
 
   draw(ctx) {
@@ -286,8 +275,10 @@ export class ResultScreen {
     const subY = d.win ? 226 : 244;
     const chapY = d.win ? 254 : 274;
     text(ctx, d.win ? '胜 利' : '战斗失败', W / 2, titleY, {
-      size: 66, weight: '700', align: 'center',
-      color: d.win ? THEME.gold : THEME.red,
+      size: 66, weight: '700', align: 'center', serif: true,
+      // 胜利=鎏金；失败=残赤点睛（玄铁冷调由底部面板承载，避免大红与喜庆语义冲突）
+      color: d.win ? THEME.gold : THEME.blood,
+      glow: d.win ? 18 : 0,
     });
     text(ctx, `第 ${d.levelN} 关${d.win ? ' 通关' : ''}${city ? ` · ${city.name}` : ''}`, W / 2, subY, {
       size: 26, align: 'center', color: THEME.textDim,
@@ -333,7 +324,7 @@ export class ResultScreen {
           : `继续挑战第 ${d.levelN + 1} 关`)
         : '返回关卡进度';
       button(ctx, this.primary, label, {
-        size: 32, fill: '#332c1d', stroke: THEME.goldDim, textColor: THEME.gold,
+        size: 32, fill: '#273038', stroke: THEME.goldDim, textColor: THEME.gold,
       });
       button(ctx, this.secondary, '返回关卡进度', { size: 30, fill: THEME.panel2, stroke: THEME.line });
       button(ctx, this.tertiary, this.autoT !== null ? '停止自动战斗' : '去宝箱页开箱', {
@@ -341,20 +332,12 @@ export class ResultScreen {
         textColor: this.autoT !== null ? THEME.red : THEME.textDim,
       });
     } else {
-      button(ctx, this.primary, '重新挑战', { size: 32, fill: '#3a2a1d', stroke: THEME.goldDim, textColor: THEME.gold });
-      this.drawTroopAdButton(ctx);
+      // 失败主按钮用玄铁冷调，与胜利鎏金形成色温对立
+      button(ctx, this.primary, '重新挑战', { size: 32, fill: '#273038', stroke: THEME.defeat, textColor: THEME.defeatLit });
       button(ctx, this.tertiary, '返回关卡进度', { size: 22, fill: THEME.panel, stroke: THEME.line });
     }
-    // 分享得宝箱入口：额度用尽置灰
-    {
-      const left = sharesLeft(g.state);
-      const chest = shareRewardFor(g.state.maxCleared);
-      const chestName = chestType(chest) ? chestType(chest).name : '宝箱';
-      button(ctx, this.shareRect, left > 0 ? `分享得${chestName}` : '今日已领完', {
-        size: 24, fill: THEME.panel, stroke: THEME.line,
-        textColor: left > 0 ? THEME.gold : THEME.textDim,
-      });
-    }
+    // 分享得宝箱：亮绿大按钮 + 回弹/抖动动效，额度用尽置灰
+    this.drawShareButton(ctx);
     if (d.heroReward && !this.heroRewardClaimed) this.drawHeroRewardModal(ctx);
   }
 
@@ -366,7 +349,7 @@ export class ResultScreen {
     const focus = info.focus;
 
     panel(ctx, r.x, r.y, r.w, r.h, {
-      fill: info.achieved ? 'rgba(51,44,29,0.9)' : 'rgba(33,26,18,0.92)',
+      fill: info.achieved ? 'rgba(51,44,29,0.9)' : 'rgba(27,34,39,0.92)',
       stroke: info.achieved ? THEME.goldDim : THEME.line,
       r: 16, lw: info.achieved ? 2 : 1.4,
     });
@@ -428,7 +411,7 @@ export class ResultScreen {
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, 21, 0, Math.PI * 2);
-    ctx.fillStyle = '#332c1d';
+    ctx.fillStyle = '#273038';
     ctx.fill();
     ctx.strokeStyle = THEME.goldDim;
     ctx.lineWidth = 1.6;
@@ -447,9 +430,9 @@ export class ResultScreen {
     ctx.fillRect(0, 0, W, this.game.H);
     ctx.restore();
     panel(ctx, 135, 430, 480, 330, {
-      fill: 'rgba(43,34,23,0.98)', stroke: '#d8b46a', r: 22, lw: 3,
+      fill: 'rgba(27,34,39,0.98)', stroke: '#e8b44c', r: 22, lw: 3,
     });
-    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#d8b46a' });
+    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#e8b44c' });
     const hero = heroById(this.d.heroReward);
     text(ctx, hero ? hero.name : this.d.heroReward, W / 2, 552, {
       size: 46, weight: '700', align: 'center', color: hero ? hero.color : THEME.gold,
@@ -460,7 +443,7 @@ export class ResultScreen {
       size: 18, align: 'center', color: THEME.textDim,
     });
     button(ctx, this.heroClaimRect, `领 取 ${hero ? hero.name : ''}`, {
-      size: 28, fill: '#332c1d', stroke: '#d8b46a', textColor: '#f2d894',
+      size: 28, fill: '#273038', stroke: '#e8b44c', textColor: '#f8e1ac',
     });
   }
 
@@ -495,7 +478,7 @@ export class ResultScreen {
 
     // 环底：内外两圈细线
     ctx.save();
-    ctx.strokeStyle = 'rgba(216,180,106,0.18)';
+    ctx.strokeStyle = 'rgba(232,180,76,0.18)';
     ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -509,14 +492,14 @@ export class ResultScreen {
       const angB = angles[i] + Math.PI / 2;
       // 顺时针（克制）：金色弧 + 箭头
       ctx.save();
-      ctx.strokeStyle = 'rgba(216,180,106,0.82)';
+      ctx.strokeStyle = 'rgba(232,180,76,0.82)';
       ctx.lineWidth = 2.2;
       ctx.beginPath();
       ctx.arc(cx, cy, R, angA + gap, angB - gap, false);
       ctx.stroke();
       ctx.restore();
       this.drawArrowHead(ctx, cx + Math.cos(angB - gap) * R, cy + Math.sin(angB - gap) * R,
-        angB - gap + Math.PI / 2, '#d8b46a', 11);
+        angB - gap + Math.PI / 2, '#e8b44c', 11);
       // 逆时针（被克）：暗红内弧 + 反方向箭头
       ctx.save();
       ctx.strokeStyle = 'rgba(178,80,64,0.72)';
@@ -533,7 +516,7 @@ export class ResultScreen {
       const lx = cx + Math.cos(mid) * (R + 46);
       const ly = cy + Math.sin(mid) * (R + 46);
       text(ctx, `克制 ${this.counterPercent(a, b) > 0 ? '+' : ''}${this.counterPercent(a, b)}%`,
-        lx, ly - 9, { size: 12, align: 'center', color: '#d8b46a' });
+        lx, ly - 9, { size: 12, align: 'center', color: '#e8b44c' });
       text(ctx, `被克 ${this.counterPercent(b, a)}%`, lx, ly + 9, {
         size: 12, align: 'center', color: '#c26a5a',
       });
@@ -567,47 +550,11 @@ export class ResultScreen {
     ctx.restore();
   }
 
-  // 「看广告试用 5 回合」：兵种用建模图标表达，不写兵种名
-  drawTroopAdButton(ctx) {
-    const r = this.secondary;
-    const st = this.game.state;
-    const left = adsLeft(st, 'defeatTroop');
-    const reward = this.troopReward;
-    // 试用兵会替换旧的，所以容量按「去掉现有试用兵」计算
-    const used = st.units.length - trialUnits(st).length;
-    const full = used >= rosterSlots(st.maxCleared).unlocked;
-    const usable = !this.troopAdUsed && left > 0 && !full && reward;
-    const rar = reward ? rarityInfo(reward.troop) : null;
-    panel(ctx, r.x, r.y, r.w, r.h, {
-      fill: usable ? '#2a2416' : THEME.panel,
-      stroke: usable ? THEME.goldDim : THEME.line,
-      r: 16, lw: usable ? 2 : 1,
-    });
-    if (reward) {
-      ctx.save();
-      if (!usable) ctx.globalAlpha = 0.38;
-      drawFrame(ctx, sheetFor(reward.troop, spriteTierFor(reward.level)), 'idle', 0,
-        r.x + 58, r.y + r.h - 12, 0.5, false, 0.95);
-      ctx.restore();
-    }
-    const textX = r.x + 100;
-    text(ctx, `观看广告 · 试用 ${TRIAL_ROUNDS} 回合`, textX, r.y + 30, {
-      size: 20, color: usable ? THEME.gold : THEME.textWeak,
-    });
-    const sub = this.troopAdUsed ? '本次失败已领取'
-      : full ? '兵营已满，先去腾格子'
-        : left <= 0 ? '广告奖励已领完'
-          : `${rar ? rar.name : ''} Lv${reward ? reward.level : 1} · 仅主线闯关可用`;
-    text(ctx, sub, textX, r.y + 60, {
-      size: 14, color: usable ? (rar ? rar.color : THEME.textDim) : THEME.textWeak,
-    });
-  }
-
   // 环上的普通兵建模节点（盾 / 弓 / 枪 / 骑）
   tileTroopNode(ctx, cx, cy, troopId, name) {
     ctx.save();
     ctx.fillStyle = 'rgba(16,22,32,0.92)';
-    ctx.strokeStyle = 'rgba(216,180,106,0.42)';
+    ctx.strokeStyle = 'rgba(232,180,76,0.42)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(cx, cy, 31, 0, Math.PI * 2);
@@ -621,7 +568,7 @@ export class ResultScreen {
   // 输出 / 承伤 Top5：综合 = 左右双栏（我方输出 / 敌方输出）+ 四个单项 Tab，全部带百分比
   drawRankings(ctx) {
     const p = this.bestRect;
-    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
     text(ctx, '战斗统计', p.x + p.w / 2, p.y + 24, { size: 17, align: 'center', color: THEME.gold });
 
     const TABS = [
@@ -643,7 +590,7 @@ export class ResultScreen {
     for (const t of this.rankTabs) {
       const active = t.key === this.rankTab;
       panel(ctx, t.rect.x, t.rect.y, t.rect.w, t.rect.h, {
-        fill: active ? 'rgba(154,116,44,0.92)' : 'rgba(30,24,16,0.85)',
+        fill: active ? 'rgba(138,100,32,0.92)' : 'rgba(18,23,27,0.85)',
         stroke: active ? THEME.goldDim : THEME.line, r: 8, lw: active ? 2 : 1,
       });
       text(ctx, t.label, t.rect.x + t.rect.w / 2, t.rect.y + t.rect.h / 2, {
@@ -696,7 +643,7 @@ export class ResultScreen {
       text(ctx, '暂无', x0 + w / 2, rowY + 30, { size: 15, align: 'center', color: THEME.textWeak });
       return;
     }
-    const rankColors = ['#ffd86c', '#c0c6d0', '#c87a3d'];
+    const rankColors = ['#f8e1ac', '#c0c6d0', '#c87a3d'];
     const iconScale = wide ? 0.62 : 0.44;
     const rankR = wide ? 16 : 12;
     const nameX = wide ? x0 + 100 : x0 + 66;
@@ -711,7 +658,7 @@ export class ResultScreen {
       ctx.save();
       ctx.beginPath();
       ctx.arc(x0 + rankR, cy, rankR, 0, Math.PI * 2);
-      ctx.fillStyle = '#1c1610';
+      ctx.fillStyle = '#0c1013';
       ctx.fill();
       ctx.strokeStyle = rankColors[i] || THEME.textDim;
       ctx.lineWidth = 2;
@@ -729,7 +676,7 @@ export class ResultScreen {
         drawEngineFigure(ctx, s.troop, {
           x: wide ? x0 + 62 : x0 + 40, y: y + rowH - 10,
           size: wide ? 56 : 44, t: 0.4,
-          color: s.side === 'player' ? '#6e9b72' : '#b85f58',
+          color: s.side === 'player' ? '#6e9b72' : '#c0392b',
         });
       } else {
         drawFrame(ctx, sheetFor(s.troop, spriteTierFor(s.level)), 'idle', 0,
@@ -755,7 +702,7 @@ export class ResultScreen {
       const pctText = `${Math.round(pct * 100)}%`;
 
       const bY = wide ? cy - barH / 2 : y + 40;
-      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#4a3a24', r: 6 });
+      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#36404a', r: 6 });
       text(ctx, pctText, barX + barW / 2, bY + barH / 2, {
         size: wide ? 20 : 13, weight: '700', align: 'center', color: '#f4efe2',
       });
@@ -770,7 +717,7 @@ export class ResultScreen {
   drawRewardStrip(ctx) {
     const st = this.game.state;
     const d = this.d;
-    panel(ctx, 70, 272, 610, 92, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 272, 610, 92, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
 
     // 左：铜钱
     text(ctx, '铜钱', 100, 296, { size: 20, color: THEME.textDim });

@@ -6,7 +6,7 @@ import { CONFIG } from './config.js';
 import { levelDef } from '../core/levels.js';
 import { engineStageFor } from '../core/siege.js';
 import { enemyBookScales } from '../core/books.js';
-import { ensureDaily } from '../core/daily.js';
+import { ensureDaily, dateKey } from '../core/daily.js';
 import { heroById } from './heroes.js';
 import { heroBattleRankLabel } from './heroBattles.js';
 import { troopPower } from '../core/power.js';
@@ -154,10 +154,10 @@ export function dailyBattleDef(stage) {
   };
 }
 
-// 关卡战力预览（不含器械，与英雄战口径一致）
-export function dailyBattlePower(stage) {
-  const def = dailyBattleDef(stage);
-  return def.enemies.reduce((sum, e) => sum + (e.hero
+// 关卡战力预览（不含器械，与英雄战口径一致）；可传入本帧已建好的 def 免二次建阵
+export function dailyBattlePower(stage, def = null) {
+  const d = def || dailyBattleDef(stage);
+  return d.enemies.reduce((sum, e) => sum + (e.hero
     ? heroPower(e.hero, e.level, e.hpMult || 1)
     : troopPower(e.troop, e.level)), 0);
 }
@@ -179,6 +179,12 @@ export function dailyClearedCount(state) {
 export function dailyStageUnlocked(state, stage) {
   if (!dailyUnlocked(state)) return false;
   return stageOf(stage) <= dailyClearedCount(state) + 1;
+}
+
+// 首页圆钮未读：进入过当日面板即已读，次日 0 点重显（红点纯色呼吸、不带数字）
+export function dailyChallengeOrbUnread(state, now) {
+  if (!dailyUnlocked(state)) return false;
+  return state?.dailyChallenge?.seenDay !== dateKey(now);
 }
 
 export function dailyFirstClearReward(stage) {

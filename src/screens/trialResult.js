@@ -70,7 +70,7 @@ export class TrialResultScreen {
 
     screenDim(ctx, W, g.H, 0.7);
     panel(ctx, 70, 200, 610, 1100, {
-      fill: '#211a12', stroke: this.win ? THEME.gold : THEME.redDim, r: 24, lw: 3,
+      fill: '#12171b', stroke: this.win ? THEME.gold : THEME.redDim, r: 24, lw: 3,
     });
 
     text(ctx, `演 武 · 第 ${trial.stage} 关`, W / 2, 264, {
@@ -85,7 +85,7 @@ export class TrialResultScreen {
     });
 
     // trial 信息面板（压缩高度）
-    panel(ctx, 120, 458, 510, 112, { fill: 'rgba(43,34,23,0.72)', stroke: THEME.line, r: 16 });
+    panel(ctx, 120, 458, 510, 112, { fill: 'rgba(27,34,39,0.72)', stroke: THEME.line, r: 16 });
     text(ctx, `敌方 ${trial.enemies.length} 支精英小队 · Lv${trial.enemyLevel}${trial.enemyLevelMax > trial.enemyLevel ? `~${trial.enemyLevelMax}` : ''}`, W / 2, 484, {
       size: 20, align: 'center', color: '#e8c3a0',
     });
@@ -126,7 +126,7 @@ export class TrialResultScreen {
     this.primary = { x: 175, y: 1122, w: 400, h: 80 };
     this.secondary = { x: 175, y: 1212, w: 400, h: 66 };
     button(ctx, this.primary, this.win ? '继 续 演 武' : '重 新 布 阵', {
-      size: 28, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
+      size: 28, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
     });
     button(ctx, this.secondary, this.win ? '返 回 首 页' : '返 回 演 武', {
       size: 22, fill: THEME.panel, stroke: THEME.line, textColor: THEME.textDim,
@@ -136,7 +136,7 @@ export class TrialResultScreen {
   // 演武战斗统计 Top5（布局与结算页一致：综合 = 左右双栏，单项 = 单列带进度条，全部显示百分比）
   drawRankings(ctx, top) {
     const p = { x: 70, y: top, w: 610, h: 470 };
-    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
     text(ctx, '战斗统计', p.x + p.w / 2, p.y + 24, { size: 17, align: 'center', color: THEME.gold });
 
     const TABS = [
@@ -158,7 +158,7 @@ export class TrialResultScreen {
     for (const t of this.rankTabs) {
       const active = t.key === this.rankTab;
       panel(ctx, t.rect.x, t.rect.y, t.rect.w, t.rect.h, {
-        fill: active ? 'rgba(154,116,44,0.92)' : 'rgba(30,24,16,0.85)',
+        fill: active ? 'rgba(138,100,32,0.92)' : 'rgba(18,23,27,0.85)',
         stroke: active ? THEME.goldDim : THEME.line, r: 8, lw: active ? 2 : 1,
       });
       text(ctx, t.label, t.rect.x + t.rect.w / 2, t.rect.y + t.rect.h / 2, {
@@ -208,7 +208,7 @@ export class TrialResultScreen {
       text(ctx, '暂无', x0 + w / 2, rowY + 30, { size: 15, align: 'center', color: THEME.textWeak });
       return;
     }
-    const rankColors = ['#ffd86c', '#c0c6d0', '#c87a3d'];
+    const rankColors = ['#f8e1ac', '#c0c6d0', '#c87a3d'];
     const iconScale = wide ? 0.62 : 0.44;
     const rankR = wide ? 16 : 12;
     const nameX = wide ? x0 + 100 : x0 + 66;
@@ -223,7 +223,7 @@ export class TrialResultScreen {
       ctx.save();
       ctx.beginPath();
       ctx.arc(x0 + rankR, cy, rankR, 0, Math.PI * 2);
-      ctx.fillStyle = '#1c1610';
+      ctx.fillStyle = '#0c1013';
       ctx.fill();
       ctx.strokeStyle = rankColors[i] || THEME.textDim;
       ctx.lineWidth = 2;
@@ -255,7 +255,7 @@ export class TrialResultScreen {
       const pctText = `${Math.round(pct * 100)}%`;
 
       const bY = wide ? cy - barH / 2 : y + 40;
-      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#4a3a24', r: 6 });
+      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#36404a', r: 6 });
       text(ctx, pctText, barX + barW / 2, bY + barH / 2, {
         size: wide ? 20 : 13, weight: '700', align: 'center', color: '#f4efe2',
       });

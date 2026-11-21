@@ -965,7 +965,7 @@ export class DeployScreen {
     const pool = undeployedUnits(st);
 
     // 顶栏
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, this.prologue ? '序章 · 董卓'
       : this.gauntletChapter ? '斩将 · 布阵'
@@ -1025,10 +1025,10 @@ export class DeployScreen {
       const pw = W - 48;
       const ph = 322;
       panel(ctx, px, py, pw, ph, {
-        fill: 'rgba(13,17,24,0.97)', stroke: 'rgba(232,196,112,0.85)', r: 26, lw: 2,
+        fill: 'rgba(13,17,24,0.97)', stroke: 'rgba(248,225,172,0.85)', r: 26, lw: 2,
       });
       // 顶部金线 + 「旁白」标签
-      ctx.strokeStyle = 'rgba(232,196,112,0.5)';
+      ctx.strokeStyle = 'rgba(248,225,172,0.5)';
       ctx.lineWidth = 1.5;
       ctx.beginPath();
       ctx.moveTo(px + 34, py + 58);
@@ -1074,7 +1074,7 @@ export class DeployScreen {
       ctx.lineWidth = 2.4;
       ctx.stroke();
       // 左右小菱形装饰
-      ctx.fillStyle = '#ffd86c';
+      ctx.fillStyle = '#f8e1ac';
       for (const dx of [8, bw - 8]) {
         ctx.beginPath();
         ctx.moveTo(bx + dx, by + bh / 2);
@@ -1097,7 +1097,7 @@ export class DeployScreen {
       const pw = W - 300;
       const ph = 158;
       panel(ctx, px, py, pw, ph, {
-        fill: 'rgba(9,12,18,0.99)', stroke: 'rgba(232,196,112,0.72)', r: 22, lw: 2,
+        fill: 'rgba(9,12,18,0.99)', stroke: 'rgba(248,225,172,0.72)', r: 22, lw: 2,
       });
       this.drawPinchIcon(ctx, px + 58, py + ph / 2, 1 + 0.06 * Math.sin(this.t * 4));
       text(ctx, '双指缩放战场', px + 106, py + 62, {
@@ -1173,26 +1173,26 @@ export class DeployScreen {
     const cmp = comparePower(myPower * myBookMult, enemyPower * enemyBookMult);
 
     panel(ctx, 36, 128, 678, 78, {
-      fill: this.mode === 'battle' ? 'rgba(55,30,30,0.55)' : 'rgba(43,34,23,0.6)',
+      fill: this.mode === 'battle' ? 'rgba(55,30,30,0.55)' : 'rgba(27,34,39,0.6)',
       stroke: this.mode === 'battle' ? THEME.redDim : THEME.line, r: 16,
     });
 
     // 战力对比（亮金黄色，放在布阵场地上方，一眼看出这一关能不能打）
     panel(ctx, 494, 134, 204, 66, {
-      fill: 'rgba(58,46,22,0.94)', stroke: THEME.gold, r: 14, lw: 2,
+      fill: 'rgba(39,48,56,0.94)', stroke: THEME.gold, r: 14, lw: 2,
     });
     const toneColor = cmp.tone === 'good' ? THEME.green : cmp.tone === 'bad' ? THEME.red : THEME.textDim;
     if (this.mode === 'battle') {
       text(ctx, '我方', 510, 153, { size: 15, color: THEME.textDim });
-      text(ctx, formatPower(myPower * myBookMult), 618, 153, { size: 19, weight: '700', align: 'right', color: '#f5d67f' });
+      text(ctx, formatPower(myPower * myBookMult), 618, 153, { size: 19, weight: '700', align: 'right', color: '#f8e1ac' });
       text(ctx, '敌方', 510, 183, { size: 15, color: THEME.textDim });
-      text(ctx, formatPower(enemyPower * enemyBookMult), 618, 183, { size: 19, weight: '700', align: 'right', color: '#f5d67f' });
+      text(ctx, formatPower(enemyPower * enemyBookMult), 618, 183, { size: 19, weight: '700', align: 'right', color: '#f8e1ac' });
       text(ctx, `${cmp.ratioText} ${cmp.label}`, 684, 183, {
         size: 13, align: 'right', color: toneColor, maxWidth: 64,
       });
     } else {
       text(ctx, '阵型战力', 510, 157, { size: 15, color: THEME.textDim });
-      text(ctx, formatPower(myPower * myBookMult), 684, 178, { size: 24, weight: '700', align: 'right', color: '#f5d67f' });
+      text(ctx, formatPower(myPower * myBookMult), 684, 178, { size: 24, weight: '700', align: 'right', color: '#f8e1ac' });
     }
 
     if (this.mode !== 'battle') {
@@ -1231,7 +1231,7 @@ export class DeployScreen {
         .map((b) => (heroById(b.hero) || {}).name || b.hero).join(' / ');
       const bossLv = bosses.length ? Math.min(...bosses.map((b) => b.level)) : 1;
       text(ctx, `${bossNames || '敌将'} Lv${bossLv} · 血量 ×${def.hpMult || 1} · 对标主线 ${def.anchor || this.levelN} 关`, 62, 160, {
-        size: 16, color: '#b3934f',
+        size: 16, color: '#b88a32',
       });
       text(ctx, `站位 ${def.rankText || '敌阵'} · 敌军 ${(def.enemies || []).length} 队（${(def.squads || []).length} 队小队 + ${bosses.length} 将）`, 62, 190, {
         size: 16, color: THEME.text,
@@ -1384,7 +1384,7 @@ export class DeployScreen {
       drawEngineFigure(ctx, this.enemyEngine.id, {
         x: p.x, y: p.y,
         size: 3.3 * this.cam.zoom * depthScaleAt(this.cam, p.y),
-        flip: false, t: this.t, color: '#b85f58',
+        flip: false, t: this.t, color: '#c0392b',
       });
     }
     // 拖动时：场上所有「能和手里这张牌合成」的小队亮绿框 + 贴「可合成」标签
@@ -1719,7 +1719,7 @@ export class DeployScreen {
     const tierColor = heroAuraColor(h);
     const onGrid = this.formation().includes(card.uid);
     const { x, y, w, h: hh } = rect;
-    panel(ctx, x, y, w, hh, { fill: '#2b2217', stroke: tierColor, r: 12, lw: 2 });
+    panel(ctx, x, y, w, hh, { fill: '#1b2227', stroke: tierColor, r: 12, lw: 2 });
     ctx.save();
     ctx.globalAlpha = dragging ? 0.4 : 1;
     // 左上角「将」标记
@@ -1740,7 +1740,7 @@ export class DeployScreen {
       x: x + w / 2, y: y + hh - 1, size: 46, action: 'idle', t: this.t, alpha: 1,
     });
     if (onGrid) {
-      panel(ctx, x + w - 50, y + hh - 22, 44, 16, { fill: 'rgba(30,24,16,0.85)', stroke: THEME.goldDim, r: 6, lw: 1 });
+      panel(ctx, x + w - 50, y + hh - 22, 44, 16, { fill: 'rgba(18,23,27,0.85)', stroke: THEME.goldDim, r: 6, lw: 1 });
       text(ctx, '已上阵', x + w - 28, y + hh - 10, { size: 10, align: 'center', color: THEME.gold });
     }
     ctx.restore();
@@ -1755,7 +1755,7 @@ export class DeployScreen {
     const ratio = LIST_VIEW.h / (LIST_VIEW.h + max);
     const h = Math.max(26, (LIST_VIEW.h - 4) * ratio);
     const y = LIST_VIEW.y + 2 + (LIST_VIEW.h - 4 - h) * (this.scrollY / max);
-    panel(ctx, x - 1, y, 5, h, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 2.5, lw: 0 });
+    panel(ctx, x - 1, y, 5, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 2.5, lw: 0 });
   }
 
   // 英雄详情弹窗：显示模型 + 完整数值 + 战法说明
@@ -1771,7 +1771,7 @@ export class DeployScreen {
     const tierColor = heroAuraColor(h);
     const tierName = h.tier === 'legendary' ? '传奇' : '史诗';
     panel(ctx, 0, 0, W, 1334, { fill: 'rgba(6,10,16,0.72)', stroke: null, r: 0, lw: 0 });
-    panel(ctx, 75, 300, 600, 470, { fill: '#211a12', stroke: tierColor, r: 22, lw: 2 });
+    panel(ctx, 75, 300, 600, 470, { fill: '#12171b', stroke: tierColor, r: 22, lw: 2 });
 
     const figH = 150;
     drawHeroAura(ctx, h.tier, 375, 496, figH * 0.75, 0.8, owned ? 0.9 : 0.4);
@@ -1792,7 +1792,7 @@ export class DeployScreen {
       size: 17, align: 'center', color: THEME.gold,
     });
 
-    text(ctx, `战法 · ${h.skill.name}`, 110, 696, { size: 17, color: '#c2b3c9' });
+    text(ctx, `战法 · ${h.skill.name}`, 110, 696, { size: 17, color: '#d9c4f2' });
     const lines = this.wrapText(h.skill.desc, 22, 2);
     lines.forEach((ln, i) => {
       text(ctx, ln, 110, 722 + i * 20, { size: 14, color: THEME.textDim });
@@ -1856,7 +1856,7 @@ export class DeployScreen {
     const r = DEPLOY_LAYOUT.engineRect;
     const ch = engineChoice(st);
     panel(ctx, r.x, r.y, r.w, r.h, {
-      fill: 'rgba(43,34,23,0.72)', stroke: ch ? THEME.gold : THEME.line, r: 14, lw: 1,
+      fill: 'rgba(27,34,39,0.72)', stroke: ch ? THEME.gold : THEME.line, r: 14, lw: 1,
     });
     const locked = !engineUnlocked(st, 'thunder');
     text(ctx, '器 械', r.x + r.w / 2, r.y + 26, {
@@ -1879,7 +1879,7 @@ export class DeployScreen {
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0, 0, W, this.game.H);
     ctx.restore();
-    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(30,24,16,0.985)', stroke: THEME.line, r: 18, lw: 1 });
+    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(18,23,27,0.985)', stroke: THEME.line, r: 18, lw: 1 });
     text(ctx, '攻城器械', P.x + 22, P.y + 36, { size: 24, weight: '700', color: THEME.gold });
     text(ctx, '每局只能上阵 1 台 · 唯一装备，不可重复获取', P.x + 22, P.y + 62, {
       size: 14, color: THEME.textWeak,
@@ -1893,7 +1893,7 @@ export class DeployScreen {
       const selected = !!(ch && ch.id === c.id);
       const r = c.rect;
       panel(ctx, r.x, r.y, r.w, r.h, {
-        fill: selected ? 'rgba(58,46,22,0.92)' : 'rgba(43,34,23,0.8)',
+        fill: selected ? 'rgba(39,48,56,0.92)' : 'rgba(27,34,39,0.8)',
         stroke: selected ? THEME.gold : THEME.line, r: 14, lw: selected ? 2 : 1,
       });
       text(ctx, c.def.name, r.x + 16, r.y + 32, {
@@ -1922,16 +1922,16 @@ export class DeployScreen {
       const can = unlocked && !maxed && st.coins >= cost;
       if (!unlocked) {
         button(ctx, c.upRect, '未解锁', {
-          size: 18, fill: 'rgba(58,46,30,0.9)', stroke: THEME.line, textColor: 'rgba(230,230,230,0.4)',
+          size: 18, fill: 'rgba(39,48,56,0.9)', stroke: THEME.line, textColor: 'rgba(230,230,230,0.4)',
         });
       } else if (maxed) {
         button(ctx, c.upRect, '已满档', {
-          size: 18, fill: 'rgba(58,46,30,0.9)', stroke: THEME.line, textColor: THEME.textWeak,
+          size: 18, fill: 'rgba(39,48,56,0.9)', stroke: THEME.line, textColor: THEME.textWeak,
         });
       } else {
         button(ctx, c.upRect, `升级 → ${fmtNum(cost)} 铜钱`, {
           size: 18,
-          fill: can ? '#332c1d' : 'rgba(58,46,30,0.9)',
+          fill: can ? '#273038' : 'rgba(39,48,56,0.9)',
           stroke: can ? THEME.gold : THEME.line,
           textColor: can ? THEME.gold : 'rgba(230,230,230,0.4)',
         });
@@ -1945,7 +1945,7 @@ export class DeployScreen {
     for (const s of L.stances) {
       const on = !!(ch && ch.stance === s.id);
       button(ctx, s.rect, s.name, {
-        size: 20, fill: on ? '#332c1d' : THEME.panel, stroke: on ? THEME.gold : THEME.line,
+        size: 20, fill: on ? '#273038' : THEME.panel, stroke: on ? THEME.gold : THEME.line,
         textColor: on ? THEME.gold : THEME.textDim,
       });
     }
@@ -2029,13 +2029,13 @@ export class DeployScreen {
     button(ctx, DEPLOY_LAYOUT.confirmRect,
       this.gauntletChapter ? '开 始 冲 锋' : this.mode === 'battle' ? '出 战' : '保存布阵', {
         size: 34,
-        fill: '#332c1d', stroke: THEME.goldDim, textColor: THEME.gold,
+        fill: '#273038', stroke: THEME.goldDim, textColor: THEME.gold,
       });
     if (!this.trial && !this.heroBattle && !this.gauntletChapter && !this.weekly) this.drawAutoBattle(ctx);
     if (this.gauntletChapter) {
       // 自动战斗位换成斩将规则卡，明示「冲锋开始后不能换兵 / 补兵」
       const r = DEPLOY_LAYOUT.autoBattleRect;
-      panel(ctx, r.x, r.y, r.w, r.h, { fill: 'rgba(43,34,23,0.72)', stroke: THEME.line, r: 14, lw: 1 });
+      panel(ctx, r.x, r.y, r.w, r.h, { fill: 'rgba(27,34,39,0.72)', stroke: THEME.line, r: 14, lw: 1 });
       text(ctx, '5 关 6 将', r.x + r.w / 2, r.y + 26, { size: 17, weight: '600', align: 'center', color: THEME.gold });
       text(ctx, '一冲到底', r.x + r.w / 2, r.y + 54, { size: 15, align: 'center', color: THEME.textDim });
       text(ctx, '阵亡不复活', r.x + r.w / 2, r.y + 74, { size: 13, align: 'center', color: THEME.textWeak });
@@ -2076,7 +2076,7 @@ export class DeployScreen {
     const unlocked = autoBattleUnlocked(this.game.state);
     const on = unlocked && this.game.state.autoBattle === true;
     panel(ctx, r.x, r.y, r.w, r.h, {
-      fill: on ? '#332c1d' : THEME.panel,
+      fill: on ? '#273038' : THEME.panel,
       stroke: on ? THEME.gold : THEME.line,
       r: 14, lw: on ? 2 : 1,
     });
@@ -2097,7 +2097,7 @@ export class DeployScreen {
     // 小拨钮：开 = 金色靠右，关 = 灰白靠左
     const sw = { x: r.x + r.w / 2 - 26, y: r.y + 38, w: 52, h: 16 };
     roundRectPath(ctx, sw.x, sw.y, sw.w, sw.h, 9);
-    ctx.fillStyle = on ? 'rgba(216,180,106,0.85)' : 'rgba(120,136,158,0.35)';
+    ctx.fillStyle = on ? 'rgba(232,180,76,0.85)' : 'rgba(120,136,158,0.35)';
     ctx.fill();
     ctx.beginPath();
     ctx.arc(on ? sw.x + sw.w - 8 : sw.x + 8, sw.y + sw.h / 2, 6, 0, Math.PI * 2);

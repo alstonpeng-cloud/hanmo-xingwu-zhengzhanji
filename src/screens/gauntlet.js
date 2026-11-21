@@ -273,7 +273,7 @@ export class GauntletScreen {
     const st = g.state;
     this.hitRects = [];
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.92)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.92)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '过 5 关 斩 6 将', W / 2 + 20, 76, { size: 36, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -304,7 +304,7 @@ export class GauntletScreen {
 
   drawLocked(ctx) {
     const st = this.game.state;
-    panel(ctx, 70, 300, 610, 240, { fill: 'rgba(43,34,23,0.7)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 300, 610, 240, { fill: 'rgba(27,34,39,0.7)', stroke: THEME.line, r: 18 });
     text(ctx, '尚 未 开 放', 375, 360, { size: 30, weight: '600', align: 'center', color: THEME.text });
     text(ctx, `主线通关 ${CONFIG.gauntlet.unlockLevel} 关后开启`, 375, 420, {
       size: 22, align: 'center', color: THEME.textDim,
@@ -327,7 +327,7 @@ export class GauntletScreen {
       const r = c.rect;
       this.hitRects.push({ kind: 'chapter', rect: r, ch });
       panel(ctx, r.x, r.y, r.w, r.h, {
-        fill: ch.cleared ? 'rgba(58,46,22,0.82)' : ch.unlocked ? '#2b2217' : '#1c1610',
+        fill: ch.cleared ? 'rgba(39,48,56,0.82)' : ch.unlocked ? '#1b2227' : '#0c1013',
         stroke: ch.cleared ? THEME.gold : ch.unlocked ? THEME.goldDim : THEME.line,
         r: 14, lw: ch.unlocked && !ch.cleared ? 2 : 1,
       });
@@ -344,14 +344,14 @@ export class GauntletScreen {
       ctx.save();
       ctx.beginPath();
       ctx.arc(r.x + r.w - 66, r.y + 98, 8, 0, Math.PI * 2);
-      ctx.fillStyle = '#c9a35a';
+      ctx.fillStyle = '#e8b44c';
       ctx.fill();
       ctx.strokeStyle = '#7c5f2a';
       ctx.lineWidth = 1.5;
       ctx.stroke();
       ctx.restore();
       text(ctx, `${ch.firstClearCoins}`, r.x + r.w - 16, r.y + 104, {
-        size: 18, align: 'right', color: '#d8b46a',
+        size: 18, align: 'right', color: '#e8b44c',
       });
       text(ctx, ch.cleared ? '已首通 · 可重复刷' : ch.unlocked ? '布 阵 后 开 跑' : '先通上一章',
         r.x + 16, r.y + 152, {
@@ -435,7 +435,7 @@ export class GauntletScreen {
         const frameColor = heroCfg ? heroAuraColor(heroCfg)
           : (CONFIG.rarity[unit ? rarityOf(unit.troop) : ''] || {}).color || THEME.textDim;
         panel(ctx, r.x, r.y, r.w, r.h, {
-          fill: unit ? (unit.dead ? '#1a1e24' : '#2b2217') : 'rgba(20,26,35,0.5)',
+          fill: unit ? (unit.dead ? '#1a1e24' : '#1b2227') : 'rgba(20,26,35,0.5)',
           stroke: picked ? THEME.green : unit && !unit.dead ? frameColor : THEME.line,
           r: 10, lw: picked ? 2.5 : 1,
         });
@@ -492,7 +492,7 @@ export class GauntletScreen {
     this.hitRects.push({ kind: 'btn', rect: b3, id: 'abandon' });
     button(ctx, b1, '重 新 布 阵', { size: 24, fill: THEME.panel, stroke: THEME.goldDim, textColor: THEME.gold });
     button(ctx, b2, run.stage === 1 ? '开 战' : '继 续 闯 关', {
-      size: 26, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
+      size: 26, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
     });
     button(ctx, b3, '放 弃 本 次', { size: 20, fill: THEME.panel, stroke: THEME.line, textColor: THEME.textWeak });
     text(ctx, '重新布阵会放弃本次冲锋进度（兵力恢复满血）', 375, 1112, {
@@ -514,7 +514,7 @@ export class GauntletScreen {
     const gap = 14;
     const x0 = (W - (cols * cw + (cols - 1) * gap)) / 2;
     const y0 = 300;
-    panel(ctx, 36, 200, W - 72, 750, { fill: '#17130e', stroke: THEME.gold, r: 20 });
+    panel(ctx, 36, 200, W - 72, 750, { fill: '#0c1013', stroke: THEME.gold, r: 20 });
     const rar = CONFIG.rarity[box.rarity] || {};
     text(ctx, `自选卡包 · ${rar.name || box.rarity} Lv${box.level}`, W / 2, 262, {
       size: 30, weight: '700', align: 'center', color: THEME.gold,
@@ -527,7 +527,7 @@ export class GauntletScreen {
         w: cw, h: chh,
       };
       this.boxPickRects.push({ rect: r, troop: t });
-      panel(ctx, r.x, r.y, r.w, r.h, { fill: '#2b2217', stroke: THEME.line, r: 12 });
+      panel(ctx, r.x, r.y, r.w, r.h, { fill: '#1b2227', stroke: THEME.line, r: 12 });
       text(ctx, t.name, r.x + r.w / 2, r.y + 42, {
         size: 20, weight: '600', align: 'center', color: (rar.color || THEME.text), maxWidth: r.w - 16,
       });
@@ -547,7 +547,7 @@ export class GauntletScreen {
     ctx.fillStyle = 'rgba(6,9,14,0.86)';
     ctx.fillRect(0, 0, W, 1334);
     ctx.restore();
-    panel(ctx, 70, 360, 610, 470, { fill: '#17130e', stroke: THEME.gold, r: 20 });
+    panel(ctx, 70, 360, 610, 470, { fill: '#0c1013', stroke: THEME.gold, r: 20 });
     text(ctx, `${s.chapter.name} · 章节通关`, W / 2, 428, {
       size: 30, weight: '600', align: 'center', color: THEME.gold,
     });
@@ -575,7 +575,7 @@ export class GauntletScreen {
       });
     }
     button(ctx, { x: 215, y: 700, w: 320, h: 78 }, '收 下', {
-      size: 28, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
+      size: 28, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
     });
   }
 }

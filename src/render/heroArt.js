@@ -59,7 +59,8 @@ const ART = {
   },
 };
 
-export const HERO_AURA = { epic: '#6f5b7d', legendary: '#b3934f' };
+// 「墨韵丹符」品级色：史诗=紫气（珍藏），传奇=鎏金（至尊）；与全局语义色同源
+export const HERO_AURA = { epic: '#9b77cf', legendary: '#e8b44c' };
 
 // 建模配置（测试 / 界面可读）：骑兵标识 horse、长兵器 weapon 等
 export function heroArtFor(heroId) {
@@ -588,8 +589,8 @@ export function drawHeroAura(ctx, tier, x, y, size = 70, t = 0, alpha = 0.9) {
   ctx.globalAlpha = alpha;
   // 地面光晕
   const g = ctx.createRadialGradient(x, y, 2, x, y, rx);
-  g.addColorStop(0, tier === 'legendary' ? 'rgba(179,147,79,0.34)' : 'rgba(111,91,125,0.32)');
-  g.addColorStop(0.6, tier === 'legendary' ? 'rgba(179,147,79,0.14)' : 'rgba(111,91,125,0.13)');
+  g.addColorStop(0, tier === 'legendary' ? 'rgba(232,180,76,0.34)' : 'rgba(155,119,207,0.32)');
+  g.addColorStop(0.6, tier === 'legendary' ? 'rgba(232,180,76,0.14)' : 'rgba(155,119,207,0.13)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g;
   ctx.beginPath();
@@ -597,7 +598,7 @@ export function drawHeroAura(ctx, tier, x, y, size = 70, t = 0, alpha = 0.9) {
   ctx.fill();
   // 品级光柱
   const beamH = size * 1.5;
-  const tint = tier === 'legendary' ? '179,147,79' : '111,91,125';
+  const tint = tier === 'legendary' ? '232,180,76' : '155,119,207';
   const beam = ctx.createLinearGradient(x, y - beamH, x, y);
   beam.addColorStop(0, `rgba(${tint},0)`);
   beam.addColorStop(0.55, `rgba(${tint},0.16)`);
@@ -641,7 +642,7 @@ export function drawHeroHalo(ctx, tier, x, y, w, h, alpha = 1) {
   ctx.save();
   ctx.globalAlpha = alpha;
   const g = ctx.createRadialGradient(x, y, 2, x, y, w / 2);
-  g.addColorStop(0, tier === 'legendary' ? 'rgba(179,147,79,0.22)' : 'rgba(111,91,125,0.2)');
+  g.addColorStop(0, tier === 'legendary' ? 'rgba(232,180,76,0.22)' : 'rgba(155,119,207,0.2)');
   g.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = g;
   ctx.beginPath();

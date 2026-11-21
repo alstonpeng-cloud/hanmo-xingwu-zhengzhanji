@@ -1,24 +1,24 @@
-// 每日挑战关卡选择（1.2.5）：主线 30 关后解锁，30 关按顺序推进。
+// 每日挑战关卡选择（1.2.5，1.2.8 改版）：主线 30 关后解锁，30 关按顺序推进。
 // 前 12 关单英雄（史诗→传奇）、13~24 双将、25~30 三将，难度对标主线 300 → 2000 关。
+// 1.2.8 · 卡面去掉英雄模型（太塑料）：只写「第 N 关 + 敌军战力数字」，
+// 卡片整体放大 128×150 → 168×164（5 列 → 4 列），手机上看得清。
 import { THEME, text, panel, hit, backButton, infoBadge, infoModal } from '../render/draw.js';
 import { CONFIG } from '../data/config.js';
 import {
   dailyBattleDef, dailyBattlePower, dailyUnlocked, dailyStageUnlocked,
-  dailyClearedCount, dailyHpMult, dailyHeroes, dailyAnchor, dailyFirstClearReward,
+  dailyClearedCount, dailyFirstClearReward,
 } from '../data/dailyChallenge.js';
-import { heroById } from '../data/heroes.js';
-import { drawHeroFigure, drawHeroAura, heroAuraColor } from '../render/heroArt.js';
 import { ensureDaily } from '../core/daily.js';
 import { formatPower } from '../core/power.js';
 import { DeployScreen } from './deploy.js';
 import { playSfx } from '../core/audio.js';
 
-const COLS = 5;
-const CARD_W = 128;
-const CARD_H = 150;
-const GAP_X = 8;
+const COLS = 4;
+const CARD_W = 168;
+const CARD_H = 164;
+const GAP_X = 10;
 const GAP_Y = 12;
-const X0 = 37;
+const X0 = 24;
 const Y0 = 210;
 
 export const DAILY_LAYOUT = {
@@ -110,7 +110,7 @@ export class DailyChallengeScreen {
     const unlockedAll = dailyUnlocked(st);
     const day = ensureDaily(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,18,12,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '每 日 挑 战', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -137,53 +137,44 @@ export class DailyChallengeScreen {
       const def = dailyBattleDef(stage);
       this.cardRects.push({ rect, stage, unlocked, def });
 
-      const hero = heroById(def.hero);
-      const aura = hero ? heroAuraColor(hero) : THEME.gold;
+      // 1.2.8 · 卡面只写「第 N 关 + 敌军战力」：去掉英雄模型 / 将名 / 血量倍率行
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: done ? 'rgba(58,46,22,0.82)' : unlocked ? '#2b2217' : '#1c1610',
-        stroke: done ? THEME.gold : current ? aura : THEME.line,
-        r: 12, lw: current ? 2 : 1,
+        fill: done ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
+        stroke: done ? THEME.gold : current ? THEME.green : THEME.line,
+        r: 14, lw: current ? 2.5 : 1.5,
       });
 
-      text(ctx, `第 ${stage} 关`, rect.x + 10, rect.y + 20, {
-        size: 14, color: done ? THEME.gold : unlocked ? THEME.textDim : THEME.textWeak,
+      text(ctx, `第 ${stage} 关`, rect.x + 12, rect.y + 26, {
+        size: 18, weight: '600', color: done ? THEME.gold : unlocked ? THEME.text : THEME.textWeak,
       });
-      text(ctx, done ? '已通关' : current ? '可挑战' : '未解锁', rect.x + rect.w - 10, rect.y + 20, {
-        size: 12, align: 'right', color: done ? THEME.gold : current ? aura : THEME.textWeak,
+      text(ctx, done ? '已通关' : current ? '可挑战' : '未解锁', rect.x + rect.w - 12, rect.y + 26, {
+        size: 14, align: 'right', color: done ? THEME.gold : current ? THEME.green : THEME.textWeak,
       });
 
-      if (hero) {
-        drawHeroAura(ctx, hero.tier, rect.x + rect.w / 2, rect.y + 72, 38, this.t + stage * 0.4, unlocked ? 0.85 : 0.3);
-        drawHeroFigure(ctx, hero.id, {
-          x: rect.x + rect.w / 2, y: rect.y + 76, size: 46,
-          action: 'idle', t: this.t + stage * 0.2, alpha: unlocked ? 1 : 0.38, flip: true,
-        });
-      }
-
-      const names = dailyHeroes(stage)
-        .map((id) => (heroById(id) || {}).name).filter(Boolean);
-      const nameText = names.length >= 3 ? `${names[0]} 等三将` : names.join(' / ');
-      text(ctx, nameText || '敌将', rect.x + rect.w / 2, rect.y + 104, {
-        size: 15, weight: '600', align: 'center',
-        color: done ? THEME.gold : unlocked ? (hero ? hero.color : THEME.text) : THEME.textWeak,
+      // 战力大数字（卡面主角）
+      text(ctx, '敌军战力', rect.x + rect.w / 2, rect.y + 62, {
+        size: 13, align: 'center', color: unlocked ? THEME.textDim : THEME.textWeak,
+      });
+      text(ctx, formatPower(dailyBattlePower(stage, def)), rect.x + rect.w / 2, rect.y + 96, {
+        size: 28, weight: '700', align: 'center',
+        color: done ? THEME.gold : unlocked ? THEME.text : THEME.textWeak,
         maxWidth: rect.w - 12,
       });
+
+      // 底部一行：可挑战 → 首通奖励；已通关 → 可重复；未解锁 → 差哪关
       if (unlocked) {
-        text(ctx, `血量 ×${dailyHpMult(stage)} · 对标主线 ${dailyAnchor(stage)} 关`, rect.x + rect.w / 2, rect.y + 124, {
-          size: 11, align: 'center',
-          color: done ? THEME.gold : hero && hero.tier === 'legendary' ? '#b3934f' : '#b3a1c2',
-          maxWidth: rect.w - 8,
-        });
         const r = dailyFirstClearReward(stage);
-        text(ctx, done ? `战力 ${formatPower(dailyBattlePower(stage))}` : `首通 铜钱${r.coins} · ${chestName(r.chest)}`,
+        text(ctx, done ? '可重复挑战（有日限奖励）' : `首通 ${r.coins} 钱 · ${chestName(r.chest)}`,
           rect.x + rect.w / 2, rect.y + 142, {
-            size: 11, align: 'center', color: done ? THEME.textWeak : THEME.gold, maxWidth: rect.w - 8,
+            size: 13, align: 'center', color: done ? THEME.textWeak : THEME.gold, maxWidth: rect.w - 8,
           });
       } else {
         text(ctx, !unlockedAll
           ? `需主线 ${CONFIG.dailyChallenge.unlockLevel} 关`
           : `需通关第 ${stage - 1} 关`,
-        rect.x + rect.w / 2, rect.y + 130, { size: 11, align: 'center', color: THEME.textWeak });
+        rect.x + rect.w / 2, rect.y + 142, {
+          size: 13, align: 'center', color: THEME.textWeak, maxWidth: rect.w - 8,
+        });
       }
     }
     ctx.restore();
@@ -196,7 +187,7 @@ export class DailyChallengeScreen {
       const ratio = V.h / (V.h + max);
       const h = Math.max(26, (V.h - 4) * ratio);
       const sy = V.y + 2 + (V.h - 4 - h) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(216,180,106,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     if (!unlockedAll) {
