@@ -16,7 +16,8 @@ export const SUPPORT_POS = { col: 4, row: 1 };
 // 支援剧情文案（进关提示 + 结算页奖励位替换文案）
 export const SUPPORT_TITLE = '幽州突骑驰援';
 export const SUPPORT_BRIEF = '公孙瓒遣幽州突骑来援，白马义从自侧翼杀入，助你破敌。';
-export const SUPPORT_RESULT = '援军之力 · 此关战利充作军资，不另赐宝箱';
+// 第 5 关剧情：援军幽州突骑战后永久编入兵营（本关不另发宝箱）
+export const SUPPORT_RESULT = '援军之力 · 幽州突骑已编入兵营，永为麾下';
 
 export function isSupportBattle(levelN, mode = 'main') {
   return mode === 'main' && levelN === SUPPORT_LEVEL;

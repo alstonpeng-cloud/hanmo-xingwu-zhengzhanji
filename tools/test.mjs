@@ -584,9 +584,11 @@ console.log('\n== 宝箱 ==');
     '幽州突骑支援只在主线第 5 关，演武 / 英雄战 / 斩将都不触发');
   const sup = supportSquad();
   ok(sup.troop === SUPPORT_TROOP && sup.level === SUPPORT_LEVEL_LV && sup.support === true,
-    '支援小队 = 幽州突骑 Lv3，标记为剧情单位（不进兵营 / 不写存档）');
-  ok(typeof SUPPORT_RESULT === 'string' && SUPPORT_RESULT.includes('不另赐宝箱'),
-    '第 5 关结算文案说明「不另赐宝箱」');
+    '支援小队 = 幽州突骑 Lv3，标记为剧情单位（战场临时助战）');
+  ok(typeof SUPPORT_RESULT === 'string' && SUPPORT_RESULT.includes('幽州突骑') && SUPPORT_RESULT.includes('编入兵营'),
+    '第 5 关结算文案说明幽州突骑永久编入兵营');
+  ok(SUPPORT_TROOP === 'youzhou' && CONFIG.troops.some((t) => t.id === 'youzhou'),
+    '第 5 关赠送的是可入兵营的正式兵种（youzhou）');
   ok(chestsForLevel(20).join() === 'wood,silver', '第 20 关首通 = 小木箱 + 银箱');
   ok(chestsForLevel(50).join() === 'wood,gold', '第 50 关首通 = 小木箱 + 金箱');
   ok(chestsForLevel(100).join() === 'wood,silver,gold',
@@ -1554,7 +1556,7 @@ console.log('\n== 分享得宝箱 ==');
     state: stR, msgs: [], saveCalled: 0,
     toast(m) { this.msgs.push(m); },
     save() { this.saveCalled += 1; },
-    platform: { share(opts) { shareCalls.push(opts); } },
+    platform: { share(opts) { shareCalls.push(opts); return Promise.resolve(true); } },
   };
   const winR = new ResultScreen(stubGame, { win: true, levelN: 30, stats: [], chests: [] });
   const loseR = new ResultScreen(stubGame, { win: false, levelN: 30, stats: [], chests: [] });
@@ -1568,29 +1570,50 @@ console.log('\n== 分享得宝箱 ==');
   ok(loseR.secondary === null, '战败页不再有广告次按钮（原广告位并入分享按钮）');
   const cx = winR.shareRect.x + winR.shareRect.w / 2;
   const cy = winR.shareRect.y + winR.shareRect.h / 2;
-  winR.tap(cx, cy);
+  await winR.tap(cx, cy);
   ok(shareCalls.length === 1, '点击分享按钮调起平台分享');
   ok(chestCount(stR, 'gold') === 1 && stR.daily.shares === 1 && stubGame.saveCalled === 1,
-    '点开分享面板即发奖：黄金箱入仓 + 当日计数 +1 + 存档');
-  ok(stubGame.msgs.some((m) => m.includes('已打开分享面板')), '提示已打开分享面板且宝箱入仓');
-  winR.tap(cx, cy);
+    '确认分享成功后发奖：黄金宝箱入仓 + 当日计数 +1 + 存档');
+  ok(winR.rewardPopup && winR.rewardPopup.chest === 'gold' && winR.rewardPopup.name.includes('黄金'),
+    '分享成功弹出「获得奖励」卡，显示黄金宝箱');
+  winR.tap(20, 20);
+  ok(winR.rewardPopup === null, '轻触任意处关闭奖励卡');
+  await winR.tap(cx, cy);
   ok(chestCount(stR, 'gold') === 2 && stR.daily.shares === 2 && shareCalls.length === 2, '第 2 次分享：额度用满');
+  ok(winR.rewardPopup !== null, '第 2 次分享成功同样弹奖励卡');
+  winR.tap(20, 20);
   winR.tap(cx, cy);
   ok(shareCalls.length === 2 && stubGame.msgs.some((m) => m.includes('已领完')),
     '第 3 次点击不再调起分享，提示今日已领完');
-  // 战败页：点原广告按钮位（现为分享按钮）同样点开面板即发奖
+  // 取消分享（平台返回 false）：不发奖、不弹卡
+  const stC = createNewState();
+  stC.maxCleared = 30;
+  const cancelGame = {
+    state: stC, msgs: [], saveCalled: 0,
+    toast(m) { this.msgs.push(m); },
+    save() { this.saveCalled += 1; },
+    platform: { share() { return Promise.resolve(false); } },
+  };
+  const cancelR = new ResultScreen(cancelGame, { win: true, levelN: 30, stats: [], chests: [] });
+  await cancelR.tap(cancelR.shareRect.x + cancelR.shareRect.w / 2,
+    cancelR.shareRect.y + cancelR.shareRect.h / 2);
+  ok(chestCount(stC, 'gold') === 0 && stC.daily.shares === 0 && cancelR.rewardPopup === null,
+    '分享未完成（取消）：不发宝箱、不弹奖励卡');
+  ok(cancelGame.msgs.some((m) => m.includes('分享未完成')), '分享取消有明确提示');
+  // 战败页：点分享按钮同样先校验分享成功再发奖
   const stL = createNewState();
   stL.maxCleared = 30;
   const loseGame = {
     state: stL, msgs: [], saveCalled: 0,
     toast(m) { this.msgs.push(m); },
     save() { this.saveCalled += 1; },
-    platform: { share(opts) { shareCalls.push(opts); } },
+    platform: { share(opts) { shareCalls.push(opts); return Promise.resolve(true); } },
   };
   const loseR2 = new ResultScreen(loseGame, { win: false, levelN: 30, stats: [], chests: [] });
-  loseR2.tap(loseR2.shareRect.x + loseR2.shareRect.w / 2, loseR2.shareRect.y + loseR2.shareRect.h / 2);
+  await loseR2.tap(loseR2.shareRect.x + loseR2.shareRect.w / 2,
+    loseR2.shareRect.y + loseR2.shareRect.h / 2);
   ok(shareCalls.length === 3 && chestCount(stL, 'gold') === 1 && stL.daily.shares === 1,
-    '战败页点分享：点开面板即发奖');
+    '战败页点分享：确认成功后发奖');
 }
 
 console.log('\n== 战斗力评定 / 本局最佳统计 ==');
@@ -1917,6 +1940,23 @@ console.log('\n== UI 修复（战力 / 英雄紫框 / 两级英雄页 / 竞技�
   const b1 = new BattleScreen(uiGame, 1);
   ok(b1.myPower > 0 && b1.enemyPower > 0,
     `第 1 关双方战力非 0（我方 ${b1.myPower} / 敌方 ${b1.enemyPower}）`);
+  // 第 5 关通关：幽州突骑永久加入兵营，且不再发宝箱
+  {
+    const stS = createNewState();
+    stS.maxCleared = 4;
+    stS.units = [];
+    const supportGame = {
+      state: stS, W: 750, H: 1334,
+      platform: { vibrate() {} }, toast() {}, save() {}, pop() {}, go() {},
+    };
+    const b5 = new BattleScreen(supportGame, 5);
+    ok(b5.supportBattle === true, '主线第 5 关为幽州突骑支援剧情关');
+    b5.outcome = 'player';
+    b5.finish();
+    ok(stS.units.some((u) => u.troop === 'youzhou'), '第 5 关通关后幽州突骑永久加入兵营');
+    ok(chestCount(stS, 'wood') === 0 && chestCount(stS, 'gold') === 0,
+      '第 5 关不再发宝箱（奖励改为幽州突骑）');
+  }
   for (const n of [100, 400]) {
     const b = new BattleScreen(uiGame, n);
     ok(b.myPower > 0 && b.enemyPower > 0, `第 ${n} 关双方战力非 0`);

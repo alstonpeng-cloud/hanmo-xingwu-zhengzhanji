@@ -54,6 +54,7 @@ import { UnlockTeachingScreen } from './unlockTeaching.js';
 import { tickTrialRounds } from '../core/trialTroop.js';
 import {
   isSupportBattle, supportSquad, SUPPORT_TITLE, SUPPORT_BRIEF, SUPPORT_RESULT,
+  SUPPORT_TROOP, SUPPORT_LEVEL_LV,
 } from '../data/supportLevel.js';
 
 // 斗技场视口：顶栏下面到屏幕底部，几乎占满全屏
@@ -753,6 +754,7 @@ export class BattleScreen {
     let chests = [];
     let unitRewards = [];
     let teaches = [];
+    let supportText = null;
 
     if (win) {
       // 铜钱只在首通发放：关卡不可重复挑战，这里只可能是首通
@@ -788,6 +790,19 @@ export class BattleScreen {
             addChest(st, 'gold', 1);
           }
         }
+        // 第 5 关剧情：援军幽州突骑战后正式编入兵营（永久获得）。
+        // 兵营已满则与里程碑单位同规则折算成 1 个黄金宝箱，并改写结算文案。
+        if (this.supportBattle) {
+          const added = addUnit(st, SUPPORT_TROOP, SUPPORT_LEVEL_LV);
+          unitRewards.push({
+            unit: SUPPORT_TROOP, level: SUPPORT_LEVEL_LV,
+            name: unitName(SUPPORT_TROOP, SUPPORT_LEVEL_LV), added: !!added,
+          });
+          if (!added) addChest(st, 'gold', 1);
+          supportText = added
+            ? SUPPORT_RESULT
+            : '援军之力 · 兵营已满，幽州突骑折算为黄金宝箱 ×1';
+        }
         noteClear(st);
         // 招募券：200 关后每 10 关首通 +1 张（200/210/220…）。
         // 只有已通关至少 1 场英雄战后才发放，避免「一场英雄战没打就囤券」。
@@ -819,7 +834,7 @@ export class BattleScreen {
     const result = new ResultScreen(g, {
       win, levelN: this.levelN, coins, firstClear, chests, unitRewards,
       // 第 5 关支援剧情：结算页的宝箱位换成剧情文案
-      storyText: this.supportBattle && win ? SUPPORT_RESULT : null,
+      storyText: this.supportBattle && win ? (supportText || SUPPORT_RESULT) : null,
       storyTitle: this.supportBattle && win ? SUPPORT_TITLE : null,
       // 250 关首通赠关平：结算页领取，防重复由 claimLevelHeroReward 记录
       heroReward: firstClear ? pendingLevelHeroReward(st, this.levelN) : null,

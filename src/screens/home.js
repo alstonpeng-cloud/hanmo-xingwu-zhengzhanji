@@ -1,4 +1,4 @@
-import { THEME, text, panel, button, coinBadge, hit, bar, screenDim, roundRectPath, primaryButton, eventOrb } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, hit, bar, screenDim, roundRectPath, primaryButton, eventOrb, menuBackdrop } from '../render/draw.js';
 import { now as clockNow } from '../core/clock.js';
 import { CONFIG } from '../data/config.js';
 import { levelTotal, rosterSlots, autoBattleUnlocked } from '../core/levels.js';
@@ -342,6 +342,9 @@ export class HomeScreen {
     const st = g.state;
     const W = g.W;
 
+    // 哑光金底纹：衬托整页内容，透明度低、不抢焦点
+    menuBackdrop(ctx, W, g.H, { t: this.t });
+
     // 顶部信息条
     panel(ctx, 40, 40, 670, 74, { fill: 'rgba(27,34,39,0.75)', stroke: THEME.line, r: 18 });
     text(ctx, '铜钱', 74, 77, { size: 24, color: THEME.textDim });
@@ -454,10 +457,23 @@ export class HomeScreen {
       size: 44, subSize: 20, t: this.t,
     });
     const chests = chestTotal(st);
+    // 哑光金主入口（商城 / 兵营）：外发光 + 金边 + 金亮字，比周围灰底入口更抓眼
+    const goldEntryGlow = (rect) => {
+      ctx.save();
+      ctx.shadowColor = 'rgba(232,180,76,0.42)';
+      ctx.shadowBlur = 24;
+      roundRectPath(ctx, rect.x, rect.y, rect.w, rect.h, 18);
+      ctx.strokeStyle = 'rgba(232,180,76,0.55)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+      ctx.restore();
+    };
     // 兵营（内含布阵 / 合成） + 招募系统（250 关解锁）并排
     // 三个常用入口只留标题，不写说明（首页做减法）
+    goldEntryGlow(r.barracks);
     button(ctx, r.barracks, '兵 营', {
-      size: 34, fill: THEME.panel2, stroke: THEME.line,
+      size: 36, fill: '#2b2419', stroke: THEME.gold,
+      textColor: THEME.goldLit,
       sub: `${st.units.length} / ${rosterSlots(st.maxCleared).unlocked} 个兵`,
       subSize: 17,
     });
@@ -478,8 +494,10 @@ export class HomeScreen {
       stroke: chests > 0 ? THEME.treasure : THEME.line,
       textColor: chests > 0 ? THEME.treasure : THEME.text,
     });
+    goldEntryGlow(r.shop);
     button(ctx, r.shop, '商 城', {
-      size: 34, fill: THEME.panel2, stroke: THEME.shop, textColor: THEME.shop,
+      size: 36, fill: '#2b2419', stroke: THEME.gold,
+      textColor: THEME.goldLit,
     });
 
     // 挂机收益（离线 / 在线都在累积，封顶 8 小时）

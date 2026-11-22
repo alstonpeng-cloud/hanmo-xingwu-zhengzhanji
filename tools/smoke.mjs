@@ -96,8 +96,8 @@ const platform = {
   onTap: (cb) => { tapCb = cb; },
   onPinch: (cb) => { pinchCb = cb; },
   rewardedAd: null,
-  // 分享桩：结算页分享按钮被模拟点击时调起面板（发奖在 shareNow 里，不依赖回调）
-  share() {},
+  // 分享桩：模拟「分享面板选中会话并返回」= 分享成功（结算页确认后才发奖）
+  share() { return Promise.resolve(true); },
   audio: {
     createSound: (src) => ({
       play: () => audioPlayed.push(src),
@@ -1587,15 +1587,26 @@ shot('32_deploy_rarity_borders');
     }
   });
   console.log('  克制环四个兵种建模节点均有可见像素');
-  // 原「看广告试用兵」按钮位已替换为亮绿分享按钮：点开面板即发奖
+  // 原「看广告试用兵」按钮位已替换为亮绿分享按钮：确认分享成功后才发奖并弹奖励卡
   game.state.daily.shares = 0;
   const shareBtn = center(game.screen.shareRect);
   const chests0 = chestCount(game.state, 'gold');
   tap(shareBtn.x, shareBtn.y);
+  await new Promise((r) => setTimeout(r, 0));
   shot('37b_result_fail_share');
   if (chestCount(game.state, 'gold') !== chests0 + 1 || game.state.daily.shares !== 1) {
     errors++;
-    console.error(`  ✗ 战败页点分享应点开面板即发奖（金箱 ${chestCount(game.state, 'gold')} / 次数 ${game.state.daily.shares}）`);
+    console.error(`  ✗ 战败页分享成功后应发奖（黄金宝箱 ${chestCount(game.state, 'gold')} / 次数 ${game.state.daily.shares}）`);
+  }
+  shot('37c_result_share_reward');
+  if (!game.screen.rewardPopup) {
+    errors++;
+    console.error('  ✗ 分享成功后应弹出「获得奖励」卡');
+  }
+  tap(20, 20);
+  if (game.screen.rewardPopup) {
+    errors++;
+    console.error('  ✗ 轻触任意处应关闭获得奖励卡');
   }
 }
 

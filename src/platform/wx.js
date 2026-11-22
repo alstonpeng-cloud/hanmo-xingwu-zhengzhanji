@@ -317,15 +317,43 @@ export function createWxPlatform(options = {}) {
       }
     },
     rewardedAd,
-    // 主动分享：只调起分享面板。微信 2021-10 起 wx.shareAppMessage 不再回调
-    // success/fail/complete，奖励由结算页在点开面板时立即发放（shareNow）
+    // 主动分享：调起分享面板并等待「真的分享出去」。
+    // 微信 2021-10 起 wx.shareAppMessage 不再回调 success/fail，只能间接判断：
+    // 分享面板里选中会话后 App 会切到聊天再回到游戏（onHide → onShow），
+    // 因此以「返回前台」作为分享完成的信号；一直没回来视为取消（超时判失败）。
+    // 返回 Promise<boolean>：true = 分享成功，false = 取消 / 失败。
     share(opts = {}) {
-      try {
-        wx.shareAppMessage({
-          title: opts.title || '汉末行伍征战记：排兵布阵，征战天下',
-          imageUrl: opts.imageUrl,
-        });
-      } catch (e) { /* 非微信环境静默：奖励已在调用前发放 */ }
+      return new Promise((resolve) => {
+        let done = false;
+        let hideAt = 0;
+        let timer = null;
+        const finish = (ok) => {
+          if (done) return;
+          done = true;
+          if (timer) clearTimeout(timer);
+          try { if (wx.offShow) wx.offShow(onShow); } catch (e) {}
+          try { if (wx.offHide) wx.offHide(onHide); } catch (e) {}
+          resolve(ok);
+        };
+        const onHide = () => { hideAt = Date.now(); };
+        const onShow = () => {
+          // 仅当确实离开过（进到会话）才算分享成功；直接关闭面板不会触发 onShow
+          finish(hideAt > 0 || Date.now() - startAt >= 1200);
+        };
+        const startAt = Date.now();
+        // 兜底：超时仍未回到前台 → 判定为取消，避免玩家一直等不到反馈
+        timer = setTimeout(() => finish(false), 20000);
+        try {
+          if (wx.onHide) wx.onHide(onHide);
+          if (wx.onShow) wx.onShow(onShow);
+          wx.shareAppMessage({
+            title: opts.title || '汉末行伍征战记：排兵布阵，征战天下',
+            imageUrl: opts.imageUrl,
+          });
+        } catch (e) {
+          finish(false);
+        }
+      });
     },
     audio: createWxAudio(),
     vibrate() {

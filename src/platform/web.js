@@ -282,8 +282,8 @@ export function createWebPlatform(canvas) {
     },
     // null = 游戏已移除广告奖励入口（1.2.9），rewardedAd 接口仅保留给 core 遗留逻辑
     rewardedAd: null,
-    // 浏览器没有微信分享：不调起任何面板；奖励已在结算页 shareNow 里发放
-    share() {},
+    // 浏览器没有微信分享：直接视为分享成功（保证网页试玩时奖励流程可走通）
+    share() { return Promise.resolve(true); },
     audio: createWebAudio(),
     vibrate() {},
   };

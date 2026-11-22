@@ -305,6 +305,57 @@ export function primaryButton(ctx, rect, label, opt = {}) {
   }
 }
 
+// 菜单页哑光金底纹：极淡鎏金氛围 + 汉镜同心暗纹 + 四角收敛暗角。
+// 只铺在内容之下，透明度很低，不抢按钮与文字的可读性。
+export function menuBackdrop(ctx, W, H, opt = {}) {
+  const t = opt.t || 0;
+  ctx.save();
+  // 顶部中央哑光金雾（主光源）
+  let g = ctx.createRadialGradient(W * 0.5, H * 0.26, 20, W * 0.5, H * 0.26, W * 0.92);
+  g.addColorStop(0, 'rgba(208,164,88,0.085)');
+  g.addColorStop(0.55, 'rgba(180,140,70,0.032)');
+  g.addColorStop(1, 'rgba(180,140,70,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+  // 左下角次级金雾（错位摆放，避免上下对称的呆板感）
+  g = ctx.createRadialGradient(W * 0.16, H * 0.94, 20, W * 0.16, H * 0.94, W * 0.78);
+  g.addColorStop(0, 'rgba(232,180,76,0.055)');
+  g.addColorStop(1, 'rgba(232,180,76,0)');
+  ctx.fillStyle = g;
+  ctx.fillRect(0, 0, W, H);
+
+  // 汉镜同心暗纹：极淡金线 + 极慢呼吸缩放
+  const cx = W * 0.5;
+  const cy = H * 0.32;
+  const breath = 1 + 0.012 * Math.sin(t * 0.6);
+  ctx.lineWidth = 1;
+  for (let i = 1; i <= 4; i++) {
+    ctx.strokeStyle = i % 2 === 0 ? 'rgba(232,180,76,0.045)' : 'rgba(232,180,76,0.075)';
+    ctx.beginPath();
+    ctx.arc(cx, cy, (86 + i * 62) * breath, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  // 八向短刻（汉镜纹样）
+  ctx.strokeStyle = 'rgba(232,180,76,0.085)';
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
+    const r0 = 338 * breath;
+    const r1 = r0 + 15;
+    ctx.beginPath();
+    ctx.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
+    ctx.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+    ctx.stroke();
+  }
+
+  // 四边收敛暗角：让中间内容更聚光
+  const vg = ctx.createRadialGradient(W * 0.5, H * 0.5, H * 0.34, W * 0.5, H * 0.5, H * 0.78);
+  vg.addColorStop(0, 'rgba(0,0,0,0)');
+  vg.addColorStop(1, 'rgba(0,0,0,0.42)');
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, W, H);
+  ctx.restore();
+}
+
 // 圆形悬浮提醒按钮：金环 + 呼吸光晕 + 漂浮粒子 + 红点角标
 export function eventOrb(ctx, cx, cy, radius, label, opt = {}) {
   const { t = 0, badge = 0, color = THEME.gold, active = true, phase = 0 } = opt;

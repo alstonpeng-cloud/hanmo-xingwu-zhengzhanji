@@ -1,4 +1,5 @@
-import { THEME, text, panel, button, coinBadge, bar, hit } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, bar, hit, roundRectPath } from '../render/draw.js';
+import { drawChest } from '../render/chest.js';
 import { CONFIG } from '../data/config.js';
 import { levelTotal, rosterSlots, autoBattleUnlocked } from '../core/levels.js';
 import { chestType, openChest } from '../core/chests.js';
@@ -30,6 +31,8 @@ export class ResultScreen {
     this.d = data;
     this.t = 0;
     this.opened = null;                       // 本次结算里刚开出来的兵
+    this.sharing = false;                     // 分享进行中（等待平台返回是否成功）
+    this.rewardPopup = null;                  // 分享奖励弹窗：{ chest, name, count }
     // 胜利页要把「本场最佳」和「下一个解锁」都塞进统计区下方，按钮整体下移；失败页保持原布局
     const win = data.win === true;
     this.primary = win ? { x: 175, y: 976, w: 400, h: 96 } : { x: 175, y: 850, w: 400, h: 112 };
@@ -166,6 +169,11 @@ export class ResultScreen {
       if (hit(this.heroClaimRect, x, y)) this.claimHeroReward();
       return;
     }
+    // 分享奖励弹窗是轻量模态：轻触任意处关闭
+    if (this.rewardPopup) {
+      this.rewardPopup = null;
+      return;
+    }
 
     // 输出扛伤 Top5 Tab 点击
     if (this.rankTabs) {
@@ -204,22 +212,57 @@ export class ResultScreen {
       }
       return;
     }
-    if (hit(this.shareRect, x, y)) this.shareNow();
+    if (hit(this.shareRect, x, y)) return this.shareNow();
   }
 
   // 分享得宝箱：每天限 2 次，前 200 关黄金箱 / 200 关起史诗箱。
-  // 微信 2021-10 起 wx.shareAppMessage 不再回调 success/fail，改为「点开分享面板即发奖」
+  // 微信已无分享 success 回调 → 由平台层用「切到会话再返回」判断是否真的分享成功；
+  // 只有确认分享成功才发奖，并弹一个轻触即关的奖励卡让玩家看到宝箱。
   shareNow() {
     const g = this.game;
+    if (this.sharing) return undefined;
     if (sharesLeft(g.state) <= 0) {
       playSfx('error', { volume: 0.7 });
       g.toast('今日分享奖励已领完（每天 2 次，明天再来）');
-      return;
+      return undefined;
     }
     if (!g.platform || typeof g.platform.share !== 'function') {
       g.toast('请在微信小游戏里分享');
-      return;
+      return undefined;
     }
+    const title = `我已在《汉末行伍征战记》通关第 ${Math.max(1, (g.state.maxCleared || 0) + 1)} 关，来布阵过关！`;
+    let p = null;
+    try {
+      p = g.platform.share({ title });
+    } catch (e) {
+      p = null;
+    }
+    // 平台不支持完成判定（旧版 / 非微信）：退回「点开面板即发奖」
+    if (!p || typeof p.then !== 'function') {
+      this.grantShareReward();
+      return undefined;
+    }
+    this.sharing = true;
+    g.toast('分享中…回到游戏后自动结算');
+    return p
+      .then((ok) => {
+        this.sharing = false;
+        if (!ok) {
+          playSfx('error', { volume: 0.7 });
+          g.toast('分享未完成，未获得宝箱');
+          return;
+        }
+        this.grantShareReward();
+      })
+      .catch(() => {
+        this.sharing = false;
+        g.toast('分享未完成，未获得宝箱');
+      });
+  }
+
+  // 确认分享成功后发奖：入宝箱仓库 + 存档 + 弹出「获得奖励」卡
+  grantShareReward() {
+    const g = this.game;
     const r = claimShareReward(g.state);
     if (!r.ok) {
       playSfx('error', { volume: 0.7 });
@@ -228,11 +271,42 @@ export class ResultScreen {
     }
     g.save();
     playSfx('reward');
-    g.platform.share({
-      title: `我已在《汉末行伍征战记》通关第 ${Math.max(1, (g.state.maxCleared || 0) + 1)} 关，来布阵过关！`,
-    });
     const chestName = chestType(r.chest) ? chestType(r.chest).name : '宝箱';
-    g.toast(`已打开分享面板：${chestName} ×1 已入宝箱仓库`);
+    this.rewardPopup = { chest: r.chest, name: chestName, count: 1 };
+    g.toast(`分享成功：${chestName} ×1 已入宝箱仓库`);
+  }
+
+  // 「获得奖励」轻量弹窗：宝箱图标 + 名称，轻触任意处关闭
+  drawRewardPopup(ctx) {
+    const g = this.game;
+    const W = g.W;
+    ctx.save();
+    ctx.fillStyle = 'rgba(6,9,14,0.76)';
+    ctx.fillRect(0, 0, W, g.H);
+    ctx.restore();
+    const px = 135;
+    const py = 452;
+    const pw = 480;
+    const ph = 330;
+    panel(ctx, px, py, pw, ph, { fill: 'rgba(34,28,18,0.98)', stroke: THEME.gold, r: 24, lw: 3 });
+    ctx.save();
+    roundRectPath(ctx, px + 8, py + 8, pw - 16, ph - 16, 18);
+    ctx.strokeStyle = 'rgba(248,225,172,0.30)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    ctx.restore();
+    text(ctx, '获 得 奖 励', W / 2, py + 46, { size: 24, align: 'center', color: THEME.gold });
+    const type = chestType(this.rewardPopup.chest);
+    const kind = this.rewardPopup.chest === 'gold' ? 'gold'
+      : this.rewardPopup.chest === 'wood' ? 'wood' : '';
+    drawChest(ctx, W / 2, py + 152, 1.35, { color: (type && type.color) || '#c8a86a', kind });
+    text(ctx, `${this.rewardPopup.name} ×${this.rewardPopup.count}`, W / 2, py + 242, {
+      size: 34, weight: '700', align: 'center', serif: true,
+      color: (type && type.color) || THEME.gold,
+    });
+    text(ctx, '轻触屏幕任意处关闭', W / 2, py + 296, {
+      size: 18, align: 'center', color: THEME.textDim,
+    });
   }
 
   // 分享按钮（win/lose 共用）：亮绿大按钮 + 动效——周期回弹（1.00→1.04）与上下轻抖（±3px）；
@@ -240,7 +314,7 @@ export class ResultScreen {
   drawShareButton(ctx) {
     const g = this.game;
     const r = this.shareRect;
-    const on = sharesLeft(g.state) > 0;
+    const on = sharesLeft(g.state) > 0 && !this.sharing;
     const chest = shareRewardFor(g.state.maxCleared);
     const chestName = chestType(chest) ? chestType(chest).name : '宝箱';
     const pulse = on ? 1 + 0.04 * (0.5 + 0.5 * Math.sin(this.t * 3.0)) : 1;
@@ -251,7 +325,9 @@ export class ResultScreen {
     ctx.translate(cx, cy + dy);
     ctx.scale(pulse, pulse);
     ctx.translate(-cx, -cy);
-    button(ctx, r, on ? `分享得${chestName}` : '今日已领完', {
+    const label = this.sharing ? '分 享 中…'
+      : sharesLeft(g.state) > 0 ? `分享得${chestName}` : '今日已领完';
+    button(ctx, r, label, {
       size: 32, fill: '#07c160', stroke: '#059a4d', textColor: '#ffffff', disabled: !on,
     });
     ctx.restore();
@@ -338,6 +414,8 @@ export class ResultScreen {
     }
     // 分享得宝箱：亮绿大按钮 + 回弹/抖动动效，额度用尽置灰
     this.drawShareButton(ctx);
+    // 分享奖励弹窗最后画：盖住结算页内容，轻触即关
+    if (this.rewardPopup) this.drawRewardPopup(ctx);
     if (d.heroReward && !this.heroRewardClaimed) this.drawHeroRewardModal(ctx);
   }
 
