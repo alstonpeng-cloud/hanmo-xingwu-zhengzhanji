@@ -204,7 +204,7 @@ export class DailyChallengeScreen {
       `主线 ${cfg.unlockLevel} 关后开放；${cfg.total} 关按顺序推进，不能跳关。`,
       '每关由敌方英雄带队：前 12 关单将（史诗→传奇），13~24 关双将，25 关起三将同时登场。',
       '敌军对标主线 300 → 2000 关满编强度，Boss 血量从 ×3 抬到 ×12。',
-      '首通永久记录：铜钱 800 起逐关递增（上限 20000），并按进度发木箱 / 银箱 / 稀有箱。',
+      '首通永久记录：铜钱 800 起逐关递增（上限 20000），并按进度发小木箱 / 白银宝箱 / 稀有箱。',
       `重复挑战每天前 ${cfg.dailyWinLimit} 胜各发铜钱 ${cfg.dailyWinCoins} + 小木箱。`,
       '已解锁的英雄、器械、兵书在本模式同样生效，练度越高越稳。',
       '上下滑动查看全部关卡。',
@@ -212,7 +212,7 @@ export class DailyChallengeScreen {
   }
 }
 
-const CHEST_NAMES = { wood: '小木箱', silver: '银箱', rare: '稀有箱' };
+const CHEST_NAMES = { wood: '小木箱', silver: '白银宝箱', rare: '稀有箱' };
 function chestName(id) {
   return CHEST_NAMES[id] || id;
 }

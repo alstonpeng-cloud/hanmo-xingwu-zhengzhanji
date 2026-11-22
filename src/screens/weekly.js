@@ -48,7 +48,7 @@ export const WEEKLY_LAYOUT = {
 };
 
 const CHEST_NAMES = {
-  wood: '小木箱', silver: '银箱', gold: '金箱', rare: '稀有箱',
+  wood: '小木箱', silver: '白银宝箱', gold: '黄金宝箱', rare: '稀有箱',
   epic: '史诗箱', legendary: '传奇箱',
 };
 function chestName(id) {
@@ -563,7 +563,7 @@ export class WeeklyChallengeScreen {
       `5 个档位 × 10 小关顺序解锁，通完上一档才开下一档；敌方战力 = 该档开战预算的纯兵上限 × 档位倍率（×${cfg.tierMult.join(' / ')}），难度逐档飙升。`,
       '第一档靠选兵就能过；第二档要硬啃配置；第三档起必须英雄 + 器械；第四档起要兵书；第五档全养成都考。',
       '你已解锁的英雄、器械、兵书在本模式全部生效（第 4 档起敌方也出器械），练度越高越稳。',
-      `首通铜钱 500 × 档位 / 关，第 5 关银箱、第 10 关高品箱 + 档位大赏；已通关关卡每天扫荡 ${cfg.sweepDailyLimit} 次，得 ${Math.round(cfg.sweepRatio * 100)}% 铜钱、无宝箱。`,
+      `首通铜钱 500 × 档位 / 关，第 5 关白银宝箱、第 10 关高品箱 + 档位大赏；已通关关卡每天扫荡 ${cfg.sweepDailyLimit} 次，得 ${Math.round(cfg.sweepRatio * 100)}% 铜钱、无宝箱。`,
     ]);
   }
 }

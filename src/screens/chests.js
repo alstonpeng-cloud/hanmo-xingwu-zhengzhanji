@@ -117,8 +117,8 @@ export class ChestScreen {
       const all = chestTypes();
       const lines = [
         late
-          ? '首通掉落：200 关后每 5 关 1 银箱，每 20 关额外 1 金箱。'
-          : '首通掉落：第 1 关与每 5 关 1 小木箱，20 关加银箱，50 关加金箱。',
+          ? '首通掉落：200 关后每 5 关 1 白银宝箱，每 20 关额外 1 黄金宝箱。'
+          : '首通掉落：第 1 关与每 5 关 1 小木箱，20 关加白银宝箱，50 关加黄金宝箱。',
         `当前通关加成：所有宝箱开出的兵种等级 +${bonus}（含挂机宝箱）。`,
         ...all.filter((t) => !t.locked).map((t) => `${t.name}：${t.desc}`),
         locked.length ? `后续档位：${locked.map((t) => `${t.name}（${t.desc}）`).join(' / ')}` : '',

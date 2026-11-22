@@ -91,7 +91,7 @@ function vibrate(game, ms) {
 }
 
 // 每日 / 周常挑战结算里的宝箱名
-const CHEST_LABELS = { wood: '小木箱', silver: '银箱', gold: '金箱', rare: '稀有箱' };
+const CHEST_LABELS = { wood: '小木箱', silver: '白银宝箱', gold: '黄金宝箱', rare: '稀有箱' };
 function chestLabel(id) {
   return CHEST_LABELS[id] || id || '';
 }

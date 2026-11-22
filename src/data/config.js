@@ -920,7 +920,7 @@ export const CONFIG = {
     // 商店广告宝箱：两个独立通道，各自独立计数
     shopOffers: [
       { id: 'ad-wood', chest: 'wood', count: 1, limitKey: 'shopWood', name: '小木箱 ×1' },
-      { id: 'ad-silver', chest: 'silver', count: 1, limitKey: 'shopSilver', name: '银箱 ×1' },
+      { id: 'ad-silver', chest: 'silver', count: 1, limitKey: 'shopSilver', name: '白银宝箱 ×1' },
     ],
   },
 
@@ -1073,7 +1073,7 @@ export const CONFIG = {
       },
       silver: {
         id: 'silver',
-        name: '银箱',
+        name: '白银宝箱',
         desc: '40% 普通 Lv2~3 / 40% 稀有 Lv1~2 / 20% 史诗 Lv1',
         color: '#b9c4d0',
         drops: [
@@ -1086,7 +1086,7 @@ export const CONFIG = {
       },
       gold: {
         id: 'gold',
-        name: '金箱',
+        name: '黄金宝箱',
         desc: '30% 稀有 Lv2~3 / 40% 史诗 Lv1~2 / 30% 传奇 Lv1',
         color: '#e0b95f',
         drops: [

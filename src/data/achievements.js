@@ -12,7 +12,7 @@ export const ACHIEVEMENT_CATS = [
 ];
 
 const CHEST_NAMES = {
-  wood: '小木箱', silver: '银箱', gold: '金箱', rare: '稀有箱',
+  wood: '小木箱', silver: '白银宝箱', gold: '黄金宝箱', rare: '稀有箱',
   epic: '史诗箱', legendary: '传奇箱',
 };
 

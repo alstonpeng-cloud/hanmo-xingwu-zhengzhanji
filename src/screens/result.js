@@ -768,7 +768,7 @@ export class ResultScreen {
         names.push(d.chests.map((c) => `${chestType(c.id)?.name || c.id} ×${c.count}`).join(' / '));
       }
       for (const u of d.unitRewards || []) {
-        names.push(u.added ? `${u.name} Lv${u.level} ×1` : `${u.name}（兵营满，折算金箱）`);
+        names.push(u.added ? `${u.name} Lv${u.level} ×1` : `${u.name}（兵营满，折算黄金宝箱）`);
       }
       text(ctx, names.length ? names.join('　') : '本关没有宝箱', 374, 330, {
         size: 15, color: names.length ? THEME.text : THEME.textWeak, maxWidth: 160,
