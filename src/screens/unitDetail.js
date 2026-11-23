@@ -110,7 +110,7 @@ export class UnitDetailScreen {
     const special = rarity !== 'common';
     const accent = special ? rar.color : THEME.gold;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '单位详情', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
@@ -121,8 +121,8 @@ export class UnitDetailScreen {
     });
     ctx.save();
     const ringGrad = ctx.createRadialGradient(375, 380, 20, 375, 380, 150);
-    ringGrad.addColorStop(0, special ? `rgba(255,255,255,0.02)` : 'rgba(232,180,76,0.16)');
-    ringGrad.addColorStop(0.35, special ? hexToRgba(rar.color, 0.2) : 'rgba(232,180,76,0.08)');
+    ringGrad.addColorStop(0, special ? `rgba(255,255,255,0.02)` : 'rgba(213,153,71,0.16)');
+    ringGrad.addColorStop(0.35, special ? hexToRgba(rar.color, 0.2) : 'rgba(213,153,71,0.08)');
     ringGrad.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = ringGrad;
     ctx.beginPath();
@@ -141,7 +141,7 @@ export class UnitDetailScreen {
     text(ctx, `等级 ${unit.level} / ${maxLevel()}`, 640, 190, { size: 22, color: accent, align: 'right' });
     // 战斗力（亮金色）：整支小队口径，和布阵页的「我方 / 敌方战力」一致
     text(ctx, `战力 ${formatPower(power)}`, 640, 234, {
-      size: 22, weight: '700', color: '#f8e1ac', align: 'right',
+      size: 22, weight: '700', color: '#f4d488', align: 'right',
     });
 
     // 等级小方块
@@ -174,7 +174,7 @@ export class UnitDetailScreen {
     const skills = traitSkills(unit.troop, unit.level);
     const note = traitNote(unit.troop);
     panel(ctx, 36, 624, 678, 186, {
-      fill: special ? hexToRgba(rar.color, 0.09) : 'rgba(27,34,39,0.7)',
+      fill: special ? hexToRgba(rar.color, 0.09) : 'rgba(43,34,23,0.7)',
       stroke: special ? hexToRgba(rar.color, 0.5) : THEME.line, r: 18,
     });
     text(ctx, '战 法 · 特 性', 70, 652, { size: 21, weight: '600', color: special ? rar.color : THEME.text });
@@ -208,7 +208,7 @@ export class UnitDetailScreen {
 
     // 合成面板
     panel(ctx, 36, 814, 678, 190, {
-      fill: info.canMerge ? 'rgba(45,40,26,0.55)' : 'rgba(27,34,39,0.6)',
+      fill: info.canMerge ? 'rgba(45,40,26,0.55)' : 'rgba(43,34,23,0.6)',
       stroke: info.canMerge ? THEME.goldDim : THEME.line, r: 18,
     });
     text(ctx, '合 成', 70, 852, { size: 24, color: THEME.textDim });
@@ -230,7 +230,7 @@ export class UnitDetailScreen {
 
     button(ctx, this.mergeRect, info.atMax ? '已 满 级' : info.canMerge ? '合 成' : '材料不足', {
       size: 38,
-      fill: info.canMerge ? '#273038' : THEME.panel2,
+      fill: info.canMerge ? '#332c1d' : THEME.panel2,
       stroke: info.canMerge ? THEME.goldDim : THEME.line,
       textColor: info.canMerge ? THEME.gold : THEME.textWeak,
     });

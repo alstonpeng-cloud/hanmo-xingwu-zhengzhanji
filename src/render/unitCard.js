@@ -42,7 +42,7 @@ export function drawUnitCard(ctx, unit, rect, opt = {}) {
         : special ? rar.color
           : onGrid ? THEME.goldDim : commonStroke;
   panel(ctx, x, y, w, h, {
-    fill: ghost ? '#243042' : onGrid ? '#2b3748' : '#1c2431',
+    fill: ghost ? '#2a2018' : onGrid ? '#332519' : '#241a16',
     stroke, r: 10, lw: hover || selected ? 3 : special ? 2.4 : (tinted ? 2.2 : 1.5),
   });
   if (special || tinted) {
@@ -125,7 +125,7 @@ export function drawUnitCard(ctx, unit, rect, opt = {}) {
   ctx.save();
   ctx.globalAlpha = alpha * 0.92;
   roundRectPath(ctx, x + 5, y + h - 29, 46, 24, 8);
-  ctx.fillStyle = 'rgba(11,16,24,0.82)';
+  ctx.fillStyle = 'rgba(21,15,10,0.82)';
   ctx.fill();
   ctx.restore();
   text(ctx, `${size} 人`, x + 28, y + h - 12, {
@@ -140,7 +140,7 @@ export function drawLockedCard(ctx, troopId, rect, unlockLevel) {
   const troop = troopById(troopId);
   const { x, y, w, h } = rect;
   panel(ctx, x, y, w, h, {
-    fill: 'rgba(16,21,29,0.88)', stroke: '#39414e', r: 10, lw: 1.4,
+    fill: 'rgba(28,21,14,0.88)', stroke: '#4a3a28', r: 10, lw: 1.4,
   });
   // 灰色立绘：缩小一档并压低透明度，给「未解锁 / 兵种名 / 解锁关卡」让出清晰的文字底
   ctx.save();
@@ -148,16 +148,16 @@ export function drawLockedCard(ctx, troopId, rect, unlockLevel) {
   drawFrame(ctx, sheetFor(troopId, 0), 'idle', 0, x + w / 2, y + h - 6, 0.5, false);
   ctx.restore();
   ctx.save();
-  ctx.fillStyle = 'rgba(13,17,24,0.55)';
+  ctx.fillStyle = 'rgba(23,17,11,0.55)';
   roundRectPath(ctx, x + 4, y + 4, w - 8, h - 8, 8);
   ctx.fill();
   ctx.restore();
 
   text(ctx, '未解锁', x + w / 2, y + 32, {
-    size: 21, align: 'center', color: '#8d97a4', weight: '600',
+    size: 21, align: 'center', color: '#9a8a72', weight: '600',
   });
   text(ctx, troop ? troop.name : troopId, x + w / 2, y + 62, {
-    size: 17, align: 'center', color: '#7c8794', maxWidth: w - 12,
+    size: 17, align: 'center', color: '#8a7d64', maxWidth: w - 12,
   });
   text(ctx, `第 ${unlockLevel} 关解锁`, x + w / 2, y + 88, {
     size: 15, align: 'center', color: '#b9904a',
@@ -167,12 +167,12 @@ export function drawLockedCard(ctx, troopId, rect, unlockLevel) {
 // 空兵营位：回到改动前的暗色空框（白色空框是布阵战场那一轮的需求，不属于兵牌/图鉴）
 export function drawEmptyCard(ctx, rect) {
   panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-    fill: 'rgba(20,26,36,0.5)', stroke: '#28323f', r: 10, lw: 1,
+    fill: 'rgba(30,22,14,0.5)', stroke: '#3a2c1e', r: 10, lw: 1,
   });
   const cx = rect.x + rect.w / 2;
   const cy = rect.y + rect.h / 2;
   ctx.save();
-  ctx.strokeStyle = '#33404f';
+  ctx.strokeStyle = '#4a3a28';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(cx - 10, cy);
@@ -188,7 +188,7 @@ export function drawAvailableCard(ctx, troopId, rect) {
   const troop = troopById(troopId);
   const { x, y, w, h } = rect;
   panel(ctx, x, y, w, h, {
-    fill: 'rgba(24,38,32,0.85)', stroke: THEME.green, r: 10, lw: 1.8,
+    fill: 'rgba(34,36,22,0.85)', stroke: THEME.green, r: 10, lw: 1.8,
   });
   ctx.save();
   ctx.globalAlpha = 0.92;
@@ -196,13 +196,13 @@ export function drawAvailableCard(ctx, troopId, rect) {
   ctx.restore();
 
   roundRectPath(ctx, x + w / 2 - 36, y + 9, 72, 24, 9);
-  ctx.fillStyle = 'rgba(18,32,25,0.92)';
+  ctx.fillStyle = 'rgba(28,30,18,0.92)';
   ctx.fill();
   text(ctx, '可获得', x + w / 2, y + 26, {
     size: 15, align: 'center', color: THEME.green, weight: '600',
   });
   text(ctx, troop ? troop.name : troopId, x + w / 2, y + h - 13, {
-    size: 17, align: 'center', color: '#dcefe2', maxWidth: w - 12,
+    size: 17, align: 'center', color: '#e8e0c8', maxWidth: w - 12,
   });
 }
 

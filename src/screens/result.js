@@ -1,4 +1,4 @@
-import { THEME, text, panel, button, coinBadge, bar, hit, roundRectPath } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, bar, hit, roundRectPath, carvedFrame } from '../render/draw.js';
 import { drawChest } from '../render/chest.js';
 import { CONFIG } from '../data/config.js';
 import { levelTotal, rosterSlots, autoBattleUnlocked } from '../core/levels.js';
@@ -30,6 +30,8 @@ export class ResultScreen {
     this.game = game;
     this.d = data;
     this.t = 0;
+    // 板块 3：结算页使用专属战报背景插画（bg_result.jpg），不再fallback到首页底图
+    this.artBg = 'result';
     this.opened = null;                       // 本次结算里刚开出来的兵
     this.sharing = false;                     // 分享进行中（等待平台返回是否成功）
     this.rewardPopup = null;                  // 分享奖励弹窗：{ chest, name, count }
@@ -281,7 +283,7 @@ export class ResultScreen {
     const g = this.game;
     const W = g.W;
     ctx.save();
-    ctx.fillStyle = 'rgba(6,9,14,0.76)';
+    ctx.fillStyle = 'rgba(13,10,7,0.76)';
     ctx.fillRect(0, 0, W, g.H);
     ctx.restore();
     const px = 135;
@@ -289,9 +291,12 @@ export class ResultScreen {
     const pw = 480;
     const ph = 330;
     panel(ctx, px, py, pw, ph, { fill: 'rgba(34,28,18,0.98)', stroke: THEME.gold, r: 24, lw: 3 });
+    carvedFrame(ctx, px, py, pw, ph, {
+      color: THEME.goldLit, alpha: 0.72, corner: 40, inset: 6, lw: 2, r: 24, glow: 4,
+    });
     ctx.save();
     roundRectPath(ctx, px + 8, py + 8, pw - 16, ph - 16, 18);
-    ctx.strokeStyle = 'rgba(248,225,172,0.30)';
+    ctx.strokeStyle = 'rgba(244,212,136,0.30)';
     ctx.lineWidth = 1;
     ctx.stroke();
     ctx.restore();
@@ -300,7 +305,7 @@ export class ResultScreen {
     const kind = this.rewardPopup.chest === 'gold' ? 'gold'
       : this.rewardPopup.chest === 'wood' ? 'wood' : '';
     drawChest(ctx, W / 2, py + 152, 1.35, { color: (type && type.color) || '#c8a86a', kind });
-    text(ctx, `${this.rewardPopup.name} ×${this.rewardPopup.count}`, W / 2, py + 242, {
+    text(ctx, `${this.rewardPopup.name} ×${this.rewardPopup.count}`, W / 2, py + 258, {
       size: 34, weight: '700', align: 'center', serif: true,
       color: (type && type.color) || THEME.gold,
     });
@@ -327,8 +332,11 @@ export class ResultScreen {
     ctx.translate(-cx, -cy);
     const label = this.sharing ? '分 享 中…'
       : sharesLeft(g.state) > 0 ? `分享得${chestName}` : '今日已领完';
+    // S2.1：微信绿改为参考图 13 的「深褐实底 + 鎏金描边 + 金字」
     button(ctx, r, label, {
-      size: 32, fill: '#07c160', stroke: '#059a4d', textColor: '#ffffff', disabled: !on,
+      size: 32, fill: on ? THEME.panel2 : THEME.panel,
+      stroke: on ? THEME.gold : THEME.line,
+      textColor: on ? THEME.goldLit : THEME.textWeak, disabled: !on,
     });
     ctx.restore();
   }
@@ -400,7 +408,7 @@ export class ResultScreen {
           : `继续挑战第 ${d.levelN + 1} 关`)
         : '返回关卡进度';
       button(ctx, this.primary, label, {
-        size: 32, fill: '#273038', stroke: THEME.goldDim, textColor: THEME.gold,
+        size: 32, fill: '#332c1d', stroke: THEME.goldDim, textColor: THEME.gold,
       });
       button(ctx, this.secondary, '返回关卡进度', { size: 30, fill: THEME.panel2, stroke: THEME.line });
       button(ctx, this.tertiary, this.autoT !== null ? '停止自动战斗' : '去宝箱页开箱', {
@@ -409,7 +417,7 @@ export class ResultScreen {
       });
     } else {
       // 失败主按钮用玄铁冷调，与胜利鎏金形成色温对立
-      button(ctx, this.primary, '重新挑战', { size: 32, fill: '#273038', stroke: THEME.defeat, textColor: THEME.defeatLit });
+      button(ctx, this.primary, '重新挑战', { size: 32, fill: '#332c1d', stroke: THEME.defeat, textColor: THEME.defeatLit });
       button(ctx, this.tertiary, '返回关卡进度', { size: 22, fill: THEME.panel, stroke: THEME.line });
     }
     // 分享得宝箱：亮绿大按钮 + 回弹/抖动动效，额度用尽置灰
@@ -427,7 +435,7 @@ export class ResultScreen {
     const focus = info.focus;
 
     panel(ctx, r.x, r.y, r.w, r.h, {
-      fill: info.achieved ? 'rgba(51,44,29,0.9)' : 'rgba(27,34,39,0.92)',
+      fill: info.achieved ? 'rgba(51,44,29,0.9)' : 'rgba(43,34,23,0.92)',
       stroke: info.achieved ? THEME.goldDim : THEME.line,
       r: 16, lw: info.achieved ? 2 : 1.4,
     });
@@ -489,7 +497,7 @@ export class ResultScreen {
     ctx.save();
     ctx.beginPath();
     ctx.arc(cx, cy, 21, 0, Math.PI * 2);
-    ctx.fillStyle = '#273038';
+    ctx.fillStyle = '#332c1d';
     ctx.fill();
     ctx.strokeStyle = THEME.goldDim;
     ctx.lineWidth = 1.6;
@@ -504,13 +512,13 @@ export class ResultScreen {
   drawHeroRewardModal(ctx) {
     const W = this.game.W;
     ctx.save();
-    ctx.fillStyle = 'rgba(6,9,14,0.72)';
+    ctx.fillStyle = 'rgba(13,10,7,0.72)';
     ctx.fillRect(0, 0, W, this.game.H);
     ctx.restore();
     panel(ctx, 135, 430, 480, 330, {
-      fill: 'rgba(27,34,39,0.98)', stroke: '#e8b44c', r: 22, lw: 3,
+      fill: 'rgba(43,34,23,0.98)', stroke: '#d59947', r: 22, lw: 3,
     });
-    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#e8b44c' });
+    text(ctx, '首 通 奖 励', W / 2, 480, { size: 26, align: 'center', color: '#d59947' });
     const hero = heroById(this.d.heroReward);
     text(ctx, hero ? hero.name : this.d.heroReward, W / 2, 552, {
       size: 46, weight: '700', align: 'center', color: hero ? hero.color : THEME.gold,
@@ -521,7 +529,7 @@ export class ResultScreen {
       size: 18, align: 'center', color: THEME.textDim,
     });
     button(ctx, this.heroClaimRect, `领 取 ${hero ? hero.name : ''}`, {
-      size: 28, fill: '#273038', stroke: '#e8b44c', textColor: '#f8e1ac',
+      size: 28, fill: '#332c1d', stroke: '#d59947', textColor: '#f4d488',
     });
   }
 
@@ -556,7 +564,7 @@ export class ResultScreen {
 
     // 环底：内外两圈细线
     ctx.save();
-    ctx.strokeStyle = 'rgba(232,180,76,0.18)';
+    ctx.strokeStyle = 'rgba(213,153,71,0.18)';
     ctx.lineWidth = 1.4;
     ctx.beginPath();
     ctx.arc(cx, cy, R, 0, Math.PI * 2);
@@ -570,14 +578,14 @@ export class ResultScreen {
       const angB = angles[i] + Math.PI / 2;
       // 顺时针（克制）：金色弧 + 箭头
       ctx.save();
-      ctx.strokeStyle = 'rgba(232,180,76,0.82)';
+      ctx.strokeStyle = 'rgba(213,153,71,0.82)';
       ctx.lineWidth = 2.2;
       ctx.beginPath();
       ctx.arc(cx, cy, R, angA + gap, angB - gap, false);
       ctx.stroke();
       ctx.restore();
       this.drawArrowHead(ctx, cx + Math.cos(angB - gap) * R, cy + Math.sin(angB - gap) * R,
-        angB - gap + Math.PI / 2, '#e8b44c', 11);
+        angB - gap + Math.PI / 2, '#d59947', 11);
       // 逆时针（被克）：暗红内弧 + 反方向箭头
       ctx.save();
       ctx.strokeStyle = 'rgba(178,80,64,0.72)';
@@ -594,7 +602,7 @@ export class ResultScreen {
       const lx = cx + Math.cos(mid) * (R + 46);
       const ly = cy + Math.sin(mid) * (R + 46);
       text(ctx, `克制 ${this.counterPercent(a, b) > 0 ? '+' : ''}${this.counterPercent(a, b)}%`,
-        lx, ly - 9, { size: 12, align: 'center', color: '#e8b44c' });
+        lx, ly - 9, { size: 12, align: 'center', color: '#d59947' });
       text(ctx, `被克 ${this.counterPercent(b, a)}%`, lx, ly + 9, {
         size: 12, align: 'center', color: '#c26a5a',
       });
@@ -632,7 +640,7 @@ export class ResultScreen {
   tileTroopNode(ctx, cx, cy, troopId, name) {
     ctx.save();
     ctx.fillStyle = 'rgba(16,22,32,0.92)';
-    ctx.strokeStyle = 'rgba(232,180,76,0.42)';
+    ctx.strokeStyle = 'rgba(213,153,71,0.42)';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.arc(cx, cy, 31, 0, Math.PI * 2);
@@ -646,7 +654,7 @@ export class ResultScreen {
   // 输出 / 承伤 Top5：综合 = 左右双栏（我方输出 / 敌方输出）+ 四个单项 Tab，全部带百分比
   drawRankings(ctx) {
     const p = this.bestRect;
-    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, p.x, p.y, p.w, p.h, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
     text(ctx, '战斗统计', p.x + p.w / 2, p.y + 24, { size: 17, align: 'center', color: THEME.gold });
 
     const TABS = [
@@ -668,7 +676,7 @@ export class ResultScreen {
     for (const t of this.rankTabs) {
       const active = t.key === this.rankTab;
       panel(ctx, t.rect.x, t.rect.y, t.rect.w, t.rect.h, {
-        fill: active ? 'rgba(138,100,32,0.92)' : 'rgba(18,23,27,0.85)',
+        fill: active ? 'rgba(138,106,50,0.92)' : 'rgba(33,26,18,0.85)',
         stroke: active ? THEME.goldDim : THEME.line, r: 8, lw: active ? 2 : 1,
       });
       text(ctx, t.label, t.rect.x + t.rect.w / 2, t.rect.y + t.rect.h / 2, {
@@ -721,7 +729,7 @@ export class ResultScreen {
       text(ctx, '暂无', x0 + w / 2, rowY + 30, { size: 15, align: 'center', color: THEME.textWeak });
       return;
     }
-    const rankColors = ['#f8e1ac', '#c0c6d0', '#c87a3d'];
+    const rankColors = ['#f4d488', '#b9a88c', '#c87a3d'];
     const iconScale = wide ? 0.62 : 0.44;
     const rankR = wide ? 16 : 12;
     const nameX = wide ? x0 + 100 : x0 + 66;
@@ -736,7 +744,7 @@ export class ResultScreen {
       ctx.save();
       ctx.beginPath();
       ctx.arc(x0 + rankR, cy, rankR, 0, Math.PI * 2);
-      ctx.fillStyle = '#0c1013';
+      ctx.fillStyle = '#17130e';
       ctx.fill();
       ctx.strokeStyle = rankColors[i] || THEME.textDim;
       ctx.lineWidth = 2;
@@ -754,7 +762,7 @@ export class ResultScreen {
         drawEngineFigure(ctx, s.troop, {
           x: wide ? x0 + 62 : x0 + 40, y: y + rowH - 10,
           size: wide ? 56 : 44, t: 0.4,
-          color: s.side === 'player' ? '#6e9b72' : '#c0392b',
+          color: s.side === 'player' ? '#6e9b72' : '#8d301b',
         });
       } else {
         drawFrame(ctx, sheetFor(s.troop, spriteTierFor(s.level)), 'idle', 0,
@@ -780,7 +788,7 @@ export class ResultScreen {
       const pctText = `${Math.round(pct * 100)}%`;
 
       const bY = wide ? cy - barH / 2 : y + 40;
-      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#36404a', r: 6 });
+      bar(ctx, barX, bY, barW, barH, pct, { fill: accent, stroke: '#4a3a24', r: 6 });
       text(ctx, pctText, barX + barW / 2, bY + barH / 2, {
         size: wide ? 20 : 13, weight: '700', align: 'center', color: '#f4efe2',
       });
@@ -795,7 +803,7 @@ export class ResultScreen {
   drawRewardStrip(ctx) {
     const st = this.game.state;
     const d = this.d;
-    panel(ctx, 70, 272, 610, 92, { fill: 'rgba(39,48,56,0.72)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 272, 610, 92, { fill: 'rgba(58,46,30,0.72)', stroke: THEME.line, r: 18 });
 
     // 左：铜钱
     text(ctx, '铜钱', 100, 296, { size: 20, color: THEME.textDim });
@@ -861,7 +869,7 @@ export class ResultScreen {
 
     if (entry) {
       button(ctx, this.chestRect, `打 开 ${type.name}`, {
-        size: 18, fill: '#221f2b', stroke: type.color || THEME.goldDim,
+        size: 18, fill: '#241a16', stroke: type.color || THEME.goldDim,
         textColor: type.color || THEME.gold,
       });
     } else {

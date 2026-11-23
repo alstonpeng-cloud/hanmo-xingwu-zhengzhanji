@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>板块 0 · 方向确认 / 视觉规格 / 验收基线</title>
+<style>
+:root{
+  --bg0:#17130e; --bg1:#211a12; --panel:#2b2217; --panel2:#3a2e1e; --panel3:#4a3a24;
+  --line:#6b5636; --lineSoft:#483921;
+  --gold:#d9a441; --goldDim:#8a6a32; --goldLit:#f4d488;
+  --red:#c8473e; --redDim:#7c2f2a; --redLit:#e8705f;
+  --green:#6e9b72; --blue:#5b7c99; --purple:#a678b8;
+  --text:#f2ead8; --textDim:#c2b394; --textWeak:#8a7d64;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg0); color:var(--text);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  line-height:1.75; font-size:14px;
+  background-image:radial-gradient(ellipse 90% 45% at 50% 0%,rgba(217,164,65,.13),transparent 70%);
+  background-attachment:fixed;
+}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px 100px}
+header{padding:64px 0 42px;border-bottom:1px solid var(--line);margin-bottom:44px;position:relative}
+header:after{content:"";position:absolute;bottom:-1px;left:0;width:180px;height:2px;background:linear-gradient(90deg,var(--gold),transparent)}
+.eyebrow{color:var(--gold);letter-spacing:.32em;font-size:11px;margin-bottom:16px}
+h1{font-size:36px;font-weight:600;letter-spacing:.06em;color:var(--goldLit);margin-bottom:14px;
+   font-family:"STKaiti","KaiTi","Kaiti SC",serif;text-shadow:0 2px 18px rgba(217,164,65,.3)}
+.sub{color:var(--textDim);font-size:14px}
+.meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:26px;font-size:12px;color:var(--textWeak)}
+.meta b{color:var(--gold);font-weight:500}
+section{margin:56px 0}
+h2{font-size:23px;color:var(--goldLit);font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:14px;
+   font-family:"STKaiti","KaiTi",serif;letter-spacing:.04em}
+h2 .no{font-size:12px;font-family:system-ui;color:var(--bg0);background:var(--gold);padding:4px 10px;border-radius:4px;letter-spacing:.1em;font-weight:700}
+h3{font-size:16px;color:var(--gold);font-weight:600;margin:28px 0 12px;padding-left:12px;border-left:3px solid var(--goldDim)}
+h4{font-size:14px;color:var(--text);font-weight:600;margin:18px 0 8px}
+p{margin:10px 0;color:var(--textDim)}
+.lead{font-size:14px;color:var(--textDim);margin-bottom:22px}
+.card{background:linear-gradient(160deg,rgba(58,46,30,.75),rgba(31,25,17,.9));border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:16px 0;position:relative}
+.card:before,.card:after{content:"";position:absolute;width:14px;height:14px;border:1px solid var(--goldDim);opacity:.7}
+.card:before{top:6px;left:6px;border-right:0;border-bottom:0;border-radius:3px 0 0 0}
+.card:after{bottom:6px;right:6px;border-left:0;border-top:0;border-radius:0 0 3px 0}
+.card.hi{border-color:var(--gold);background:linear-gradient(160deg,rgba(90,68,34,.55),rgba(35,27,17,.92))}
+.card.warn{border-color:var(--redDim)}
+.card.warn .tag{background:var(--redDim);color:#ffd9cf}
+.tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:3px;background:var(--goldDim);color:#fff4d8;margin-right:8px;letter-spacing:.06em}
+.tag.g{background:#2f5b3c;color:#d3f0d8}
+.tag.r{background:var(--redDim);color:#ffd9cf}
+.tag.b{background:#334b60;color:#d3e4f2}
+.tag.p{background:#5a3d68;color:#f0dcf5}
+table{width:100%;border-collapse:collapse;margin:16px 0;font-size:13px}
+th{background:rgba(107,86,54,.32);color:var(--goldLit);text-align:left;padding:11px 13px;font-weight:600;border:1px solid var(--lineSoft);white-space:nowrap}
+td{padding:10px 13px;border:1px solid var(--lineSoft);color:var(--textDim);vertical-align:top}
+td b{color:var(--text);font-weight:600}
+tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+code{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;background:rgba(0,0,0,.35);padding:2px 6px;border-radius:3px;color:var(--goldLit)}
+.swatch{display:inline-block;width:15px;height:15px;border-radius:3px;border:1px solid rgba(255,255,255,.18);vertical-align:-3px;margin-right:7px}
+.palette{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px;margin:18px 0}
+.pc{background:rgba(0,0,0,.28);border:1px solid var(--lineSoft);border-radius:8px;padding:12px}
+.pc .bar{height:34px;border-radius:5px;margin-bottom:9px;border:1px solid rgba(255,255,255,.1)}
+.pc .nm{font-size:12px;color:var(--text);font-weight:600}
+.pc .hx{font-size:11px;color:var(--gold);font-family:monospace;margin-top:2px}
+.pc .us{font-size:11px;color:var(--textWeak);margin-top:3px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:860px){.grid2,.grid3{grid-template-columns:1fr}}
+ul,ol{margin:10px 0 10px 22px;color:var(--textDim)}
+li{margin:6px 0}
+li b{color:var(--text)}
+.refgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0}
+@media(max-width:860px){.refgrid{grid-template-columns:repeat(2,1fr)}}
+.refc{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg1)}
+.refc img{width:100%;aspect-ratio:9/16;object-fit:cover;object-position:top;display:block}
+.refc .lb{padding:9px 11px;font-size:12px;color:var(--gold);border-top:1px solid var(--lineSoft)}
+.refc .lb span{color:var(--textWeak);display:block;font-size:11px;margin-top:2px}
+.spec{background:rgba(0,0,0,.22);border:1px solid var(--lineSoft);border-radius:8px;padding:16px 18px;margin:12px 0}
+.spec .top{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.spec .top .n{font-size:15px;color:var(--goldLit);font-weight:600}
+.spec dl{display:grid;grid-template-columns:88px 1fr;gap:6px 12px;font-size:12.5px}
+.spec dt{color:var(--gold);font-weight:600}
+.spec dd{color:var(--textDim)}
+.chk{list-style:none;margin-left:0}
+.chk li{padding-left:26px;position:relative}
+.chk li:before{content:"";position:absolute;left:0;top:5px;width:13px;height:13px;border:1px solid var(--goldDim);border-radius:2px}
+.flow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:16px 0;font-size:12px}
+.flow span{background:rgba(107,86,54,.28);border:1px solid var(--line);padding:7px 12px;border-radius:5px;color:var(--text)}
+.flow i{color:var(--gold);font-style:normal}
+.note{border-left:3px solid var(--gold);background:rgba(217,164,65,.07);padding:12px 16px;margin:16px 0;font-size:13px;color:var(--textDim)}
+.note b{color:var(--goldLit)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+@media(max-width:860px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.kpi .k{background:rgba(0,0,0,.3);border:1px solid var(--lineSoft);border-radius:8px;padding:16px;text-align:center}
+.kpi .v{font-size:24px;color:var(--goldLit);font-weight:600;font-family:monospace}
+.kpi .l{font-size:11px;color:var(--textWeak);margin-top:4px}
+footer{margin-top:70px;padding-top:26px;border-top:1px solid var(--line);color:var(--textWeak);font-size:12px;text-align:center}
+.a{color:var(--gold);text-decoration:none;border-bottom:1px dotted var(--goldDim)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">汉末行伍征战记 · UI 精细化改造 / PHASE 0</div>
+  <h1>方向确认 · 视觉规格 · 验收基线</h1>
+  <div class="sub">板块 0 交付｜以 12 张参考图为唯一视觉基准，回退冷玄墨，重建暖褐暗金；英雄采用 AI 立绘并置于分包</div>
+  <div class="meta">
+    <span>版本 <b>v0.1 / 2026-11-22</b></span>
+    <span>状态 <b>待你验收</b></span>
+    <span>备份 <b>game_demo_backup_20261122_115416</b></span>
+    <span>基线主包 <b>3.61 MB</b></span>
+  </div>
+</header>
+
+<section>
+  <h2><span class="no">S0.2</span>方向确认单</h2>
+  <p class="lead">你已拍板的两项决策，作为整个改造的不可变基准。后续任何一步与此冲突，以此单为准。</p>
+
+  <div class="card hi">
+    <h4><span class="tag">决策 1</span>风格基准：回到暖褐暗金，完全复刻 12 张参考图</h4>
+    <ul>
+      <li><b>撤销</b>上一轮落地的冷玄墨「墨韵丹符」：冷灰蓝底 <code>#0c1013</code> / <code>#1b2227</code>、青蚨绿、玄铁失败色全部退出。</li>
+      <li><b>恢复</b>第一轮改造前的原始暖褐暗金 THEME 值。程序化取色验证：原 <code>panel #2b2217</code> ≈ 参考图实测主色 <code>#2A2218</code>，原 <code>gold #d9a441</code> ≈ 参考图实测 <code>#D59947</code>，吻合度极高，<b>无需重新调色</b>。</li>
+      <li>成功 / 失败 / 商城 / 宝箱不再用色相区分，统一回归参考图的金 / 朱红 / 冷蓝灰 / 紫的既有表达。</li>
+      <li>参考图是唯一验收依据；「完全复刻」的落地边界见 <a class="a" href="#s-grade">三类要素分级</a>。</li>
+    </ul>
+  </div>
+
+  <div class="card hi">
+    <h4><span class="tag">决策 2</span>英雄建模：AI 立绘放分包</h4>
+    <p style="margin-bottom:6px">拆解 12 张图后发现<b style="color:var(--goldLit)">英雄存在两套完全不同的质感</b>，这是本轮最容易做偏的地方，必须分两路：</p>
+    <table>
+      <tr><th style="width:150px">出现位置</th><th>参考图质感</th><th>实现路线</th></tr>
+      <tr><td><b>招募系统 / 兵牌 / 布阵</b><br>图 09、06、11</td><td>低多边形 3D 小人，站在金色圆形底座光环上，暖光侧打，带专属服饰与武器（青龙偃月刀、丈八蛇矛、金冠等），有明暗面与投影</td><td>AI 生成 12 张<b>透明底立绘</b>放分包；程序化绘制作为分包未就绪时的 fallback</td></tr>
+      <tr><td><b>每日挑战 / 英雄详情</b><br>图 08</td><td><b>写实厚涂武将立绘</b>：黑金铠甲、侧逆光、烟尘、暗背景，接近卡牌原画</td><td>AI 生成 12 张<b>方形厚涂卡面</b>放分包，与招募立绘是两套资产</td></tr>
+    </table>
+    <div class="note"><b>待你确认（不阻塞板块 0）：</b>两套立绘都做（共 24 张，效果最完整），还是只做招募小人 + 每日挑战复用程序化？此决策在板块 4 开工前定即可。</div>
+  </div>
+
+  <div class="card">
+    <h4>回滚保障</h4>
+    <p>完整备份 <code>D:/Projects/record/trae_project/game_demo_backup_20261122_115416</code>，378 MB / 2006 个文件，与源项目文件数一致。任何一步验收不通过，可整体回滚或单文件比对还原。</p>
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">S0.3-1</span>参考图实测色板</h2>
+  <p class="lead">用 Pillow 对 12 张图逐张量化取色、汇总像素占比得到，非目测。下列为规范后的设计令牌候选，板块 2 的 THEME v2 以此定案。</p>
+
+  <h3>底色层次（全局高频，合计占比约 20%）</h3>
+  <div class="palette">
+    <div class="pc"><div class="bar" style="background:#17120B"></div><div class="nm">最深底 / 暗角</div><div class="hx">#17120B</div><div class="us">页脚、面板外底、四角压暗</div></div>
+    <div class="pc"><div class="bar" style="background:#241A11"></div><div class="nm">次深底</div><div class="hx">#241A11</div><div class="us">内容区背景渐变下端</div></div>
+    <div class="pc"><div class="bar" style="background:#2A2218"></div><div class="nm">主背景</div><div class="hx">#2A2218 · 3.22%</div><div class="us">全局最高频主色</div></div>
+    <div class="pc"><div class="bar" style="background:#372617"></div><div class="nm">面板亮底</div><div class="hx">#372617 · 2.00%</div><div class="us">卡片、胶囊、顶栏</div></div>
+    <div class="pc"><div class="bar" style="background:#463726"></div><div class="nm">面板高光</div><div class="hx">#463726</div><div class="us">选中态、悬停、按钮上沿</div></div>
+    <div class="pc"><div class="bar" style="background:#151C21"></div><div class="nm">冷蓝灰（辅）</div><div class="hx">#151C21</div><div class="us">首页商城/兵营入口、自动战斗开关</div></div>
+  </div>
+
+  <h3>语义色</h3>
+  <div class="palette">
+    <div class="pc"><div class="bar" style="background:#d9a441"></div><div class="nm">鎏金 · 主强调</div><div class="hx">#D9A441</div><div class="us">描边、标题、货币、进度条、一级金按钮</div></div>
+    <div class="pc"><div class="bar" style="background:#f4d488"></div><div class="nm">亮金 · 文字</div><div class="hx">#F4D488</div><div class="us">大标题、数值、书法字高光</div></div>
+    <div class="pc"><div class="bar" style="background:#8a6a32"></div><div class="nm">暗金 · 结构线</div><div class="hx">#8A6A32</div><div class="us">次级描边、分隔线、禁用态</div></div>
+    <div class="pc"><div class="bar" style="background:#882E1C"></div><div class="nm">朱红 · 一级操作</div><div class="hx">#882E1C</div><div class="us">闯关/出战/挑战/扫荡大按钮、战败标题</div></div>
+    <div class="pc"><div class="bar" style="background:#c8473e"></div><div class="nm">朱红亮阶</div><div class="hx">#C8473E</div><div class="us">敌军、敌方输出条、红点角标</div></div>
+    <div class="pc"><div class="bar" style="background:#a678b8"></div><div class="nm">紫气 · 史诗/招募</div><div class="hx">#A678B8</div><div class="us">史诗品级、招募系统、演武入口</div></div>
+    <div class="pc"><div class="bar" style="background:#3E885D"></div><div class="nm">青绿 · 正向</div><div class="hx">#3E885D</div><div class="us">我方输出条、进度达成、已通关、普通品级</div></div>
+    <div class="pc"><div class="bar" style="background:#5b7c99"></div><div class="nm">靛蓝 · 稀有</div><div class="hx">#5B7C99</div><div class="us">稀有品级、成长之路、冷调入口</div></div>
+  </div>
+
+  <h3>文字色与对比度（WCAG AA 校验）</h3>
+  <table>
+    <tr><th>用途</th><th>色值</th><th>承载底色</th><th>对比度</th><th>判定</th></tr>
+    <tr><td>主文字</td><td><code>#F2EAD8</code></td><td><span class="swatch" style="background:#2A2218"></span><code>#2A2218</code></td><td>约 12.4:1</td><td><span class="tag g">AA 通过</span></td></tr>
+    <tr><td>次文字</td><td><code>#C2B394</code></td><td><span class="swatch" style="background:#2A2218"></span><code>#2A2218</code></td><td>约 7.6:1</td><td><span class="tag g">AA 通过</span></td></tr>
+    <tr><td>弱文字</td><td><code>#8A7D64</code></td><td><span class="swatch" style="background:#2A2218"></span><code>#2A2218</code></td><td>约 4.0:1</td><td><span class="tag r">仅用于 ≥18px 大字/装饰</span></td></tr>
+    <tr><td>金色标题</td><td><code>#F4D488</code></td><td><span class="swatch" style="background:#2A2218"></span><code>#2A2218</code></td><td>约 10.1:1</td><td><span class="tag g">AA 通过</span></td></tr>
+  </table>
+  <div class="note"><b>无障碍约束：</b>弱文字 <code>#8A7D64</code> 对比度仅约 4.0:1，不用于小于 18px 的正文；所有按钮文字保持 ≥ 4.5:1，触摸热区 ≥ 44×44px。</div>
+</section>
+
+<section>
+  <h2><span class="no">S0.3-2</span>设计语言总纲（12 屏共用）</h2>
+  <div class="grid2">
+    <div class="card">
+      <h4>① 背景与光效</h4>
+      <ul>
+        <li>深褐近黑底，<b>顶部暖金放射光晕</b>（斜上方打光），四角暗角压暗</li>
+        <li>金色<b>粒子星尘</b>散布（首页、每日挑战、每周挑战最密）</li>
+        <li>底部祥云暗纹 / 卷云浮雕，部分页面四角有<b>青绿玉雕祥云角花</b>（战败页最明显）</li>
+        <li>页脚固定：上下双细金线 + 居中金字「汉末行伍征战记」</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>② 边框与纹样</h4>
+      <ul>
+        <li><b>双层金线</b>：外层亮金 + 内层暗金细线，圆角约 10–14px</li>
+        <li>四角<b>中式云纹 / 回纹角花</b>（一级按钮、英雄卡、每周挑战格、卷轴）</li>
+        <li>选中态：金色外发光 + 粒子 + 内高光条</li>
+        <li>禁用态：灰褐底 + 暗金线 + 降透明度</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>③ 字体层级</h4>
+      <ul>
+        <li>大标题：<b>毛笔书法体</b>（飞白笔触）+ 金色渐变 + 暗描边 + 光晕</li>
+        <li>页面标题：书法感宋/楷，24–34px，暖金</li>
+        <li>卡片名：18–22px 暖金；正文 13–15px 米白；辅助 11–13px 暗米</li>
+        <li>数值：等宽或加粗，金色高亮；进度/百分比用绿或朱红</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>④ 按钮体系</h4>
+      <ul>
+        <li><b>一级</b>：朱红渐变 + 金边 + 四角云纹角花 + 内发光（闯关/出战/挑战/扫荡/重新挑战）</li>
+        <li><b>次级</b>：深褐底 + 金边 + 金色书法大字（继续挑战/一键合成/开箱）</li>
+        <li><b>三级</b>：暗褐底 + 暗金细线 + 米白字（返回/去宝箱页开箱）</li>
+        <li><b>功能</b>：冷蓝灰 / 紫色 / 金色胶囊，按系统区分</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>⑤ 建模语言</h4>
+      <ul>
+        <li><b>兵模</b>：低多边形小人，有明暗面、地面投影、装备识别（盾/弓/枪/马/弩车），成方阵排布</li>
+        <li><b>英雄（招募）</b>：低多边形 3D 小人 + 金色圆形底座光环 + 暖光侧打</li>
+        <li><b>英雄（每日）</b>：写实厚涂武将立绘，黑金铠甲、侧逆光、烟尘</li>
+        <li><b>宝箱</b>：3D 渲染质感，木纹 / 银 / 金 / 紫 / 红，金属包边与高光</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>⑥ 版式</h4>
+      <ul>
+        <li>竖屏 9:16，安全区左右各约 24px</li>
+        <li>顶栏三件套：<b>返回（左）+ 标题（中）+ 货币（右）</b>，下方一道细金线</li>
+        <li>内容区：分组标题 + 卡片网格（2/3/4/5 列按屏适配）</li>
+        <li>底部主行动按钮固定，页脚信息条独立</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="no">S0.3-3</span>12 屏视觉要素规格表</h2>
+  <p class="lead">逐屏可勾对规格。每张参考图原件已复制到 <code>docs/精细化改造/ref/</code>，改前截图在 <code>before/</code>。</p>
+
+  <div class="refgrid">
+    <div class="refc"><img src="ref/01_首页.png" alt="首页"><div class="lb">01 首页<span>带挑战按钮</span></div></div>
+    <div class="refc"><img src="ref/02_关卡.png" alt="关卡"><div class="lb">02 关卡<span>征战 · 黄巾风起</span></div></div>
+    <div class="refc"><img src="ref/03_商城.png" alt="商城"><div class="lb">03 商城<span>四兵种 + 特殊宝箱</span></div></div>
+    <div class="refc"><img src="ref/04_战斗.png" alt="战斗"><div class="lb">04 战斗<span>沙金战场 · 方阵</span></div></div>
+    <div class="refc"><img src="ref/05_结算.png" alt="胜利结算"><div class="lb">05 胜利结算<span>书法大标题</span></div></div>
+    <div class="refc"><img src="ref/06_布阵.png" alt="布阵"><div class="lb">06 布阵<span>橙金棋盘 5×6</span></div></div>
+    <div class="refc"><img src="ref/07_每周挑战.png" alt="每周挑战"><div class="lb">07 每周挑战<span>5×3 宝箱矩阵</span></div></div>
+    <div class="refc"><img src="ref/08_每日挑战.png" alt="每日挑战"><div class="lb">08 每日挑战<span>写实武将立绘</span></div></div>
+    <div class="refc"><img src="ref/09_招募.png" alt="招募"><div class="lb">09 招募系统<span>低模英雄 + 金底座</span></div></div>
+    <div class="refc"><img src="ref/10_宝箱.png" alt="宝箱"><div class="lb">10 宝箱<span>3D 箱体图标</span></div></div>
+    <div class="refc"><img src="ref/11_兵营.png" alt="兵营"><div class="lb">11 兵营<span>5×5 品级兵牌</span></div></div>
+    <div class="refc"><img src="ref/13_战败结算.png" alt="战败结算"><div class="lb">13 战败结算<span>克制环 + 玉云角花</span></div></div>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">01 首页</span><span class="tag">最复杂</span><span class="tag r">粒子光效</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>三格胶囊：铜钱 98000（金圆币）／声音 BGM·音效设置／每日 签到·任务·7日登录（右上红点）</dd>
+      <dt>次栏</dt><dd>三枚胶囊：演武（紫边）精英挑战 5/50 关、英雄战（红边）Boss 挑战 6/50 关、成长之路（蓝边）节点 15/17</dd>
+      <dt>主视觉</dt><dd>书法金字大标题「汉末行伍征战记」+ 飞白笔触；副标「单机试玩版 v0.1」；章节「黄巾风起·宛城 301-400」+ 50/100 关 + 金色进度条</dd>
+      <dt>左侧</dt><dd>两枚圆形鎏金印章「每周」「每日」，带旋转光环、金色粒子、红点角标 3 / 5</dd>
+      <dt>主按钮</dt><dd>朱红大按钮「闯关」，金边 + 四角云纹角花 + 内发光；副文「第 351 关待挑战·自动战斗已开放」</dd>
+      <dt>四宫格</dt><dd>宝箱（金边／6 个待开）、商城（冷蓝灰／铜钱买兵直入营）、兵营（冷蓝灰／合成升阶·布阵上阵·上限 Lv10）、招募系统（紫边／招募券 30·已拥有 4/12）</dd>
+      <dt>下半</dt><dd>挂机收益 / 挂机宝箱 双卡（01:00 倒计时、第 1/8 个）；兵营容量卡 25/100 个兵、武将位 3 个（未开放）</dd>
+      <dt>改造点</dt><dd>回退冷玄墨底；补书法标题、粒子星尘、旋转光环、云纹角花、四宫格语义边框色</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">02 关卡</span><span class="tag">双层金边</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回（金边胶囊）／「征战·黄巾风起」书法金／铜钱 98000</dd>
+      <dt>章节卡</dt><dd>双层金边大卡：「第一章·黄巾风起」本章已通关 350/400 关·88%；绿色进度条带涿郡/广宗/颍川/宛城节点刻度；下一关与银箱/金箱提示</dd>
+      <dt>奖励卡</dt><dd>「城池／章节奖励」4 张：3 张已达成（绿标，紫/金边）+ 章节通关传奇宝箱</dd>
+      <dt>关卡奖励</dt><dd>「第 351~375 关奖励」5 张卡，首张金色高亮「进行中」，其余暗色「待推进」，银箱/金箱图标</dd>
+      <dt>主按钮</dt><dd>朱红「挑战第 351 关」金边云纹角花 + 副文「宛城·敌军 Lv4~5·首通」；下方「下一章：第二章·董卓乱京（第 401 关开启）」</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">03 商城</span><span class="tag b">冷蓝灰入口</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回／商城（书法金）／铜钱 98081</dd>
+      <dt>控制行</dt><dd>「每日商店」金边选中胶囊 + 今日已购 0/6 + 信息圆钮；右侧兵营 25/100</dd>
+      <dt>等级</dt><dd>购买等级 Lv1（金边选中）／Lv3／Lv6</dd>
+      <dt>商品卡</dt><dd>四张金边深褐卡：盾兵（布衣盾卒 112/12/8）、弓兵、枪兵、骑兵（轻装骑）；各含低模小人、铜钱价格、金色「购买」按钮</dd>
+      <dt>特殊宝箱</dt><dd>稀有宝箱（蓝）5000 铜钱、史诗宝箱（紫）20000 铜钱 + 购买按钮；广告·小木箱×1（剩 5/5）、广告·银箱×1（剩 2/2）</dd>
+      <dt>改造点</dt><dd>回退青蚨绿标题为暖金；商品卡补双层金边与兵模明暗面</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">04 战斗</span><span class="tag g">现状最接近</span></div>
+    <dl>
+      <dt>顶条</dt><dd>朱红渐变信息条「第 12 关」白色书法，我方 15（绿）: 6（红）敌军，总战力，2×速金按钮</dd>
+      <dt>Top5</dt><dd>左右双金边深褐面板：我方输出 Top5（青绿条）/ 敌方输出 Top5（朱红条），各带兵种小图标与数值</dd>
+      <dt>战场</dt><dd>沙金/暖褐格纹地面，沙粒、石子、划痕质感，虚线半场分隔，云纹暗纹</dd>
+      <dt>兵模</dt><dd>低多边形小人成方阵，红方 / 蓝白方，明暗面 + 地面投影 + 持械（盾/弓/枪/弩车/白马）；伤害数字与光环特效</dd>
+      <dt>底条</dt><dd>朱红信息条：2.5 秒、我方 115/115、敌军 6/15、击倒提示，金色云纹角花</dd>
+      <dt>改造点</dt><dd>战场已基本达标，只需把面板/顶条/底条从冷玄墨回退为暖褐金，并加深兵模明暗面与投影</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">05 胜利结算</span><span class="tag">书法大标题</span></div>
+    <dl>
+      <dt>主视觉</dt><dd>超大书法金字「胜利」+ 飞白笔触 + 放射光晕 + 顶部暖金聚光；副标「第 12 关 通关·涿郡」「第一章·黄巾风起」</dd>
+      <dt>奖励卡</dt><dd>获得铜钱 +81（金色大字）、首通奖励、本关没有宝箱、「已开完」禁用按钮</dd>
+      <dt>统计</dt><dd>战斗统计 5 tab（综合金边选中 / 我方输出 / 敌方输出 / 我方承伤 / 敌方承伤）；双 Top5 列表带兵模小图标、名次圆章、绿/红进度条</dd>
+      <dt>进度</dt><dd>新兵种「丹阳青竹弓手」（蓝字）+ 金色进度条 + 已过 12 关／还需 8 关</dd>
+      <dt>按钮</dt><dd>金色主按钮「继续挑战第 13 关」、深褐「返回关卡进度」、三级「去宝箱页开箱」</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">06 布阵</span><span class="tag">橙金棋盘</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回／布阵·第 12 关／铜钱 98000</dd>
+      <dt>信息条</dt><dd>朱红敌军条「敌军 6 支小队·15 兵·Lv1~2 / 盾1·弓3·枪1·骑1」；右侧金框战力对比「我方 40,319 敌方 2,024 20x 优势」</dd>
+      <dt>棋盘</dt><dd>橙金渐变格纹 5 列×6 行，每格兵模 + Lv 标签，品级边框（绿/蓝/紫/金），选中格金色高亮，云纹暗纹，「我方半场」水印</dd>
+      <dt>功能行</dt><dd>按战力布阵／清空／一键开启宝箱 6（金边）／兵营</dd>
+      <dt>兵牌</dt><dd>英雄位 0/1·已拥有 4/12；4 张英雄卡：关羽、张飞（传奇金边），关平、黄盖（史诗紫边），各带兵模</dd>
+      <dt>底部</dt><dd>朱红「出战」金边云纹角花；冷蓝灰自动战斗开关（主线 30 关开放）；场上 25 支小队·未上阵 0 张兵牌</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">07 每周挑战</span><span class="tag">5×3 矩阵</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>金色返回箭头／书法「每周挑战」／三种货币（金 12,345、银 678、票 88）</dd>
+      <dt>Tab</dt><dd>挑战关卡（金边选中）/ 积分选兵；章节 壹（金边选中）贰 叁 肆 伍</dd>
+      <dt>矩阵</dt><dd>5×3 宝箱格：深褐金边卡 + 3D 木箱图标（金属包边高光）+ 关卡名 + 将令×20 银两×5000 + 四角云纹角花；已通关绿勾、当前关金色外发光 + 粒子 + 「前」标记、部分格紫色「将」标记</dd>
+      <dt>积分</dt><dd>本周积分 1600（大金字）／积分排名：第 12 名</dd>
+      <dt>按钮</dt><dd>挑战（金边深褐）/ 扫荡（朱红）；扫荡消耗体力：30</dd>
+      <dt>背景</dt><dd>深褐 + 古建筑剪影 + 祥云暗纹 + 金色粒子</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">08 每日挑战</span><span class="tag p">写实厚涂立绘</span><span class="tag r">分包资产</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>金色返回箭头／书法「每日挑战」／金币 0</dd>
+      <dt>横幅</dt><dd>朱红卷轴「主线 30 关后解锁·每日挑战 30 关」，两端卷轴轴头 + 金边</dd>
+      <dt>进度</dt><dd>今日已通关 5/30 + 绿色进度条；每日前 3 胜额外奖励（宝箱/铜钱/玉佩/宝箱图标）</dd>
+      <dt>矩阵</dt><dd>5×3 英雄格：<b>写实厚涂武将立绘</b>（黑金铠甲、侧逆光、烟尘、暗背景），金边四角云纹；底部品级胶囊（史诗紫／传奇金）与状态（已通关绿字+宝箱、待挑战金字、未解锁灰）；未解锁格暗化剪影</dd>
+      <dt>按钮</dt><dd>朱红「挑战第 6 关」金边云纹角花</dd>
+      <dt>改造点</dt><dd>此屏是「AI 立绘放分包」的<b>主要目标</b>，当前程序化绘制与之差距最大</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">09 招募系统</span><span class="tag p">低模英雄</span><span class="tag r">分包资产</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回／招募系统（书法金）／铜钱 98001</dd>
+      <dt>资源行</dt><dd>招募券×30、已拥有 4/12；右上朱红「看广告 +1 券（剩 2）」</dd>
+      <dt>英雄卡</dt><dd>2×3 六张：金边 + 四角云纹角花 + 深褐渐变底；传奇胶囊；名字（关羽绿字/张飞白字）、Lv4/30 或「未获得」；<b>低多边形 3D 小人站在金色圆形底座光环上</b>，暖光侧打，专属服饰与武器</dd>
+      <dt>说明框</dt><dd>金边云纹框「1 券 1 抽·20 抽必出传奇」+ 信息圆钮</dd>
+      <dt>按钮</dt><dd>紫色「招募×1（1 券）」/ 金色「十连招募（10 券）」</dd>
+      <dt>底部</dt><dd>金色 plaque「汉末行伍征战记」带角花；深褐祥云暗纹背景</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">10 宝箱</span><span class="tag">3D 箱体</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回／宝箱（书法金）／铜钱 98081；信息行「宝箱 6 个·兵营 25/100」+ 信息圆钮</dd>
+      <dt>常规</dt><dd>分组「常规宝箱（关卡轮换）」3 行金边卡：小木箱×3、银箱×2、金箱×1，各带 3D 箱体图标（木纹/银/金 + 金属包边高光）与金色「开箱」按钮</dd>
+      <dt>特殊</dt><dd>分组「特殊宝箱（必出对应品级）」3 行：稀有（蓝紫）、史诗（紫红）、传奇（红金），×0 + 灰褐禁用「暂无宝箱」</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">11 兵营</span><span class="tag">5×5 品级兵牌</span></div>
+    <dl>
+      <dt>顶栏</dt><dd>返回／兵营（书法金）／铜钱 98081</dd>
+      <dt>信息行</dt><dd>兵营 25/100、已上阵 25/25·未上阵 0；「仅查看：点兵牌看详情，不能拖拽」；右侧「灰色未解锁 0·绿色可获得 9」</dd>
+      <dt>兵牌</dt><dd>5×5 网格：每张品级边框色（传奇金／史诗紫／稀有蓝／普通绿／灰未解锁），含品级标签 + 名称 + Lv + 人数 + 兵模小像</dd>
+      <dt>说明</dt><dd>「武将位×3（预留，本期不开放）」+ 合成规则说明两行</dd>
+      <dt>按钮</dt><dd>金色「一键合成」/ 深褐「返回布阵」</dd>
+    </dl>
+  </div>
+
+  <div class="spec">
+    <div class="top"><span class="n">13 战败结算</span><span class="tag g">玉云角花</span></div>
+    <dl>
+      <dt>四角</dt><dd>青绿玉雕祥云角花（左上、右下大而明显），与胜利页形成对称</dd>
+      <dt>主视觉</dt><dd>超大朱红书法「战斗失败」+ 光晕；副标「第 350 关·宛城」「第一章·黄巾风起」</dd>
+      <dt>克制环</dt><dd>金边大卡：「没有损失任何资源或单位」「兵种克制环·顺时针克制，适时被克」；中央环形图 盾→弓→枪→骑 + 朱红弧线箭头 + 四角「克制 +10% 被克 -10%」；结论「近战放前排先接敌，弓兵放后排靠 14 格射程输出」</dd>
+      <dt>进度</dt><dd>再败一次 宝箱兵种等级 +2，金色进度条，已过 349 关／还需 51 关</dd>
+      <dt>按钮</dt><dd>深褐金边「重新挑战」书法大字；「观看广告立即获得×1 稀有兵 Lv2·今日剩余 10 次」带兵模图标；三级「返回关卡进度」</dd>
+      <dt>改造点</dt><dd>回退「玄铁失败色」，恢复朱红大标题与金边深褐按钮</dd>
+    </dl>
+  </div>
+</section>
+
+<section id="s-grade">
+  <h2><span class="no">S0.3-4</span>三类要素分级（诚实的技术边界）</h2>
+  <p class="lead">参考图是 AI 生成的渲染级视觉稿。为了让「完全复刻」有可验收的定义，把 12 屏的所有视觉要素分成三类：</p>
+  <div class="grid3">
+    <div class="card">
+      <h4><span class="tag g">A 类</span>可精确复刻</h4>
+      <p>Canvas 代码直接绘制，可做到与参考图一致。</p>
+      <ul>
+        <li>布局、栅格、间距、卡片尺寸</li>
+        <li>全部色值与渐变方向</li>
+        <li>边框层数、圆角、描边粗细</li>
+        <li>文字层级、字号、字重</li>
+        <li>进度条、数据排版、品级色</li>
+        <li>按钮形状与状态（选中/禁用）</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4><span class="tag b">B 类</span>分层渐变逼近</h4>
+      <p>程序化可做到 80–90% 观感，细节需取舍。</p>
+      <ul>
+        <li>书法标题：系统楷体 + 描边 + 金渐变 + 轻微倾斜（笔触飞白无法 1:1）</li>
+        <li>顶部放射光晕、金色粒子星尘</li>
+        <li>云纹 / 回纹角花（SVG 路径近似）</li>
+        <li>朱红卷轴、青绿玉雕祥云</li>
+        <li>金属渐变、暗角、内外发光</li>
+        <li>兵模明暗面与投影</li>
+      </ul>
+    </div>
+    <div class="card warn">
+      <h4><span class="tag">C 类</span>必须分包贴图</h4>
+      <p>靠代码无法生成，需 AI 生成图片并置于分包。</p>
+      <ul>
+        <li>写实厚涂武将立绘（图 08）</li>
+        <li>低模 3D 英雄小人（图 09）</li>
+        <li>3D 宝箱图标 5 种（图 10/07）</li>
+        <li>兵种/器械高精贴图（按需）</li>
+        <li>书法字帖字形（若要求 100% 笔形）</li>
+      </ul>
+    </div>
+  </div>
+  <div class="note"><b>结论：</b>A 类必须 100% 达标；B 类以「整体观感一致、无违和」为验收线；C 类以「分包下载后立绘到位、下载前 fallback 不塌陷」为验收线。这样每屏验收都有明确尺度，不会出现「说不清像不像」的扯皮。</div>
+</section>
+
+<section>
+  <h2><span class="no">S0.3-5</span>C 类资产规格（供板块 1 / 4 使用）</h2>
+  <table>
+    <tr><th>资产组</th><th>数量</th><th>建议尺寸</th><th>格式</th><th>命名</th><th>分包归属</th></tr>
+    <tr><td>写实厚涂武将立绘</td><td>12</td><td>512×640 竖版</td><td>WebP q85</td><td><code>hero_paint_{id}.webp</code></td><td><code>heroes</code></td></tr>
+    <tr><td>低模 3D 英雄小人</td><td>12</td><td>384×512 透明底</td><td>WebP 带 alpha</td><td><code>hero_fig_{id}.webp</code></td><td><code>heroes</code></td></tr>
+    <tr><td>宝箱 3D 图标</td><td>5</td><td>256×256 透明底</td><td>WebP 带 alpha</td><td><code>chest_{tier}.webp</code></td><td><code>art</code></td></tr>
+    <tr><td>主 BGM</td><td>1</td><td>—</td><td>MP3</td><td><code>glorious_morning.mp3</code></td><td><code>audio</code></td></tr>
+    <tr><td>器械/兵种高精贴图</td><td>按需</td><td>256×256</td><td>WebP 带 alpha</td><td><code>unit_{id}.webp</code></td><td><code>art</code></td></tr>
+  </table>
+  <p>体积预估：立绘 12×约 60KB = 0.72MB，小人 12×约 35KB = 0.42MB，宝箱 5×约 20KB = 0.1MB，BGM 1.32MB，合计约 <b style="color:var(--goldLit)">2.6MB</b>。主包让出 BGM 后约 2.29MB，总包约 5.9MB，远低于 30MB 上限。<b>分包拓扑在板块 1 正式定案。</b></p>
+</section>
+
+<section>
+  <h2><span class="no">S0.4</span>验收标准与对比基线</h2>
+
+  <h3>量化基线（已固化）</h3>
+  <div class="kpi">
+    <div class="k"><div class="v">3.61 MB</div><div class="l">当前主包 / 上限 4 MB</div></div>
+    <div class="k"><div class="v">235</div><div class="l">冒烟截图数</div></div>
+    <div class="k"><div class="v">2006</div><div class="l">备份文件数（已校验）</div></div>
+    <div class="k"><div class="v">12 + 12</div><div class="l">参考图 + 改前基线截图</div></div>
+  </div>
+  <table>
+    <tr><th>对比位</th><th>路径</th><th>内容</th></tr>
+    <tr><td><b>参考图</b></td><td><code>docs/精细化改造/ref/</code></td><td>12 张，命名 <code>01_首页.png</code> … <code>13_战败结算.png</code></td></tr>
+    <tr><td><b>改前</b></td><td><code>docs/精细化改造/before/</code></td><td>12 张，与参考图<b>同名</b>，来自当前冒烟截图</td></tr>
+    <tr><td><b>改后</b></td><td><code>docs/精细化改造/after/</code></td><td>每步产出，与参考图<b>同名</b>，可三栏并排</td></tr>
+    <tr><td><b>机器基线</b></td><td><code>docs/精细化改造/baseline.json</code></td><td>方向决策、备份路径、主包体积、色板、截图映射</td></tr>
+  </table>
+
+  <h3>参考图 ↔ 改前截图映射</h3>
+  <table>
+    <tr><th>屏</th><th>参考图</th><th>改前基线截图</th><th>屏</th><th>参考图</th><th>改前基线截图</th></tr>
+    <tr><td>首页</td><td>01_首页</td><td><code>01_home.png</code></td><td>每周挑战</td><td>07_每周挑战</td><td><code>65a_weekly_stages.png</code></td></tr>
+    <tr><td>关卡</td><td>02_关卡</td><td><code>02_levels.png</code></td><td>每日挑战</td><td>08_每日挑战</td><td><code>66_daily_challenge.png</code></td></tr>
+    <tr><td>商城</td><td>03_商城</td><td><code>26_shop.png</code></td><td>招募</td><td>09_招募</td><td><code>48b_hero_screen.png</code></td></tr>
+    <tr><td>战斗</td><td>04_战斗</td><td><code>48g_battle_heroes.png</code></td><td>宝箱</td><td>10_宝箱</td><td><code>25b_chests.png</code></td></tr>
+    <tr><td>胜利</td><td>05_结算</td><td><code>12_result.png</code></td><td>兵营</td><td>11_兵营</td><td><code>14_barracks.png</code></td></tr>
+    <tr><td>布阵</td><td>06_布阵</td><td><code>03_deploy.png</code></td><td>战败</td><td>13_战败结算</td><td><code>37_result_fail_counter_ring.png</code></td></tr>
+  </table>
+
+  <h3>每屏验收 checklist（12 屏通用）</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>A 类 · 必须 100% 一致</h4>
+      <ul class="chk">
+        <li>整体底色为暖褐（无冷灰蓝残留）</li>
+        <li>顶栏三件套位置与金线分隔</li>
+        <li>卡片数量、网格列数、间距一致</li>
+        <li>主按钮文案、层级、位置一致</li>
+        <li>品级色：金/紫/蓝/绿/灰对应正确</li>
+        <li>页脚双金线 + 游戏名居中</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>B 类 · 观感一致</h4>
+      <ul class="chk">
+        <li>标题为书法感金字 + 描边 + 光晕</li>
+        <li>顶部暖金聚光与四角暗角</li>
+        <li>双层金边与四角云纹角花</li>
+        <li>金色粒子星尘（该有的屏必须有点）</li>
+        <li>朱红按钮内发光与上沿高光</li>
+        <li>兵模有明暗面与地面投影</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>C 类 · 分包资产</h4>
+      <ul class="chk">
+        <li>立绘/小人/宝箱贴图到位且清晰不糊</li>
+        <li>分包未下载时 fallback 不塌陷、不空白</li>
+        <li>下载完成后无闪烁替换</li>
+        <li>透明底正确，无白边黑边</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>功能与包体</h4>
+      <ul class="chk">
+        <li>逻辑测试全绿（1625 断言基线）</li>
+        <li>冒烟 90 断言 / 235 截图无报错</li>
+        <li>主包 ≤ 4 MB、总包 ≤ 30 MB</li>
+        <li>分包失败/断网时核心玩法仍可继续</li>
+        <li>存档、音频、购买、招募、开箱、结算无回归</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>每步交付节奏</h3>
+  <div class="flow">
+    <span>说明本步改动</span><i>→</i><span>改代码</span><i>→</i><span>跑冒烟出真实截图</span><i>→</i><span>三栏对比参考图</span><i>→</i><span>你验收</span><i>→</i><span>通过才进下一步</span>
+  </div>
+  <div class="note"><b>本板块不改任何游戏代码。</b>板块 0 只做方向、规格、基线三件事；代码改动从板块 1（分包架构）开始。</div>
+</section>
+
+<section>
+  <h2><span class="no">NEXT</span>板块 0 验收项</h2>
+  <div class="card hi">
+    <ul class="chk">
+      <li>方向确认单两项决策无误，回滚备份已就位</li>
+      <li>实测色板与设计语言总纲符合你对 12 张图的理解</li>
+      <li>12 屏视觉要素规格表无遗漏、无错读</li>
+      <li>A/B/C 三类分级与验收尺度认可</li>
+      <li><b>确认英雄立绘做两套（24 张）还是一套 + 程序化复用</b></li>
+      <li>验收 checklist 与三栏对比位认可</li>
+    </ul>
+    <p style="margin-top:16px;color:var(--goldLit)">你说「过」，我进入板块 1 · 分包架构（S1.1 资源盘点）。任何一项要改，我原地修订规格，不往下走。</p>
+  </div>
+</section>
+
+<footer>UI Designer · 像素君｜汉末行伍征战记 UI 精细化改造 · 板块 0｜文档为纯内联 CSS，零外部依赖</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>板块 1 · 分包架构与验收 | 汉末行伍征战记</title>
+<style>
+  :root{
+    --bg0:#15110C; --bg1:#1D1710; --panel:#241C13; --panel2:#2E2418;
+    --line:#6B522C; --line-soft:#43331E; --gold:#E8B44C; --gold-dim:#AA8B58;
+    --gold-deep:#8A6420; --red:#882E1C; --red-lit:#C0392B;
+    --teal:#3E885D; --purple:#96659A; --ink:#F2EAD8; --ink-dim:#C2B394; --ink-weak:#8A7D64;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:
+      radial-gradient(1100px 620px at 50% -8%, rgba(232,180,76,.10), transparent 62%),
+      radial-gradient(760px 520px at 100% 100%, rgba(136,46,28,.10), transparent 60%),
+      var(--bg0);
+    color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",system-ui,sans-serif;
+    line-height:1.75; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:44px 28px 90px}
+  .hero{
+    position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    background:linear-gradient(155deg,#2C2115 0%,#1B150E 62%,#221A11 100%);
+    padding:42px 44px 38px;box-shadow:0 18px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(232,180,76,.14);
+  }
+  .hero:before,.hero:after{content:"";position:absolute;width:54px;height:54px;border:2px solid var(--gold-dim);opacity:.55}
+  .hero:before{top:12px;left:12px;border-right:0;border-bottom:0;border-radius:6px 0 0 0}
+  .hero:after{bottom:12px;right:12px;border-left:0;border-top:0;border-radius:0 0 6px 0}
+  .eyebrow{letter-spacing:.34em;font-size:12px;color:var(--gold-dim);margin:0 0 12px}
+  h1{font-family:"STKaiti","KaiTi","Songti SC",serif;font-size:42px;letter-spacing:.10em;margin:0 0 10px;
+     background:linear-gradient(180deg,#F8E1AC,#D59947 60%,#9A7128);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--ink-dim);font-size:15px;margin:0}
+  .seal{position:absolute;right:44px;top:42px;width:82px;height:82px;border:2px solid var(--red-lit);border-radius:8px;
+        color:#E8A090;display:grid;place-items:center;font-family:"STKaiti","KaiTi",serif;font-size:22px;line-height:1.15;
+        letter-spacing:.1em;text-align:center;transform:rotate(-7deg);opacity:.9;background:rgba(136,46,28,.14)}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:26px}
+  .tag{border:1px solid var(--line);background:rgba(0,0,0,.26);color:var(--ink-dim);font-size:12px;
+       padding:5px 12px;border-radius:999px}
+  .tag.ok{border-color:#4E7A54;color:#8FC79C}
+  .tag.hot{border-color:var(--red);color:#E2A08F}
+
+  h2{font-family:"STKaiti","KaiTi","Songti SC",serif;font-size:26px;letter-spacing:.06em;margin:52px 0 6px;
+     color:var(--gold);display:flex;align-items:center;gap:14px}
+  h2 .no{font:600 13px/1 system-ui;color:#1A130C;background:linear-gradient(180deg,#E8B44C,#AA8B58);
+         padding:7px 9px;border-radius:6px;letter-spacing:0}
+  .lead{color:var(--ink-dim);font-size:14px;margin:0 0 20px;padding-left:44px}
+  .card{border:1px solid var(--line-soft);border-radius:14px;background:linear-gradient(160deg,var(--panel),#1B150E);
+        padding:24px 26px;margin:16px 0;box-shadow:inset 0 1px 0 rgba(232,180,76,.07)}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.grid2,.grid3,.grid4{grid-template-columns:1fr}}
+
+  .stat{border:1px solid var(--line-soft);border-radius:12px;padding:18px 18px 16px;background:rgba(0,0,0,.22)}
+  .stat .k{font-size:12px;color:var(--ink-weak);letter-spacing:.08em}
+  .stat .v{font:600 30px/1.25 system-ui;color:var(--gold);margin:6px 0 2px}
+  .stat .v small{font-size:14px;color:var(--ink-dim);font-weight:400}
+  .stat .d{font-size:12px;color:var(--ink-dim)}
+  .stat.green .v{color:#7FC79A}
+  .stat.red .v{color:#E2A08F}
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;margin:8px 0}
+  th{text-align:left;color:var(--gold-dim);font-weight:600;font-size:12px;letter-spacing:.08em;
+     border-bottom:1px solid var(--line);padding:11px 10px;background:rgba(232,180,76,.05)}
+  td{border-bottom:1px solid rgba(107,82,44,.28);padding:11px 10px;color:var(--ink-dim);vertical-align:top}
+  td strong{color:var(--ink);font-weight:600}
+  tr:hover td{background:rgba(232,180,76,.04)}
+  code{font-family:ui-monospace,Consolas,"Courier New",monospace;font-size:12.5px;color:#EBCB8B;
+       background:rgba(0,0,0,.34);border:1px solid rgba(107,82,44,.4);padding:1px 6px;border-radius:4px}
+  pre{background:#100C08;border:1px solid var(--line-soft);border-radius:10px;padding:16px 18px;overflow:auto;
+      font-family:ui-monospace,Consolas,monospace;font-size:12.5px;line-height:1.7;color:#D8C9A8;margin:12px 0}
+  pre .c{color:#8A7D64}
+  pre .g{color:#E8B44C}
+  .note{border-left:3px solid var(--gold-dim);background:rgba(232,180,76,.06);padding:12px 16px;border-radius:0 8px 8px 0;
+        color:var(--ink-dim);font-size:13.5px;margin:14px 0}
+  .note.warn{border-left-color:var(--red-lit);background:rgba(136,46,28,.10)}
+  .note.good{border-left-color:#4E7A54;background:rgba(62,136,93,.09)}
+
+  .bar{height:9px;border-radius:99px;background:#0E0B07;border:1px solid var(--line-soft);overflow:hidden;margin-top:8px}
+  .bar > i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#8A6420,#E8B44C)}
+  .bar > i.teal{background:linear-gradient(90deg,#2A6142,#3E885D)}
+  .bar > i.purple{background:linear-gradient(90deg,#5F3F62,#96659A)}
+  .barlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-weak);margin-top:6px}
+
+  .pkg{border:1px solid var(--line-soft);border-radius:12px;padding:16px;background:rgba(0,0,0,.22)}
+  .pkg h3{margin:0 0 4px;font-size:16px;color:var(--gold)}
+  .pkg .p{font:12px ui-monospace,monospace;color:var(--ink-weak);margin:0 0 10px}
+  .pkg .s{font-size:12.5px;color:var(--ink-dim);margin:0}
+  .pill{display:inline-block;font-size:11px;padding:2px 9px;border-radius:99px;border:1px solid var(--line);color:var(--ink-dim);margin:0 6px 6px 0}
+  .pill.p0{border-color:var(--red);color:#E2A08F}
+  .pill.p1{border-color:var(--purple);color:#C9A8D8}
+  .pill.p2{border-color:var(--teal);color:#8FC79C}
+  .pill.live{border-color:#4E7A54;color:#8FC79C;background:rgba(62,136,93,.12)}
+
+  ul.chk{list-style:none;padding:0;margin:10px 0}
+  ul.chk li{padding:9px 0 9px 30px;position:relative;border-bottom:1px dashed rgba(107,82,44,.3);font-size:14px;color:var(--ink-dim)}
+  ul.chk li:before{content:"☐";position:absolute;left:2px;top:8px;color:var(--gold);font-size:16px}
+  ul.chk li strong{color:var(--ink)}
+  .foot{margin-top:54px;border-top:1px solid var(--line);padding-top:20px;color:var(--ink-weak);font-size:12.5px;
+        display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+  svg{display:block;width:100%;height:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="seal">分包<br>已落地</div>
+    <p class="eyebrow">板块 1 / 分包架构 · 验收单</p>
+    <h1>进入后下载，效果不打折</h1>
+    <p class="sub">主包守住 4 MB 硬线，30 MB 额度宽裕使用；高音质 BGM、英雄立绘、器械与装饰贴图一律原图原音轨，不做有损压缩。</p>
+    <div class="meta">
+      <span class="tag ok">35 项分包校验全过</span>
+      <span class="tag ok">1633 逻辑断言 / 0 失败</span>
+      <span class="tag ok">90 冒烟断言 · 197 截图全绿</span>
+      <span class="tag ok">发布检查通过</span>
+      <span class="tag hot">主包 3.61 → 2.32 MB</span>
+    </div>
+  </div>
+
+  <h2><span class="no">01</span>决策与结论</h2>
+  <p class="lead">本板块不改任何界面视觉，只把「素材放得下、放得好」的地基铺完。</p>
+  <div class="card">
+    <div class="note good"><strong>你的取向已落实：</strong>「30 MB 还是很大的、没必要那么省，以呈现效果为最重要」——我按「额度宽裕、画质优先」执行：素材不转码、不降采样、不用低码率换取体积；分包预算按 <strong>约 24 MB</strong> 规划，留 <strong>约 6 MB</strong> 冗余。唯一仍严格遵守的是微信的 <strong>4 MB 主包硬线</strong>（平台规则，不可放宽）。若你的本意其实是「30 MB 太大、应尽量精简」，告诉我，我立刻把预算调回去。</div>
+    <div class="grid4" style="margin-top:18px">
+      <div class="stat"><div class="k">改造前 · 主包</div><div class="v">3.61<small> MB</small></div><div class="d">贴近 4 MB 红线</div></div>
+      <div class="stat green"><div class="k">改造后 · 主包</div><div class="v">2.32<small> MB</small></div><div class="d">余量 1.68 MB</div></div>
+      <div class="stat"><div class="k">已进入分包</div><div class="v">1.29<small> MB</small></div><div class="d">pkg_audio · 主 BGM</div></div>
+      <div class="stat red"><div class="k">总包 / 上限</div><div class="v">3.61<small> / 30 MB</small></div><div class="d">余量 26.39 MB</div></div>
+    </div>
+    <div style="margin-top:22px">
+      <div class="barlbl"><span>主包占用（4 MB 上限）</span><span>2.32 MB · 58%</span></div>
+      <div class="bar"><i style="width:58%"></i></div>
+      <div class="barlbl" style="margin-top:16px"><span>总包占用（30 MB 上限）</span><span>3.61 MB · 12%</span></div>
+      <div class="bar"><i class="teal" style="width:12%"></i></div>
+    </div>
+  </div>
+
+  <h2><span class="no">02</span>分包拓扑</h2>
+  <p class="lead">四个分包按「进入后下载」组织，只有确实含素材的分包才会被声明，空目录不会写进 game.json。</p>
+  <div class="card">
+    <svg viewBox="0 0 1000 330" role="img" aria-label="主包与四个分包拓扑">
+      <defs>
+        <linearGradient id="gmain" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#3B2C19"/><stop offset="1" stop-color="#221A11"/>
+        </linearGradient>
+        <linearGradient id="gsub" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#2B2116"/><stop offset="1" stop-color="#19130D"/>
+        </linearGradient>
+        <marker id="arrow" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto">
+          <path d="M0,0 L9,4.5 L0,9 Z" fill="#D59947"/>
+        </marker>
+      </defs>
+      <rect x="14" y="24" width="300" height="282" rx="16" fill="url(#gmain)" stroke="#8A6420" stroke-width="2"/>
+      <text x="164" y="60" text-anchor="middle" fill="#E8B44C" font-size="20" font-family="serif">主包 · 启动即下载</text>
+      <text x="164" y="86" text-anchor="middle" fill="#8A7D64" font-size="13">≤ 4 MB 硬线 · 实测 2.32 MB</text>
+      <line x1="40" y1="104" x2="288" y2="104" stroke="#6B522C"/>
+      <text x="40" y="132" fill="#F2EAD8" font-size="14">全部游戏代码（88 个 js）</text>
+      <text x="40" y="158" fill="#F2EAD8" font-size="14">16 张 4 档兵模精灵 PNG</text>
+      <text x="40" y="184" fill="#F2EAD8" font-size="14">草书标题 title.png</text>
+      <text x="40" y="210" fill="#F2EAD8" font-size="14">16 个音效 · 约 150 KB</text>
+      <text x="40" y="236" fill="#F2EAD8" font-size="14">48 KB 占位循环（首屏不静音）</text>
+      <text x="40" y="272" fill="#8FC79C" font-size="13">首帧可玩，无需等待任何下载</text>
+
+      <path d="M314 165 C 380 165, 390 165, 438 165" stroke="#D59947" stroke-width="2.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="376" y="150" text-anchor="middle" fill="#AA8B58" font-size="12">首帧后静默下载</text>
+
+      <rect x="452" y="24" width="534" height="282" rx="16" fill="none" stroke="#43331E" stroke-dasharray="6 6"/>
+      <text x="470" y="50" fill="#C2B394" font-size="13">进入后下载 · 按优先级串行 · 总计 ≤ 30 MB</text>
+
+      <g>
+        <rect x="470" y="62" width="240" height="104" rx="12" fill="url(#gsub)" stroke="#8A6420"/>
+        <text x="488" y="88" fill="#E8B44C" font-size="16">pkg_audio</text>
+        <text x="488" y="110" fill="#8A7D64" font-size="12">优先级 P0 · 已启用</text>
+        <text x="488" y="132" fill="#F2EAD8" font-size="12.5">高音质主 BGM 1.29 MB</text>
+        <text x="488" y="152" fill="#8FC79C" font-size="12">就绪后自动升级，不打断播放</text>
+      </g>
+      <g>
+        <rect x="726" y="62" width="240" height="104" rx="12" fill="url(#gsub)" stroke="#7556A6"/>
+        <text x="744" y="88" fill="#C9A8D8" font-size="16">pkg_heroes</text>
+        <text x="744" y="110" fill="#8A7D64" font-size="12">优先级 P1 · 预留 12 MB</text>
+        <text x="744" y="132" fill="#F2EAD8" font-size="12.5">24 张英雄立绘 / 招募小人</text>
+        <text x="744" y="152" fill="#C2B394" font-size="12">板块 4 放图即自动生效</text>
+      </g>
+      <g>
+        <rect x="470" y="180" width="240" height="104" rx="12" fill="url(#gsub)" stroke="#3E885D"/>
+        <text x="488" y="206" fill="#8FC79C" font-size="16">pkg_siege</text>
+        <text x="488" y="228" fill="#8A7D64" font-size="12">优先级 P2 · 预留 5 MB</text>
+        <text x="488" y="250" fill="#F2EAD8" font-size="12.5">器械 / 兵模高清贴图</text>
+        <text x="488" y="270" fill="#C2B394" font-size="12">未就绪时保持程序化绘制</text>
+      </g>
+      <g>
+        <rect x="726" y="180" width="240" height="104" rx="12" fill="url(#gsub)" stroke="#96659A"/>
+        <text x="744" y="206" fill="#C9A8D8" font-size="16">pkg_art</text>
+        <text x="744" y="228" fill="#8A7D64" font-size="12">优先级 P3 · 预留 4 MB</text>
+        <text x="744" y="250" fill="#F2EAD8" font-size="12.5">雕花边框 / 宝箱图标 / 光效</text>
+        <text x="744" y="270" fill="#C2B394" font-size="12">未就绪时用 Canvas 纹样兜底</text>
+      </g>
+    </svg>
+  </div>
+
+  <div class="grid4">
+    <div class="pkg"><h3>audio</h3><p class="p">root: pkg_audio/</p><span class="pill p0">P0 声音优先</span><span class="pill live">现已启用</span><p class="s">源：<code>assets/audio/*.mp3</code>（排除占位曲与 sfx）。未来加高音质音轨直接放目录即可。</p></div>
+    <div class="pkg"><h3>heroes</h3><p class="p">root: pkg_heroes/</p><span class="pill p1">P1 立绘</span><p class="s">源：<code>assets/heroes/</code>。板块 4 的 12 位写实立绘 + 12 张招募小人放这里。</p></div>
+    <div class="pkg"><h3>siege</h3><p class="p">root: pkg_siege/</p><span class="pill p2">P2 器械</span><p class="s">源：<code>assets/siege/</code>。弩车 / 投石车等器械与兵模高清贴图。</p></div>
+    <div class="pkg"><h3>art</h3><p class="p">root: pkg_art/</p><span class="pill">P3 装饰</span><p class="s">源：<code>assets/art/</code>。雕花边框、玉雕祥云、宝箱 3D 图标、粒子光斑。</p></div>
+  </div>
+
+  <h2><span class="no">03</span>体积预算（效果优先）</h2>
+  <p class="lead">不做有损压缩，按素材原始质量预留；4 MB 主包与 30 MB 总包由构建脚本硬校验，超限直接构建失败。</p>
+  <div class="card">
+    <table>
+      <thead><tr><th>分区</th><th>当前实测</th><th>预留上限</th><th>内容 / 理由</th></tr></thead>
+      <tbody>
+        <tr><td><strong>主包</strong></td><td>2.32 MB</td><td>4.00 MB<span style="color:#8A7D64">（硬线）</span></td><td>代码 + 首屏精灵 + 标题图 + 音效 + 占位循环。首帧零等待。</td></tr>
+        <tr><td><strong>pkg_audio</strong></td><td>1.29 MB</td><td>6 MB</td><td>主 BGM 1.32 MB；后续可加多首高码率场景曲，不必压到 80 kbps。</td></tr>
+        <tr><td><strong>pkg_heroes</strong></td><td>0（待板块 4）</td><td>12 MB</td><td>24 张立绘，单张按 400–600 KB 原图估算，留足写实厚涂细节。</td></tr>
+        <tr><td><strong>pkg_siege</strong></td><td>0（待板块 4）</td><td>5 MB</td><td>器械与兵模高清贴图，避免低分辨率导致兵模糊。</td></tr>
+        <tr><td><strong>pkg_art</strong></td><td>0（待板块 4）</td><td>4 MB</td><td>边框 / 宝箱 / 光效贴图，参考图里最吃质感的 B 类要素。</td></tr>
+        <tr><td><strong>合计</strong></td><td>3.61 MB</td><td>≈ 24 MB / 30 MB</td><td>刻意留约 6 MB 冗余，后续加素材不必反复腾挪。</td></tr>
+      </tbody>
+    </table>
+    <div class="note"><strong>一个取舍说明：</strong>分包是按「整包」下载的，包越大单次下载越久。因此没有把 24 张立绘塞进一个 20 MB 的巨型包，而是按系统拆成 4 个、串行下载——声音先到、立绘随后，玩家在首页就能感知到画面逐步变精致，而不是一开始卡在加载条上。</div>
+  </div>
+
+  <h2><span class="no">04</span>启动时序与回退</h2>
+  <p class="lead">首帧优先渲染，下载在后台静默进行；任何一步失败都有兜底，不影响可玩性。</p>
+  <div class="card">
+    <svg viewBox="0 0 1000 210" role="img" aria-label="进入后下载时序">
+      <line x1="60" y1="104" x2="940" y2="104" stroke="#6B522C" stroke-width="2"/>
+      <g fill="#15110C" stroke="#8A6420" stroke-width="2">
+        <circle cx="90" cy="104" r="11"/><circle cx="260" cy="104" r="11"/><circle cx="430" cy="104" r="11"/>
+        <circle cx="600" cy="104" r="11"/><circle cx="770" cy="104" r="11"/><circle cx="920" cy="104" r="11"/>
+      </g>
+      <g fill="#E8B44C" font-size="14" text-anchor="middle">
+        <text x="90" y="72">启动</text><text x="260" y="72">首帧渲染</text><text x="430" y="72">占位 BGM</text>
+        <text x="600" y="72">audio 就绪</text><text x="770" y="72">立绘 / 器械</text><text x="920" y="72">完整效果</text>
+      </g>
+      <g fill="#8A7D64" font-size="12" text-anchor="middle">
+        <text x="90" y="142">仅 2.32 MB</text><text x="260" y="142">首页可点</text><text x="430" y="142">48 KB 循环</text>
+        <text x="600" y="142">自动升级</text><text x="770" y="142">逐屏变精致</text><text x="920" y="142">≈ 24 MB 额度内</text>
+      </g>
+      <text x="500" y="186" text-anchor="middle" fill="#8FC79C" font-size="12.5">下载失败 / 断网：主包占位曲 + 程序化绘制全程可用，不会黑屏、不会静音</text>
+    </svg>
+    <table style="margin-top:18px">
+      <thead><tr><th>场景</th><th>系统行为</th><th>玩家感知</th></tr></thead>
+      <tbody>
+        <tr><td>分包未就绪</td><td><code>resolveAsset()</code> 返回 <code>null</code>；音频用 48 KB 占位循环，图片走程序化绘制</td><td>首屏有声音、有兵模，不等待</td></tr>
+        <tr><td>下载中</td><td><code>onProgressUpdate</code> 写入 <code>packageSnapshot()</code>，供后续板块做进度提示</td><td>无感，可正常开局</td></tr>
+        <tr><td>audio 就绪</td><td>音频层销毁占位轨、同轨重建高音质主曲并续播当前场景</td><td>音质自然提升，不切断</td></tr>
+        <tr><td>单次失败</td><td>自动重试 2 次，间隔递增（0.9 s / 1.8 s）</td><td>短暂波动后自愈</td></tr>
+        <tr><td>彻底失败 / 断网</td><td>标记 <code>failed</code>，资源永久回退主包占位；下次启动会重新尝试</td><td>游戏完整可玩</td></tr>
+        <tr><td>本地预览 / 冒烟</td><td>非微信环境一律视为就绪，路径直通 <code>assets/</code></td><td>开发链路零改动</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="no">05</span>实际改动文件</h2>
+  <p class="lead">本板块改的是构建与资源调度链路，未触碰任何界面绘制逻辑。</p>
+  <div class="card">
+    <table>
+      <thead><tr><th>文件</th><th>类型</th><th>改动</th></tr></thead>
+      <tbody>
+        <tr><td><code>src/core/subpackage.js</code></td><td>新增</td><td>加载管理器：优先级串行下载、进度回调、失败重试 2 次、就绪订阅、按需下载、状态快照、非微信直通</td></tr>
+        <tr><td><code>src/core/asset-routes.js</code></td><td>新增</td><td>资源映射表（源码为空表；微信版由构建脚本按真实素材自动覆盖）</td></tr>
+        <tr><td><code>src/core/audio.js</code></td><td>修改</td><td>接入 <code>resolveAsset</code>：未就绪用主包占位曲、就绪后自动升级到分包高音质主曲；<code>audioState()</code> 增加 <code>pendingUpgrade</code> 供校验</td></tr>
+        <tr><td><code>tools/build-wx.mjs</code></td><td>修改</td><td>四条分包规则、扫描并迁出素材、自动生成映射表、<code>game.json</code> 声明 <code>subpackages</code>、入口注入静默下载、4 MB / 30 MB 硬校验</td></tr>
+        <tr><td><code>tools/release-wx.mjs</code></td><td>修改</td><td>主包体积只算非 <code>pkg_*</code> 文件、增加 30 MB 总包校验、加固产物同样区分主包/分包</td></tr>
+        <tr><td><code>tools/verify-wx-pack.mjs</code></td><td>新增</td><td>35 项校验脚本（含模拟微信环境实测下载/重试/音频升级、模拟素材构建、历史分包残留检查）</td></tr>
+        <tr><td><code>package.json</code></td><td>修改</td><td>新增 <code>npm run verify:wx</code></td></tr>
+        <tr><td><code>assets/audio/README.md</code></td><td>修改</td><td>删除「为 4 MB 压缩 BGM」的过时指引，改为音质优先 + 分包说明</td></tr>
+        <tr><td><code>assets/heroes|siege|art/</code></td><td>新增</td><td>三个素材目录与用途说明（README 不进包）</td></tr>
+        <tr><td><code>docs/精细化改造/baseline.json</code></td><td>修改</td><td>追加板块 1 预算、实测与验收数据</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="no">06</span>验收数据</h2>
+  <p class="lead">四套测试全部实跑，不是推断；其中模拟素材构建会在结束时自动清理并重建正式产物。</p>
+  <div class="grid2">
+    <div class="card" style="margin:0">
+      <table>
+        <thead><tr><th>测试</th><th>结果</th></tr></thead>
+        <tbody>
+          <tr><td><strong>分包校验</strong> <code>verify:wx</code></td><td style="color:#8FC79C">35 通过 / 0 失败</td></tr>
+          <tr><td><strong>逻辑测试</strong> <code>npm test</code></td><td style="color:#8FC79C">1633 通过 / 0 失败</td></tr>
+          <tr><td><strong>冒烟测试</strong> <code>npm run smoke</code></td><td style="color:#8FC79C">90 断言 · 197 截图全绿</td></tr>
+          <tr><td><strong>发布检查</strong> <code>wx:release</code></td><td style="color:#8FC79C">通过 · zip 2.82 MB</td></tr>
+          <tr><td>主包 / 总包</td><td style="color:#8FC79C">2.32 MB / 3.61 MB，双红线内</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card" style="margin:0">
+      <p style="margin:0 0 8px;color:var(--gold);font-size:14px">模拟素材链路实测（板块 4 前置验证）</p>
+      <p style="margin:0;color:var(--ink-dim);font-size:13.5px">
+        往 <code>assets/heroes/</code> 临时放一张 PNG → 重新构建 →
+        <code>game.json</code> 自动多出 <code>heroes</code> 分包、素材落到
+        <code>pkg_heroes/heroes/</code>、映射表与入口下载列表自动收录、主包仍 2.32 MB ≤ 4 MB；
+        随后清理模拟素材并重建，正式产物恢复为仅 <code>audio</code> 一个分包。
+      </p>
+      <div class="note good" style="margin-bottom:0">结论：板块 4 生成 24 张立绘后<strong>不需要再改任何一行配置</strong>，放进目录即可自动进入分包。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <p style="margin:0 0 8px;color:var(--gold);font-size:14px">打回修改记录 · 一次真实缺陷</p>
+    <p style="margin:0;font-size:13.5px;color:var(--ink-dim)">
+      首轮 33 项校验全过，但复核产物目录时发现 <code>wechat/pkg_heroes/heroes/verify_fixture.png</code> 残留——
+      <code>game.json</code> 只声明 audio，模拟构建留下的旧分包目录却仍在产物里，会被上传流程算进总包。
+      根因是构建脚本在「清空 wechat/ 被环境拦截 → 覆盖式同步」时没有清理历史 <code>pkg_*</code> 目录。
+    </p>
+    <div class="note warn">
+      <strong>已修复 ①：</strong>构建开始后无条件逐文件清理所有历史 <code>pkg_*</code> 目录（不依赖可能被拦截的递归删除）；
+      校验脚本新增两条断言——「无未声明的历史分包目录残留」「模拟分包目录已彻底清理」。
+    </div>
+    <div class="note warn" style="margin-bottom:0">
+      <strong>已修复 ②：</strong>连续复跑时发现「每个新会话首次校验偶发 7 项误判」——根因是校验脚本读的是外部遗留的
+      <code>wechat/</code> 状态，读到旧版空映射表会让所有分包断言连锁失败。现改为<strong>校验前先自行构建一次</strong>、
+      并把固定毫秒等待全部换成事件驱动等待。连续多次 + 跨会话复跑均为
+      <strong style="color:#8FC79C">35 通过 / 0 失败</strong>，最终产物只剩 <code>pkg_audio</code>。
+    </div>
+  </div>
+
+  <h2><span class="no">07</span>板块 4 的素材约定</h2>
+  <p class="lead">提前写清调用方式，避免后面生成了立绘却接不进画面。</p>
+  <div class="card">
+    <pre><span class="c">// 逻辑路径永远写 assets/ 开头的原始位置，运行时统一解析</span>
+<span class="g">import</span> { resolveAsset, ensureSubpackage, onPackageReady } <span class="g">from</span> '../core/subpackage.js';
+
+<span class="c">// 1) 渲染前取真实路径；null = 分包还没到，用程序化建模兜底</span>
+<span class="g">const</span> src = resolveAsset(<span style="color:#D8A0C8">'assets/heroes/guan_yu.png'</span>);
+<span class="g">if</span> (src) platform.loadImage(src, (img) =&gt; { ... });
+
+<span class="c">// 2) 进入招募页时按需确保立绘分包已下载</span>
+ensureSubpackage(<span style="color:#D8A0C8">'heroes'</span>);
+
+<span class="c">// 3) 就绪后重绘当前页，或做一次淡入替换</span>
+onPackageReady(<span style="color:#D8A0C8">'heroes'</span>, () =&gt; refreshCurrentScreen());</pre>
+    <div class="note warn"><strong>约束：</strong>分包之间不能互相 <code>require</code> 代码，因此分包里只放<strong>图片 / 音频</strong>这类纯资源，所有绘制与业务逻辑继续留在主包。这也是本方案把「代码」和「美术材质」彻底分开的原因。</div>
+  </div>
+
+  <h2><span class="no">08</span>回滚与请你验收</h2>
+  <div class="grid2">
+    <div class="card" style="margin:0">
+      <p style="margin:0 0 10px;color:var(--gold)">回滚点</p>
+      <p style="margin:0;font-size:13.5px;color:var(--ink-dim)">
+        完整备份：<code>D:/Projects/record/trae_project/game_demo_backup_20261122_115416</code><br>
+        378 MB / 2006 文件，与本板块开工前完全一致。<br>
+        单步回退也可只还原 <code>src/core/audio.js</code>、<code>tools/build-wx.mjs</code>、<code>tools/release-wx.mjs</code> 三个文件，再跑一次 <code>npm run build:wx</code> 即可。
+      </p>
+    </div>
+    <div class="card" style="margin:0">
+      <p style="margin:0 0 8px;color:var(--gold)">请勾对</p>
+      <ul class="chk">
+        <li><strong>取向</strong>：30 MB 额度宽裕用、素材不压缩，理解无误</li>
+        <li><strong>拓扑</strong>：audio / heroes / siege / art 四分包与优先级</li>
+        <li><strong>体积</strong>：主包 2.32 MB、总包 3.61 MB，双红线内</li>
+        <li><strong>体验</strong>：首帧不等待、占位曲 → 高音质自动升级</li>
+        <li><strong>验收数据</strong>：四套测试全绿、模拟素材链路通过</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>板块 1 · 分包架构 · 2026-11-22</span>
+    <span>下一步：板块 2 · 设计系统层（THEME v2 回回暖褐暗金 + 通用组件升级）</span>
+  </div>
+</div>
+</body>
+</html>

@@ -245,7 +245,7 @@ export class DevScreen {
       size: 15, align: 'center', color: THEME.textWeak,
     });
 
-    panel(ctx, 24, 104, 702, 126, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 16 });
+    panel(ctx, 24, 104, 702, 126, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 16 });
     text(ctx, this.player.length ? `我方 ${this.player.length} 支` : '我方（空）', 199, 144, {
       size: 20, align: 'center', color: this.player.length ? THEME.gold : THEME.textWeak,
     });
@@ -256,12 +256,12 @@ export class DevScreen {
     button(ctx, L.clearEnemy, '清空敌方', { size: 16, fill: THEME.panel, stroke: THEME.line });
 
     button(ctx, L.tabTroop, '兵 种', {
-      size: 22, fill: this.tab === 'troop' ? '#273038' : THEME.panel,
+      size: 22, fill: this.tab === 'troop' ? '#332c1d' : THEME.panel,
       stroke: this.tab === 'troop' ? THEME.gold : THEME.line,
       textColor: this.tab === 'troop' ? THEME.gold : THEME.text,
     });
     button(ctx, L.tabHero, '英 雄', {
-      size: 22, fill: this.tab === 'hero' ? '#273038' : THEME.panel,
+      size: 22, fill: this.tab === 'hero' ? '#332c1d' : THEME.panel,
       stroke: this.tab === 'hero' ? THEME.gold : THEME.line,
       textColor: this.tab === 'hero' ? THEME.gold : THEME.text,
     });
@@ -272,14 +272,14 @@ export class DevScreen {
     this.drawLevelRow(ctx);
 
     button(ctx, L.addPlayer, '我方布阵', {
-      size: 24, fill: '#1b2227', stroke: THEME.goldDim, textColor: THEME.gold,
+      size: 24, fill: '#2b2217', stroke: THEME.goldDim, textColor: THEME.gold,
     });
     button(ctx, L.addEnemy, '敌方布阵', {
       size: 24, fill: '#2a1d1d', stroke: '#8a4a4a', textColor: '#e0a0a0',
     });
 
     button(ctx, L.start, '开始对打', {
-      size: 32, primary: true, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
+      size: 32, primary: true, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
     });
     if (this.note) {
       text(ctx, this.note, W / 2, 1012, { size: 16, align: 'center', color: THEME.textDim });
@@ -318,7 +318,7 @@ export class DevScreen {
         const u = list.find((x) => x.col === col && x.row === row);
         const front = side === 'player' ? col === G.cols - 1 : col === 0;
         panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-          fill: u ? '#1b2227' : '#151c27',
+          fill: u ? '#2b2217' : '#151c27',
           stroke: u ? THEME.gold : (front ? THEME.goldDim : THEME.line),
           r: 10,
         });
@@ -329,7 +329,7 @@ export class DevScreen {
     }
     button(ctx, PLACE.auto, '自动布阵', { size: 20, fill: THEME.panel, stroke: THEME.line });
     button(ctx, PLACE.done, '完成', {
-      size: 20, primary: true, fill: '#273038', stroke: THEME.gold, textColor: THEME.gold,
+      size: 20, primary: true, fill: '#332c1d', stroke: THEME.gold, textColor: THEME.gold,
     });
     text(ctx, `当前 ${list.length} / 25 支 · 靠近中线的一列用金边标出`, g.W / 2, 866, {
       size: 14, align: 'center', color: THEME.textWeak,
@@ -366,7 +366,7 @@ export class DevScreen {
       const on = h.id === this.heroId;
       button(ctx, rect, `${h.name} Lv${this.heroMax ? HERO_MAX_LEVEL : 1}`, {
         size: 15,
-        fill: on ? '#273038' : THEME.panel,
+        fill: on ? '#332c1d' : THEME.panel,
         stroke: on ? THEME.gold : THEME.line,
         textColor: on ? THEME.gold : THEME.text,
       });

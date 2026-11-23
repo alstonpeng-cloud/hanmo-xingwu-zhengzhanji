@@ -1,5 +1,5 @@
 // 商城：花铜钱直接买兵（买到的单位进兵营，受兵营格子数限制）
-import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal, carvedFrame } from '../render/draw.js';
 import { now as clockNow } from '../core/clock.js';
 import { CONFIG } from '../data/config.js';
 import { rosterSlots, shopPrice, buyUnit } from '../core/levels.js';
@@ -38,6 +38,7 @@ export const SHOP_LAYOUT = {
 export class ShopScreen {
   constructor(game) {
     this.game = game;
+    this.artBg = 'shop';
     this.tutorialId = 'shop';
     this.bgm = 'shop';
     this.backRect = { x: 36, y: 44, w: 124, h: 64 };
@@ -129,7 +130,7 @@ export class ShopScreen {
     const slots = rosterSlots(st.maxCleared);
     const full = st.units.length >= slots.unlocked;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     // 青蚨绿为商城系统色，标题与一级入口用色相承担导航
     text(ctx, '商 城', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center', color: THEME.shop, serif: true });
@@ -142,7 +143,7 @@ export class ShopScreen {
       : 0;
     button(ctx, this.dailyRect, dailyOn ? '每 日 商 店' : '每日商店 · 100关解锁', {
       size: dailyOn ? 26 : 20,
-      fill: dailyOn ? '#1b2227' : THEME.panel,
+      fill: dailyOn ? '#2b2217' : THEME.panel,
       stroke: dailyOn ? THEME.shop : THEME.line,
       textColor: dailyOn ? THEME.shop : THEME.textWeak,
       disabled: !dailyOn,
@@ -167,7 +168,7 @@ export class ShopScreen {
       const on = this.level === lv;
       button(ctx, rect, `Lv${lv}`, {
         size: 26,
-        fill: on ? '#273038' : THEME.panel,
+        fill: on ? '#332c1d' : THEME.panel,
         stroke: on ? THEME.shop : THEME.line,
         textColor: on ? THEME.shop : THEME.text,
         active: on,
@@ -186,7 +187,7 @@ export class ShopScreen {
       const buyRect = { x: x + 16, y: y + SHOP_LAYOUT.buyOffsetY, w: CARD_W - 32, h: BUY_H };
       this.cardRects.push({ rect: buyRect, troop: t.id });
 
-      panel(ctx, x, y, CARD_W, CARD_H, { fill: '#1b2227', stroke: THEME.line, r: 18 });
+      panel(ctx, x, y, CARD_W, CARD_H, { fill: '#2b2217', stroke: THEME.line, r: 18 });
 
       text(ctx, t.name, x + CARD_W / 2, y + 32, { size: 28, weight: '600', align: 'center' });
       text(ctx, unitName(t.id, this.level), x + CARD_W / 2, y + 66, {
@@ -210,7 +211,7 @@ export class ShopScreen {
       const canBuy = affordable && !full;
       button(ctx, buyRect, full ? '兵营已满' : affordable ? '购 买' : '铜钱不足', {
         size: 24,
-        fill: canBuy ? '#273038' : THEME.panel,
+        fill: canBuy ? '#332c1d' : THEME.panel,
         stroke: canBuy ? THEME.goldDim : THEME.line,
         textColor: canBuy ? THEME.gold : THEME.textWeak,
       });
@@ -218,7 +219,10 @@ export class ShopScreen {
 
     // 特殊宝箱：稀有 / 史诗铜钱直购（广告宝箱入口已于 1.2.9 移除）
     const P = SHOP_LAYOUT.chestPanel;
-    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 18 });
+    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 18 });
+    carvedFrame(ctx, P.x, P.y, P.w, P.h, {
+      color: THEME.gold, alpha: 0.55, corner: 34, inset: 5, lw: 1.6, r: 18,
+    });
     text(ctx, '特殊宝箱 · 铜钱直购', 100, P.y + 30, {
       size: 26, color: THEME.goldDim,
     });
@@ -228,7 +232,8 @@ export class ShopScreen {
       const y = SHOP_LAYOUT.chestRowY[i];
       if (!type) return;
       const affordable = st.coins >= item.price;
-      drawChest(ctx, SHOP_LAYOUT.chestIconX, y + 22, SHOP_LAYOUT.chestIconS, { color: type.color });
+      drawChest(ctx, SHOP_LAYOUT.chestIconX, y + 22, SHOP_LAYOUT.chestIconS,
+        { color: type.color, kind: type.id });
       text(ctx, type.name, SHOP_LAYOUT.chestTextX, y + 12, { size: 26, color: THEME.text });
       text(ctx, `${item.price} 铜钱`, SHOP_LAYOUT.chestPriceX, y + 14, {
         size: 24, align: 'right', color: affordable ? THEME.gold : THEME.red,
@@ -240,7 +245,7 @@ export class ShopScreen {
       this.chestRects.push({ rect: btn, id: item.id });
       button(ctx, btn, affordable ? '购 买' : '铜钱不足', {
         size: 22,
-        fill: affordable ? '#273038' : THEME.panel,
+        fill: affordable ? '#332c1d' : THEME.panel,
         stroke: affordable ? THEME.goldDim : THEME.line,
         textColor: affordable ? THEME.gold : THEME.textWeak,
         disabled: !affordable,

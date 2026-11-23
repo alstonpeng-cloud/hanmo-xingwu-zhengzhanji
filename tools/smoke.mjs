@@ -75,6 +75,22 @@ try {
   titleLoadFailed = true;
   console.error('  ✗ 草书标题位图加载失败:', e.message);
 }
+// 板块 3/4：分包美术（12 英雄立绘 / 6 宝箱 / 5 器械 / 5 背景）同步预加载。
+// 冒烟是同步主流程，异步 loadImage 赶不上首帧；放进 preloaded 后平台 loadImage 会同步回调，
+// 截图因此是「真实启用美术」的画面，而不是程序化兜底。
+for (const dir of ['heroes', 'siege', 'art']) {
+  const base = path.resolve('assets', dir);
+  if (!fs.existsSync(base)) continue;
+  for (const name of fs.readdirSync(base)) {
+    if (!/\.(png|jpg)$/i.test(name)) continue;
+    const logical = `assets/${dir}/${name}`;
+    try {
+      preloaded.set(logical, await loadImage(path.resolve(logical)));
+    } catch (e) {
+      console.error(`  ✗ 美术素材预加载失败 ${logical}:`, e.message);
+    }
+  }
+}
 // 音频桩：记录播放事件，验证「音效真的被触发」而不是静默
 const audioPlayed = [];
 const platform = {
@@ -1185,7 +1201,7 @@ tap(98, 76); // 返回首页
   // 边框差异化：普通 / 稀有 / 史诗 / 传奇 四张牌的边框颜色必须互不相同
   game.draw();
   const cols = BARRACKS_LAYOUT.list.cols;
-  const FILL = [28, 36, 49];              // 兵牌底色 #1c2431，采样时排除它
+  const FILL = [36, 26, 22];              // 兵牌底色 #241a16（v2 暖褐），采样时排除它
   const borderOf = (i) => {
     const r = cardRect(i, cols, BARRACKS_LAYOUT.list.x0, BARRACKS_LAYOUT.list.y0, CARD);
     // 边框线宽 1.5~2.4 居中压在边沿：纵向扫 5 个像素，取离底色最远的那个

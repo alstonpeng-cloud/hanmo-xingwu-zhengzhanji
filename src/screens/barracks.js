@@ -1,13 +1,14 @@
 // 兵营：全部单位的小兵牌网格（容量 300），支持拖拽合成
 // 拖一张兵牌到另一个同兵种同等级的兵牌上 = 合到它身上（目标 +1 级，拖动的被消耗）
 // 点兵牌进详情页（可看属性 / 合成）；底部「一键合成」把全兵营两两合到不能再合
-import { THEME, text, panel, button, coinBadge, hit, backButton } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, hit, backButton, roundRectPath } from '../render/draw.js';
 import { CONFIG } from '../data/config.js';
 import {
   engineList, engineUnlocked, engineUnlockLevel, engineTier, engineStats,
   engineUpgradeCost, upgradeEngine, engineChoice, engineName,
 } from '../core/siege.js';
 import { drawEngineFigure } from '../render/engineArt.js';
+import { ART as ART_PATHS, drawArt } from '../render/packageArt.js';
 import { rosterSlots } from '../core/levels.js';
 import { autoMerge, AUTO_MERGE_MIN_UNITS } from '../core/merge.js';
 import { sortUnits, troopUnlocked, troopUnlockLevel } from '../core/units.js';
@@ -96,6 +97,7 @@ export class BarracksScreen {
   // opts.viewOnly：仅查看（从布阵进入时用），彻底禁用拿起 / 拖拽
   constructor(game, opts = {}) {
     this.game = game;
+    this.artBg = 'barracks';
     this.tutorialId = 'barracks';
     this.viewOnly = !!opts.viewOnly;
     this.page = 0;
@@ -379,17 +381,17 @@ export class BarracksScreen {
     const b = bookBonus(st);
     const P = BOOKS_VIEW.panel;
     ctx.save();
-    ctx.fillStyle = 'rgba(6,9,14,0.8)';
+    ctx.fillStyle = 'rgba(13,10,7,0.8)';
     ctx.fillRect(0, 0, g.W, g.H);
     ctx.restore();
-    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(18,23,27,0.98)', stroke: THEME.goldDim, r: 22, lw: 2 });
+    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(33,26,18,0.98)', stroke: THEME.goldDim, r: 22, lw: 2 });
     text(ctx, '兵 书', 375, P.y + 54, { size: 32, weight: '600', align: 'center' });
     text(ctx, `每卷 ${CONFIG.books.maxLevel} 级 · 每级 +2% · 铜钱升级`, 375, P.y + 92, {
       size: 18, align: 'center', color: THEME.textWeak,
     });
     for (const row of this.bookRows()) {
       panel(ctx, row.rect.x, row.rect.y, row.rect.w, row.rect.h, {
-        fill: 'rgba(27,34,39,0.9)', stroke: THEME.line, r: 16,
+        fill: 'rgba(43,34,23,0.9)', stroke: THEME.line, r: 16,
       });
       text(ctx, row.track.name, row.rect.x + 22, row.rect.y + 42, { size: 26, weight: '600' });
       text(ctx, row.track.note, row.rect.x + 22, row.rect.y + 74, { size: 18, color: THEME.textWeak });
@@ -406,7 +408,7 @@ export class BarracksScreen {
         const afford = st.coins >= row.cost;
         button(ctx, row.btn, `升级 ${fmtNum(row.cost)}`, {
           size: 18,
-          fill: afford ? '#273038' : THEME.panel,
+          fill: afford ? '#332c1d' : THEME.panel,
           stroke: afford ? THEME.goldDim : THEME.line,
           textColor: afford ? THEME.gold : THEME.textWeak,
         });
@@ -460,14 +462,34 @@ export class BarracksScreen {
     const stage = Math.max(1, Number(st.maxCleared) || 1);
     const choice = engineChoice(st);
     ctx.save();
-    ctx.fillStyle = 'rgba(6,9,14,0.8)';
+    ctx.fillStyle = 'rgba(13,10,7,0.8)';
     ctx.fillRect(0, 0, g.W, g.H);
     ctx.restore();
-    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(18,23,27,0.98)', stroke: THEME.goldDim, r: 22, lw: 2 });
+    panel(ctx, P.x, P.y, P.w, P.h, { fill: 'rgba(33,26,18,0.98)', stroke: THEME.goldDim, r: 22, lw: 2 });
     text(ctx, '器 械', 375, P.y + 54, { size: 32, weight: '600', align: 'center' });
     text(ctx, `每台 ${CONFIG.siege.maxLevel} 档 · 基础强度跟随关卡，升级只加额外增幅`, 375, P.y + 92, {
       size: 17, align: 'center', color: THEME.textWeak, maxWidth: P.w - 50,
     });
+    // 板块 4a · 器械图谱：标题与卡片之间原本是 68px 空带，铺成「器械陈列」。
+    // 5 张 3D 建模贴图全部在此真实出镜（战场只用到其中 2 张），
+    // 未下载好分包时 drawArt 返回 false，静默留空不影响任何交互。
+    const GALLERY = ['catapult', 'ram', 'ballista', 'war_drum', 'shield_cart'];
+    const gy = P.y + 106;
+    const cellW = 118;
+    const cellGap = (P.w - 32 - GALLERY.length * cellW) / (GALLERY.length - 1);
+    for (let i = 0; i < GALLERY.length; i += 1) {
+      const gx = P.x + 16 + i * (cellW + cellGap);
+      ctx.save();
+      roundRectPath(ctx, gx, gy, cellW, 54, 8);
+      ctx.fillStyle = 'rgba(58,46,30,0.55)';
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(213,153,71,0.34)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+      drawArt(ctx, ART_PATHS.siege(GALLERY[i]), gx + cellW / 2, gy + 27,
+        cellW - 6, 50, { alpha: 0.92, shadow: 3 });
+    }
     for (const card of siegeCards()) {
       const r = card.rect;
       const unlocked = engineUnlocked(st, card.id);
@@ -475,7 +497,7 @@ export class BarracksScreen {
       const picked = !!choice && choice.id === card.id;
       const s = engineStats(card.id, tier, stage);
       panel(ctx, r.x, r.y, r.w, r.h, {
-        fill: 'rgba(27,34,39,0.9)',
+        fill: 'rgba(43,34,23,0.9)',
         stroke: picked ? THEME.gold : THEME.line, r: 16,
       });
       // 左半边：器械建模（未解锁压暗）
@@ -509,7 +531,7 @@ export class BarracksScreen {
         const afford = st.coins >= cost;
         button(ctx, btn, `升级 ${fmtNum(cost)}`, {
           size: 19,
-          fill: afford ? '#273038' : THEME.panel,
+          fill: afford ? '#332c1d' : THEME.panel,
           stroke: afford ? THEME.goldDim : THEME.line,
           textColor: afford ? THEME.gold : THEME.textWeak,
         });
@@ -533,7 +555,7 @@ export class BarracksScreen {
     const deployed = new Set((Array.isArray(st.formation) ? st.formation : []).filter(Boolean));
     const undeployed = units.filter((u) => !deployed.has(u.id)).length;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '兵 营', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
@@ -596,7 +618,7 @@ export class BarracksScreen {
       const ratio = VIEW.h / (VIEW.h + max);
       const h = Math.max(26, (VIEW.h - 4) * ratio);
       const sy = VIEW.y + 2 + (VIEW.h - 4 - h) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(213,153,71,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     // 拖拽悬停反馈
@@ -623,7 +645,7 @@ export class BarracksScreen {
     // #dev-only:start
     // 开发者通道：小 DEV 入口（右下），点击后弹明确标注的调试面板
     button(ctx, BARRACKS_LAYOUT.devRect, 'DEV', {
-      size: 13, fill: 'rgba(27,34,39,0.5)', stroke: '#8a6420', textColor: '#e8b44c',
+      size: 13, fill: 'rgba(43,34,23,0.5)', stroke: '#8a6a32', textColor: '#d59947',
     });
     // #dev-only:end
     text(ctx, `武将位 ×${CONFIG.roster.heroSlots}（预留）`, 44, 892, {
@@ -652,7 +674,7 @@ export class BarracksScreen {
 
     if (this.canAutoMerge()) {
       button(ctx, BARRACKS_LAYOUT.mergeAllRect, '一键合成', {
-        size: 26, fill: '#273038', stroke: THEME.goldDim, textColor: THEME.gold,
+        size: 26, fill: '#332c1d', stroke: THEME.goldDim, textColor: THEME.gold,
       });
     }
     button(ctx, BARRACKS_LAYOUT.deployRect, this.viewOnly ? '返回布阵' : '去布阵上阵', {
@@ -666,11 +688,11 @@ export class BarracksScreen {
     // 开发者通道面板：明确标注只给调试 / 体验
     if (this.devOpen) {
       ctx.save();
-      ctx.fillStyle = 'rgba(6,9,14,0.78)';
+      ctx.fillStyle = 'rgba(13,10,7,0.78)';
       ctx.fillRect(0, 0, W, g.H);
       ctx.restore();
-      panel(ctx, 100, 420, 550, 460, { fill: 'rgba(18,23,27,0.98)', stroke: '#8a6420', r: 22, lw: 2 });
-      text(ctx, '开发者通道 · 兵营', W / 2, 468, { size: 26, align: 'center', color: '#e8b44c' });
+      panel(ctx, 100, 420, 550, 460, { fill: 'rgba(33,26,18,0.98)', stroke: '#8a6a32', r: 22, lw: 2 });
+      text(ctx, '开发者通道 · 兵营', W / 2, 468, { size: 26, align: 'center', color: '#d59947' });
       text(ctx, '仅用于调试 / 体验，不属于正常玩家功能', W / 2, 506, {
         size: 15, align: 'center', color: THEME.textWeak,
       });
@@ -685,7 +707,7 @@ export class BarracksScreen {
         });
       } else {
         button(ctx, BARRACKS_LAYOUT.devGrantRect, '每个兵种各发 1 个', {
-          size: 24, fill: '#273038', stroke: '#e8b44c', textColor: '#f8e1ac',
+          size: 24, fill: '#332c1d', stroke: '#d59947', textColor: '#f4d488',
         });
         text(ctx, '包含全部特殊兵种；兵营满时只发能放下的', W / 2, 730, {
           size: 15, align: 'center', color: THEME.textDim,

@@ -1,5 +1,5 @@
 // 宝箱页：常规箱（小木 / 银 / 金）+ 特殊箱（稀有 / 史诗 / 传奇），铂金 / 玄玉先占位
-import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, hit, backButton, infoBadge, infoModal, carvedFrame } from '../render/draw.js';
 import { chestTypes, chestCount, chestTotal, openChest, chestLevelBonus } from '../core/chests.js';
 import { rosterSlots } from '../core/levels.js';
 import { unitName, rarityOf, rarityInfo } from '../core/units.js';
@@ -15,6 +15,7 @@ const ROW_GAP = 8;
 export class ChestScreen {
   constructor(game) {
     this.game = game;
+    this.artBg = 'recruit';
     this.tutorialId = 'chests';
     this.backRect = { x: 36, y: 44, w: 124, h: 64 };
     this.rows = [];
@@ -76,7 +77,7 @@ export class ChestScreen {
     const full = st.units.length >= slots.unlocked;
     const total = chestTotal(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     // 紫气为宝箱系统色，标题用色相承担导航
     text(ctx, '宝 箱', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center', color: THEME.treasure, serif: true });
@@ -138,10 +139,18 @@ export class ChestScreen {
     this.rows.push({ type, openRect: canOpen ? openRect : null });
 
     panel(ctx, x, y, ROW_W, ROW_H, {
-      fill: count > 0 ? 'rgba(39,48,56,0.72)' : 'rgba(27,34,39,0.6)',
+      fill: count > 0 ? 'rgba(58,46,30,0.72)' : 'rgba(43,34,23,0.6)',
       stroke: count > 0 ? type.color : THEME.line,
       r: 18,
       lw: count > 0 ? 2 : 1,
+    });
+    // S2.2：云纹角花。有货的箱子用自身品级色描边，空箱只留极淡的暗金，
+    // 视觉层级与「能不能开」直接对应，且不改 panel 的命中区域。
+    carvedFrame(ctx, x, y, ROW_W, ROW_H, {
+      color: count > 0 ? type.color : THEME.goldDim,
+      alpha: count > 0 ? 0.72 : 0.30,
+      corner: 26, inset: 4, lw: count > 0 ? 1.8 : 1.2,
+      r: 18, inner: false,
     });
 
     drawChest(ctx, x + 58, y + 50, 0.5, {
@@ -159,7 +168,7 @@ export class ChestScreen {
 
     if (canOpen) {
       button(ctx, openRect, '开 箱', {
-        size: 26, fill: '#221f2b', stroke: type.color, textColor: type.color,
+        size: 26, fill: '#241a16', stroke: type.color, textColor: type.color,
       });
     } else {
       button(ctx, openRect, full ? '兵营已满' : '暂无宝箱', {

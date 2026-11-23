@@ -1,10 +1,10 @@
-import { THEME, text, panel, button, coinBadge, hit, bar, screenDim, roundRectPath, primaryButton, eventOrb, menuBackdrop } from '../render/draw.js';
+import { THEME, text, panel, button, coinBadge, hit, bar, screenDim, roundRectPath, primaryButton, eventOrb, menuBackdrop, carvedFrame } from '../render/draw.js';
 import { now as clockNow } from '../core/clock.js';
 import { CONFIG } from '../data/config.js';
 import { levelTotal, rosterSlots, autoBattleUnlocked } from '../core/levels.js';
 import { cityOfLevel, chapterOfLevel } from '../core/chapters.js';
 import { maxLevel } from '../core/merge.js';
-import { chestTotal, chestType } from '../core/chests.js';
+import { chestType } from '../core/chests.js';
 import { ensureIdleAt, idleAccrued, claimIdle } from '../core/idle.js';
 import { idleChestState, claimIdleChest, ensureIdleChest, formatIdleCountdown } from '../core/idleChest.js';
 import { drawChest } from '../render/chest.js';
@@ -346,7 +346,8 @@ export class HomeScreen {
     menuBackdrop(ctx, W, g.H, { t: this.t });
 
     // 顶部信息条
-    panel(ctx, 40, 40, 670, 74, { fill: 'rgba(27,34,39,0.75)', stroke: THEME.line, r: 18 });
+    panel(ctx, 40, 40, 670, 74, { fill: 'rgba(43,34,23,0.75)', stroke: THEME.line, r: 18 });
+    carvedFrame(ctx, 40, 40, 670, 74, { color: THEME.goldSoft, alpha: 0.55, corner: 20, inset: 3, lw: 1.6, r: 18, inner: false });
     text(ctx, '铜钱', 74, 77, { size: 24, color: THEME.textDim });
     coinBadge(ctx, 138, 77, st.coins, { size: 26 });
 
@@ -356,7 +357,7 @@ export class HomeScreen {
       size: 21,
       sub: dailyUnlocked(st) ? '签到 · 任务 · 7 日登录' : `通关 ${CONFIG.daily.unlockLevel} 关开放`,
       subSize: 14,
-      fill: dailyReady ? '#273038' : THEME.panel,
+      fill: dailyReady ? '#332c1d' : THEME.panel,
       stroke: dailyReady ? THEME.goldDim : THEME.line,
       textColor: dailyReady ? THEME.gold : THEME.textDim,
     });
@@ -392,7 +393,7 @@ export class HomeScreen {
         : `主线 ${CONFIG.heroBattles.unlockLevel} 关解锁`,
       subSize: 16,
       fill: hbOpen ? '#3a241e' : THEME.panel,
-      stroke: hbOpen ? '#c0392b' : THEME.line,
+      stroke: hbOpen ? '#8d301b' : THEME.line,
       textColor: hbOpen ? '#e8a094' : THEME.textWeak,
     });
 
@@ -412,7 +413,7 @@ export class HomeScreen {
       size: 26,
       sub: `节点 ${growthDone}/${GROWTH_NODES.length}`,
       subSize: 16,
-      fill: growthDone >= GROWTH_NODES.length ? '#273038' : THEME.panel,
+      fill: growthDone >= GROWTH_NODES.length ? '#332c1d' : THEME.panel,
       stroke: growthDone >= GROWTH_NODES.length ? THEME.goldDim : THEME.line,
       textColor: growthDone >= GROWTH_NODES.length ? THEME.gold : THEME.text,
     });
@@ -423,7 +424,7 @@ export class HomeScreen {
       size: 21,
       sub: soundOn ? 'BGM · 音效 设置' : '已静音',
       subSize: 14,
-      fill: this.audioOpen || soundOn ? '#273038' : THEME.panel,
+      fill: this.audioOpen || soundOn ? '#332c1d' : THEME.panel,
       stroke: this.audioOpen || soundOn ? THEME.goldDim : THEME.line,
       textColor: this.audioOpen || soundOn ? THEME.gold : THEME.textWeak,
     });
@@ -456,48 +457,50 @@ export class HomeScreen {
         : `第 ${st.maxCleared + 1} 关待挑战 · 主线 ${CONFIG.autoBattle.unlockLevel} 关开放自动战斗`,
       size: 44, subSize: 20, t: this.t,
     });
-    const chests = chestTotal(st);
-    // 哑光金主入口（商城 / 兵营）：外发光 + 金边 + 金亮字，比周围灰底入口更抓眼
-    const goldEntryGlow = (rect) => {
+    // S2.2：主按钮四角云纹雕花，复刻参考图 01 朱砂「闯关」牌的鎏金角花
+    carvedFrame(ctx, r.battle.x, r.battle.y, r.battle.w, r.battle.h, {
+      color: THEME.goldLit, alpha: 0.8, corner: 34, inset: 3, lw: 2.2, r: 18, glow: 6,
+    });
+    // 三个常用入口用金色 / 淡紫色 / 亮绿色实底，并配同色外发光
+    const entryGlow = (rect, rgb) => {
       ctx.save();
-      ctx.shadowColor = 'rgba(232,180,76,0.42)';
+      ctx.shadowColor = `rgba(${rgb},0.42)`;
       ctx.shadowBlur = 24;
       roundRectPath(ctx, rect.x, rect.y, rect.w, rect.h, 18);
-      ctx.strokeStyle = 'rgba(232,180,76,0.55)';
+      ctx.strokeStyle = `rgba(${rgb},0.55)`;
       ctx.lineWidth = 2.5;
       ctx.stroke();
       ctx.restore();
     };
-    // 兵营（内含布阵 / 合成） + 招募系统（250 关解锁）并排
-    // 三个常用入口只留标题，不写说明（首页做减法）
-    goldEntryGlow(r.barracks);
+    // 四个入口：参考图 01 为「深褐近黑实底 + 细描边 + 亮色文字」，
+    // 不用高饱和纯色块（S2.1 回退时一并修正，避免破坏暖褐暗金的整体氛围）。
+    entryGlow(r.barracks, '170,150,110');
     button(ctx, r.barracks, '兵 营', {
-      size: 36, fill: '#2b2419', stroke: THEME.gold,
-      textColor: THEME.goldLit,
+      size: 36, fill: '#241c14', stroke: THEME.goldDim,
+      textColor: THEME.text, subColor: THEME.textDim,
       sub: `${st.units.length} / ${rosterSlots(st.maxCleared).unlocked} 个兵`,
       subSize: 17,
     });
     const heroOpen = st.maxCleared >= CONFIG.heroes.unlockLevel;
-    // 「墨韵丹符」色相即导航：招募/宝箱=紫气（珍藏），商城=青蚨（交易）
+    // 招募系统：深紫褐底 + 紫气描边，与兵营的深褐底拉开层级
     button(ctx, r.hero, '招 募 系 统', {
       sub: heroOpen
         ? `招募券 ${heroTickets(st)} · 已拥有 ${unlockedHeroes(st).length}/${HEROES.length}`
         : `通关 ${CONFIG.heroes.unlockLevel} 关开放`,
       size: 27, subSize: heroOpen ? 19 : 16,
-      fill: heroOpen ? '#241d33' : THEME.panel2,
-      stroke: heroOpen ? THEME.treasure : THEME.line,
-      textColor: heroOpen ? THEME.treasure : THEME.textWeak,
+      fill: heroOpen ? '#2a1f2b' : THEME.panel2,
+      stroke: heroOpen ? THEME.purple : THEME.line,
+      textColor: heroOpen ? '#c9a0d0' : THEME.textWeak,
     });
+    entryGlow(r.chests, '213,153,71');
     button(ctx, r.chests, '宝 箱', {
-      size: 34,
-      fill: chests > 0 ? '#241d33' : THEME.panel2,
-      stroke: chests > 0 ? THEME.treasure : THEME.line,
-      textColor: chests > 0 ? THEME.treasure : THEME.text,
-    });
-    goldEntryGlow(r.shop);
-    button(ctx, r.shop, '商 城', {
-      size: 36, fill: '#2b2419', stroke: THEME.gold,
+      size: 34, fill: '#2a2016', stroke: THEME.gold,
       textColor: THEME.goldLit,
+    });
+    entryGlow(r.shop, '120,150,150');
+    button(ctx, r.shop, '商 城', {
+      size: 36, fill: '#202a2c', stroke: '#5b7280',
+      textColor: '#dce4e6',
     });
 
     // 挂机收益（离线 / 在线都在累积，封顶 8 小时）
@@ -529,7 +532,7 @@ export class HomeScreen {
         ? (claimable > 0 ? `可领取 ${claimable} 项奖励` : `已解锁 ${ACHIEVEMENTS.length} 条成就`)
         : `通关 ${CONFIG.achievements.unlockLevel} 关开放`,
       subSize: 15,
-      fill: claimable > 0 ? '#273038' : THEME.panel2,
+      fill: claimable > 0 ? '#332c1d' : THEME.panel2,
       stroke: claimable > 0 ? THEME.goldDim : THEME.line,
       textColor: claimable > 0 ? THEME.gold : achOpen ? THEME.text : THEME.textWeak,
     });
@@ -549,7 +552,7 @@ export class HomeScreen {
     });
     button(ctx, r.reset, '重置存档', { size: 22, fill: THEME.panel, stroke: THEME.redDim, textColor: THEME.textDim });
     button(ctx, r.devTest, '开发者测试场', {
-      size: 22, fill: '#1b2227', stroke: THEME.goldDim, textColor: THEME.gold,
+      size: 22, fill: '#2b2217', stroke: THEME.goldDim, textColor: THEME.gold,
     });
     text(ctx, '以上按钮为开发者通道，正式版会移除', W / 2, 1364, { size: 18, align: 'center', color: THEME.textWeak });
     // #dev-only:end
@@ -609,7 +612,7 @@ export class HomeScreen {
     text(ctx, '声音 / 震动总开关', 130, 570, { size: 22, color: THEME.text });
     button(ctx, L.master, on ? '开 启' : '已 关 闭', {
       size: 22,
-      fill: on ? '#273038' : THEME.panel2,
+      fill: on ? '#332c1d' : THEME.panel2,
       stroke: on ? THEME.goldDim : THEME.line,
       textColor: on ? THEME.gold : THEME.textWeak,
     });
@@ -617,7 +620,7 @@ export class HomeScreen {
     // 音量滑条：点击轨道直接设置，圆点显示当前位置
     const drawSlider = (b, ratio, color, label, yText) => {
       text(ctx, label, 130, yText, { size: 22, color: THEME.text });
-      bar(ctx, b.x, b.y, b.w, b.h, ratio, { fill: color, stroke: '#36404a', r: 9 });
+      bar(ctx, b.x, b.y, b.w, b.h, ratio, { fill: color, stroke: '#4a3a24', r: 9 });
       ctx.save();
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -659,13 +662,13 @@ export class HomeScreen {
     const r = this.rects.idleClaim;
     const coins = idleAccrued(st, this.nowMs);
 
-    panel(ctx, 70, 842, 610, 138, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 18 });
+    panel(ctx, 70, 842, 610, 138, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 18 });
 
     // 左半：只留一个大的铜钱图标 + 当前可领取数量（不写任何说明小字）
     coinBadge(ctx, 100, 882, coins, { size: 42 });
     button(ctx, r, coins > 0 ? '领 取' : '暂无可领', {
       size: 24,
-      fill: coins > 0 ? '#273038' : THEME.panel,
+      fill: coins > 0 ? '#332c1d' : THEME.panel,
       stroke: coins > 0 ? THEME.goldDim : THEME.line,
       textColor: coins > 0 ? THEME.gold : THEME.textWeak,
       disabled: coins <= 0,

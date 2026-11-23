@@ -445,6 +445,7 @@ export const CONFIG = {
     speedUnlockLevel: 10, // 主线 10 关前锁 1 倍速（按钮置灰 + 一句提示）
     attackAnimTime: 0.55, // 单次出手动画时长（1 倍速，秒）
     hitAnimTime: 0.30,
+    skillAnimTime: 0.85, // 英雄技能起手 / 释放 / 收势整段时长（1 倍速，秒）
     // 阵亡单位当帧消失，不再保留倒地动画与尸体淡出配置
     // 出手顺序由兵种 order 决定：小 = 先出手
   },
@@ -1204,13 +1205,14 @@ export const CONFIG = {
   /* ============ 稀有度 ============ */
   // 普通 → 稀有 → 史诗 → 传奇 → 英雄（武将）。
   // 特殊兵种在 troops 里标一个 rarity，兵牌边框 / 宝箱 / 详情页都按这个配色走。
-  // 「墨韵丹符」品级色：普通玄铁灰 / 稀有靛青 / 史诗紫气 / 传奇鎏金 / 英雄丹砂
+  // 「汉帛·朱金」v2 品级色（S2.1）：普通暖灰 / 稀有靛青 / 史诗实测紫 / 传奇实测金 / 英雄朱砂
+  // 色值对齐 12 张参考图程序化取色，见 docs/精细化改造/baseline.json
   rarity: {
-    common: { name: '普通', color: '#8c9ba7' },
-    rare: { name: '稀有', color: '#5b9bd5' },
-    epic: { name: '史诗', color: '#9b77cf' },
-    legendary: { name: '传奇', color: '#e8b44c' },
-    hero: { name: '英雄', color: '#c0392b' },
+    common: { name: '普通', color: '#8a7d64' },
+    rare: { name: '稀有', color: '#5b7c99' },
+    epic: { name: '史诗', color: '#96659a' },
+    legendary: { name: '传奇', color: '#d59947' },
+    hero: { name: '英雄', color: '#8d301b' },
   },
   // 特殊兵种相对「同兵种线普通兵」的属性倍率（只影响 1 级基础值，成长率沿用基础兵种）
   // 平衡目标：1 级传奇 ≈ 3 级史诗 ≈ 5~7 级稀有 / 8 级普通（单兵口径，含战法常驻倍率 / 毒伤）。

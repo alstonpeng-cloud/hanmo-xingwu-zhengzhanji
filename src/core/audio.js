@@ -2,8 +2,10 @@
 // 逻辑层不依赖 DOM：负责「按场景切 BGM、音量、静音、音效节流、主曲缺失时回退」
 // 切场景时只暂停 / 恢复两套缓存播放器，不销毁重建，尽量不打断正在播的音乐。
 import { CONFIG } from '../data/config.js';
+import { resolveAsset, onPackageReady } from './subpackage.js';
 
 let backend = null;
+let unsubPackage = null;
 let enabled = true;
 let bgmVolume = CONFIG.audio.bgmVolume;
 let sfxVolume = CONFIG.audio.sfxVolume;
@@ -64,17 +66,47 @@ function loadTrack(rec, src, allowFallback) {
 }
 
 function ensureTrack(kind) {
-  if (!CONFIG.audio.bgm[kind]) return null;
+  const conf = CONFIG.audio.bgm[kind];
+  if (!conf) return null;
   let rec = tracks.get(kind);
   if (!rec) {
-    rec = { kind, player: null, fallback: false, gaveUp: false, token: 0 };
+    rec = { kind, player: null, fallback: false, gaveUp: false, pendingUpgrade: false, token: 0 };
     tracks.set(kind, rec);
   }
   if (!rec.player && !rec.gaveUp) {
-    rec.fallback = false;
-    loadTrack(rec, CONFIG.audio.bgm[kind].src, true);
+    const real = resolveAsset(conf.src);
+    if (real === null) {
+      // 高音质主曲还在分包里：先用主包 48KB 占位循环顶上，避免首屏静音。
+      // 分包就绪后 upgradeTracks() 会在同一条轨道上换成正式曲目。
+      rec.pendingUpgrade = true;
+      if (conf.fallback) loadTrack(rec, conf.fallback, false);
+    } else {
+      rec.pendingUpgrade = false;
+      rec.fallback = false;
+      loadTrack(rec, real, true);
+    }
   }
   return rec;
+}
+
+// 分包下载完成：把「占位循环」平滑升级为高音质主曲，不断开正在播放的场景轨。
+function upgradeTracks() {
+  if (!backend) return;
+  for (const [kind, rec] of tracks) {
+    if (!rec.pendingUpgrade) continue;
+    const conf = CONFIG.audio.bgm[kind];
+    const real = conf && resolveAsset(conf.src);
+    if (!real) continue;
+    rec.pendingUpgrade = false;
+    rec.gaveUp = false;
+    rec.fallback = false;
+    if (rec.player) {
+      try { rec.player.destroy(); } catch (e) {}
+      rec.player = null;
+    }
+    loadTrack(rec, real, true);
+  }
+  if (desiredKind !== 'none' && enabled && hasGesture) playKind(desiredKind);
 }
 
 function pauseAllMusic() {
@@ -141,6 +173,12 @@ export function initAudio(audioBackend, opts = {}) {
   bgmVolume = clampVolume(opts.bgmVolume ?? CONFIG.audio.bgmVolume, CONFIG.audio.bgmVolume);
   sfxVolume = clampVolume(opts.sfxVolume ?? CONFIG.audio.sfxVolume, CONFIG.audio.sfxVolume);
   // 不自动起 BGM：由 Game.syncBgm 根据当前页面（主 / 商城）决定
+  // 订阅高音质 BGM 分包：就绪时把占位循环升级成正式主曲（本地预览会立即回调）。
+  if (unsubPackage) {
+    try { unsubPackage(); } catch (e) {}
+    unsubPackage = null;
+  }
+  unsubPackage = onPackageReady('audio', () => upgradeTracks());
 }
 
 export function isAudioEnabled() {
@@ -251,6 +289,7 @@ export function audioState() {
     mainReady: !!(main && main.player),
     shopReady: !!(shop && shop.player),
     usingFallback: !!(main && main.fallback),
+    pendingUpgrade: !!(main && main.pendingUpgrade),
     bgmVolume,
     sfxVolume,
   };

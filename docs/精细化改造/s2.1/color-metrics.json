@@ -1,0 +1,235 @@
+{
+  "stage": "s2.1",
+  "summary": {
+    "ref": {
+      "warm": 59.0,
+      "cold": 0.3
+    },
+    "before": {
+      "warm": 14.3,
+      "cold": 11.1
+    },
+    "after": {
+      "warm": 43.8,
+      "cold": 0.1
+    }
+  },
+  "screens": {
+    "01_首页": {
+      "shot": "01_home.png",
+      "ref": {
+        "warm": 46.0,
+        "cold": 0.0,
+        "hue": 35.6
+      },
+      "before": {
+        "warm": 15.2,
+        "cold": 14.3,
+        "hue": 101.0
+      },
+      "after": {
+        "warm": 51.7,
+        "cold": 0.3,
+        "hue": 31.4
+      }
+    },
+    "02_关卡": {
+      "shot": "02_levels.png",
+      "ref": {
+        "warm": 51.7,
+        "cold": 0.0,
+        "hue": 34.4
+      },
+      "before": {
+        "warm": 3.5,
+        "cold": 10.4,
+        "hue": 122.4
+      },
+      "after": {
+        "warm": 49.1,
+        "cold": 0.0,
+        "hue": 34.9
+      }
+    },
+    "03_商城": {
+      "shot": "26_shop.png",
+      "ref": {
+        "warm": 60.4,
+        "cold": 0.0,
+        "hue": 30.1
+      },
+      "before": {
+        "warm": 5.0,
+        "cold": 8.2,
+        "hue": 102.8
+      },
+      "after": {
+        "warm": 44.6,
+        "cold": 0.0,
+        "hue": 33.4
+      }
+    },
+    "04_战斗": {
+      "shot": "48g_battle_heroes.png",
+      "ref": {
+        "warm": 92.5,
+        "cold": 0.1,
+        "hue": 27.0
+      },
+      "before": {
+        "warm": 74.7,
+        "cold": 0.9,
+        "hue": 32.3
+      },
+      "after": {
+        "warm": 82.7,
+        "cold": 0.4,
+        "hue": 32.1
+      }
+    },
+    "05_结算": {
+      "shot": "12_result.png",
+      "ref": {
+        "warm": 60.6,
+        "cold": 0.1,
+        "hue": 33.1
+      },
+      "before": {
+        "warm": 4.8,
+        "cold": 43.7,
+        "hue": 168.4
+      },
+      "after": {
+        "warm": 60.5,
+        "cold": 0.2,
+        "hue": 31.4
+      }
+    },
+    "06_布阵": {
+      "shot": "03_deploy.png",
+      "ref": {
+        "warm": 72.2,
+        "cold": 0.9,
+        "hue": 32.6
+      },
+      "before": {
+        "warm": 45.8,
+        "cold": 4.5,
+        "hue": 38.4
+      },
+      "after": {
+        "warm": 58.7,
+        "cold": 0.0,
+        "hue": 31.9
+      }
+    },
+    "07_每周挑战": {
+      "shot": "65a_weekly_stages.png",
+      "ref": {
+        "warm": 48.7,
+        "cold": 0.0,
+        "hue": 34.4
+      },
+      "before": {
+        "warm": 1.7,
+        "cold": 11.7,
+        "hue": 175.6
+      },
+      "after": {
+        "warm": 21.3,
+        "cold": 0.0,
+        "hue": 34.8
+      }
+    },
+    "08_每日挑战": {
+      "shot": "66_daily_challenge.png",
+      "ref": {
+        "warm": 57.9,
+        "cold": 0.0,
+        "hue": 30.7
+      },
+      "before": {
+        "warm": 2.2,
+        "cold": 7.5,
+        "hue": 153.4
+      },
+      "after": {
+        "warm": 21.5,
+        "cold": 0.0,
+        "hue": 35.9
+      }
+    },
+    "09_招募": {
+      "shot": "48b_hero_screen.png",
+      "ref": {
+        "warm": 70.7,
+        "cold": 0.1,
+        "hue": 30.9
+      },
+      "before": {
+        "warm": 8.0,
+        "cold": 5.3,
+        "hue": 78.0
+      },
+      "after": {
+        "warm": 42.9,
+        "cold": 0.1,
+        "hue": 36.8
+      }
+    },
+    "10_宝箱": {
+      "shot": "25b_chests.png",
+      "ref": {
+        "warm": 60.4,
+        "cold": 0.0,
+        "hue": 28.0
+      },
+      "before": {
+        "warm": 2.7,
+        "cold": 4.4,
+        "hue": 149.7
+      },
+      "after": {
+        "warm": 21.6,
+        "cold": 0.0,
+        "hue": 32.2
+      }
+    },
+    "11_兵营": {
+      "shot": "14_barracks.png",
+      "ref": {
+        "warm": 42.9,
+        "cold": 1.9,
+        "hue": 42.9
+      },
+      "before": {
+        "warm": 3.4,
+        "cold": 12.4,
+        "hue": 170.1
+      },
+      "after": {
+        "warm": 22.0,
+        "cold": 0.8,
+        "hue": 45.2
+      }
+    },
+    "13_战败结算": {
+      "shot": "37_result_fail_counter_ring.png",
+      "ref": {
+        "warm": 44.5,
+        "cold": 0.0,
+        "hue": 32.5
+      },
+      "before": {
+        "warm": 4.4,
+        "cold": 10.1,
+        "hue": 122.1
+      },
+      "after": {
+        "warm": 48.6,
+        "cold": 0.0,
+        "hue": 31.2
+      }
+    }
+  }
+}

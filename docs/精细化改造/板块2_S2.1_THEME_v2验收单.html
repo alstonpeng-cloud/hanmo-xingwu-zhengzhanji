@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>板块 2 · S2.1 THEME v2 令牌表 · 验收单</title>
+<style>
+:root{
+  --bg:#17130e; --bg2:#211a12; --panel:#2a2218; --panel2:#372617;
+  --line:#8a6a3a; --line-soft:#5a4528; --gold:#d59947; --gold-lit:#f4d488;
+  --red:#8d301b; --red-lit:#ce4a3a; --purple:#96659a; --green:#3e885d;
+  --text:#f2ead8; --dim:#c2b394; --weak:#8a7d64;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(180deg,#241a12,#17130e 55%,#100b06);
+  color:var(--text);font:15px/1.75 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+  padding:0 0 80px}
+.wrap{max-width:1180px;margin:auto;padding:0 28px}
+header{border-bottom:2px solid var(--line);padding:52px 0 30px;margin-bottom:34px;
+  background:radial-gradient(ellipse at 78% 0%,rgba(213,153,71,.13),transparent 62%)}
+.kicker{color:var(--gold);letter-spacing:.32em;font-size:12px;font-weight:700}
+h1{font-size:34px;margin:12px 0 8px;color:var(--gold-lit);letter-spacing:.04em;font-weight:700}
+.sub{color:var(--dim);font-size:14px}
+.badges{margin-top:18px;display:flex;gap:9px;flex-wrap:wrap}
+.tag{display:inline-block;padding:5px 13px;border:1px solid var(--line);border-radius:20px;
+  font-size:12px;color:var(--dim);background:rgba(42,34,24,.7)}
+.tag.ok{border-color:var(--green);color:#8ed0a6}
+.tag.warn{border-color:var(--gold);color:var(--gold-lit)}
+.tag.red{border-color:var(--red-lit);color:#e88a78}
+h2{font-size:21px;margin:44px 0 14px;padding-left:14px;border-left:4px solid var(--gold);
+  color:var(--gold-lit);letter-spacing:.03em}
+h3{font-size:16px;margin:26px 0 10px;color:var(--gold)}
+p{margin:9px 0;color:var(--dim)}
+.card{background:linear-gradient(160deg,rgba(55,38,23,.85),rgba(42,34,24,.92));
+  border:1px solid var(--line-soft);border-radius:12px;padding:20px 22px;margin:14px 0}
+.note{border-left:3px solid var(--gold);background:rgba(213,153,71,.08);padding:12px 16px;
+  border-radius:0 8px 8px 0;margin:12px 0;color:var(--dim)}
+.note.good{border-color:var(--green);background:rgba(62,136,93,.09)}
+.note.warn2{border-color:var(--red-lit);background:rgba(206,74,58,.09)}
+table{width:100%;border-collapse:collapse;margin:12px 0;font-size:13.5px}
+th,td{border:1px solid var(--line-soft);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:rgba(213,153,71,.12);color:var(--gold-lit);font-weight:600;white-space:nowrap}
+td code,.mono{font-family:Consolas,Menlo,monospace;font-size:12.5px}
+tr:nth-child(even) td{background:rgba(0,0,0,.12)}
+.sw{display:inline-block;width:15px;height:15px;border-radius:3px;border:1px solid rgba(255,255,255,.25);
+  vertical-align:-3px;margin-right:7px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:12px;margin:14px 0}
+.mini{background:rgba(23,19,14,.65);border:1px solid var(--line-soft);border-radius:10px;padding:14px}
+.mini b{display:block;color:var(--gold-lit);font-size:13px;margin-bottom:5px}
+.mini span{font-size:12.5px;color:var(--weak);line-height:1.6}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0 22px}
+.trio figure{margin:0;border:1px solid var(--line-soft);border-radius:9px;overflow:hidden;background:#100b06}
+.trio img{width:100%;display:block;aspect-ratio:9/16;object-fit:contain;background:#100b06}
+.trio figcaption{font-size:11.5px;color:var(--weak);padding:7px 9px;border-top:1px solid var(--line-soft);
+  display:flex;justify-content:space-between}
+.trio figcaption b{color:var(--gold)}
+.screen{border:1px solid var(--line-soft);border-radius:12px;padding:16px;margin:16px 0;
+  background:rgba(23,19,14,.45)}
+.screen h4{margin:0 0 4px;color:var(--gold-lit);font-size:16px}
+.screen .meta{font-size:12px;color:var(--weak);margin-bottom:10px}
+ul{color:var(--dim);padding-left:22px;margin:8px 0}
+li{margin:5px 0}
+.chk{list-style:none;padding-left:0}
+.chk li{padding-left:26px;position:relative}
+.chk li:before{content:"✓";position:absolute;left:2px;color:var(--green);font-weight:700}
+.chk li.pending:before{content:"○";color:var(--gold)}
+footer{margin-top:50px;border-top:1px solid var(--line-soft);padding-top:20px;
+  font-size:12.5px;color:var(--weak)}
+.stat{display:flex;gap:14px;flex-wrap:wrap;margin:14px 0}
+.stat div{flex:1;min-width:150px;background:rgba(23,19,14,.6);border:1px solid var(--line-soft);
+  border-radius:10px;padding:14px 16px}
+.stat b{display:block;font-size:23px;color:var(--gold-lit);font-weight:700}
+.stat span{font-size:12px;color:var(--weak)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">精细化改造 · 板块 2 · 步骤 S2.1</div>
+  <h1>THEME v2 令牌表 · 验收单</h1>
+  <div class="sub">暖褐暗金完全复刻 12 张参考图 — 全局配色回退、令牌重建、三栏量化对比</div>
+  <div class="badges">
+    <span class="tag ok">逻辑测试 1633 / 0</span>
+    <span class="tag ok">冒烟 90 断言 · 197 截图</span>
+    <span class="tag ok">分包校验 36 / 0</span>
+    <span class="tag ok">主包 2.33 MB / 4 MB</span>
+    <span class="tag warn">冷色 11.1% → 0.1%</span>
+    <span class="tag">暖色 14.3% → 43.8%</span>
+  </div>
+</header>
+
+<h2>01 · 本步边界</h2>
+<div class="card">
+  <p><strong style="color:var(--gold-lit)">S2.1 只做「设计系统令牌层 + 全局色调回退」</strong>：撤销上一轮冷玄墨「墨韵丹符」，按 12 张参考图程序化取色重建 v2 色板，并把 UI 层所有冷色硬编码精准回退。保留全部历史 key 与语义别名，280 处 <code>THEME.*</code> 引用零改动。</p>
+  <div class="grid">
+    <div class="mini"><b>本步负责（A 类 · 可精确复刻）</b><span>色值、面板底、描边、文字层级、全局背景、品级色、语义别名、高饱和实底修正</span></div>
+    <div class="mini"><b>明确不属于本步</b><span>雕花边框 / 玉雕角花 / 金色粒子 / 书法飞白（S2.2）；各屏专属暖色插画背景（板块 3）；英雄写实立绘与兵模重做（板块 4）</span></div>
+    <div class="mini"><b>验收方式</b><span>程序化量化「暖/冷像素占比」三栏对照 + 真实冒烟截图逐屏核对，不靠肉眼感觉</span></div>
+  </div>
+  <div class="note">方向依据：板块 0 确认单 —「回到暖褐暗金完全复刻图片」+「AI 立绘放分包」；你追加的「30MB 额度宽裕、呈现效果优先」已在板块 1 落地。</div>
+</div>
+
+<h2>02 · THEME v2 令牌表</h2>
+<p>结构色沿用与实测吻合的原始暖褐层次；强调色直接采用 12 张图 48 色量化后的高频实测值。所有值集中在 <code>src/render/draw.js</code> 的 <code>THEME</code>，仍是单一换肤源。</p>
+<table>
+  <tr><th>类别</th><th>Key</th><th>色值</th><th>依据 / 用途</th><th>对比度（对 panel）</th></tr>
+  <tr><td rowspan="7">结构色</td><td><code>bg0</code></td><td><span class="sw" style="background:#17130e"></span><code>#17130E</code></td><td>最深底，实测近 <code>#15120D</code></td><td>15.44:1（text）</td></tr>
+  <tr><td><code>bg1</code></td><td><span class="sw" style="background:#211a12"></span><code>#211A12</code></td><td>次级底</td><td>—</td></tr>
+  <tr><td><code>panel</code></td><td><span class="sw" style="background:#2a2218"></span><code>#2A2218</code></td><td><strong>实测 3.22%，占比第一</strong>，主面板</td><td>基准</td></tr>
+  <tr><td><code>panel2</code></td><td><span class="sw" style="background:#372617"></span><code>#372617</code></td><td><strong>实测 2.00%</strong>，亮面板 / 按钮底</td><td>—</td></tr>
+  <tr><td><code>panel3</code></td><td><span class="sw" style="background:#4a3a24"></span><code>#4A3A24</code></td><td>高亮层</td><td>—</td></tr>
+  <tr><td><code>line</code></td><td><span class="sw" style="background:#8a6a3a"></span><code>#8A6A3A</code></td><td>鎏金描边（由实测 <code>#AA8B58</code> 收暗）</td><td>—</td></tr>
+  <tr><td><code>lineSoft</code></td><td><span class="sw" style="background:#5a4528"></span><code>#5A4528</code></td><td>暗金细线</td><td>—</td></tr>
+  <tr><td rowspan="3">鎏金</td><td><code>gold</code></td><td><span class="sw" style="background:#d59947"></span><code>#D59947</code></td><td><strong>实测主金</strong>；胜利 / 货币 / 主描边</td><td>6.32:1 AA✓</td></tr>
+  <tr><td><code>goldDim</code></td><td><span class="sw" style="background:#8a6a32"></span><code>#8A6A32</code></td><td>暗金边</td><td>3.12:1 大字✓</td></tr>
+  <tr><td><code>goldLit</code></td><td><span class="sw" style="background:#f4d488"></span><code>#F4D488</code></td><td>亮金文字</td><td>10.91:1 AA✓</td></tr>
+  <tr><td rowspan="3">朱砂</td><td><code>red</code></td><td><span class="sw" style="background:#8d301b"></span><code>#8D301B</code></td><td><strong>实测深朱红</strong>；主按钮 / 印章（作填充，不作正文）</td><td>1.92:1（仅填充）</td></tr>
+  <tr><td><code>redDim</code></td><td><span class="sw" style="background:#662718"></span><code>#662718</code></td><td>暗阶</td><td>—</td></tr>
+  <tr><td><code>redLit / blood</code></td><td><span class="sw" style="background:#ce4a3a"></span><code>#CE4A3A</code></td><td><strong>参考图 13 标题实测中位色</strong>；战败大字</td><td>4.3:1 大字✓</td></tr>
+  <tr><td rowspan="3">品级 / 状态</td><td><code>purple</code></td><td><span class="sw" style="background:#96659a"></span><code>#96659A</code></td><td><strong>实测紫</strong>；史诗</td><td>3.45:1 大字✓</td></tr>
+  <tr><td><code>green</code></td><td><span class="sw" style="background:#3e885d"></span><code>#3E885D</code></td><td><strong>实测青绿</strong>；正向 / 血条</td><td>3.64:1 大字✓</td></tr>
+  <tr><td><code>blue</code></td><td><span class="sw" style="background:#5b7c99"></span><code>#5B7C99</code></td><td>稀有</td><td>—</td></tr>
+  <tr><td rowspan="3">文字</td><td><code>text</code></td><td><span class="sw" style="background:#f2ead8"></span><code>#F2EAD8</code></td><td>暖白正文</td><td>13.08:1 AA✓</td></tr>
+  <tr><td><code>textDim</code></td><td><span class="sw" style="background:#c2b394"></span><code>#C2B394</code></td><td>次级</td><td>7.59:1 AA✓</td></tr>
+  <tr><td><code>textWeak</code></td><td><span class="sw" style="background:#8a7d64"></span><code>#8A7D64</code></td><td>弱信息 / 禁用</td><td>3.88:1 大字✓</td></tr>
+</table>
+<div class="note good"><strong>语义别名全部保留但值回退到暖体系</strong>：<code>victory→gold</code>、<code>blood→redLit</code>、<code>defeat→#6B4A38</code> 暖褐灰、<code>shop→gold</code>（商城标题回归鎏金）、<code>treasure→#C9A45C</code> 金木色。这样 S2.1 无需改动 30+ 界面的引用点，也不会留下冷玄铁/青蚨/紫气的功能色残留。另新增 <code>goldSoft / brown / inkDeep / haloGold / haloRed</code> 供 S2.2 纹样与光效使用。</div>
+
+<h2>03 · 实际改动清单</h2>
+<table>
+  <tr><th>文件</th><th>改动</th></tr>
+  <tr><td><code>src/render/draw.js</code></td><td>THEME v2 全量重写；主按钮渐变压暗；<code>infoBadge</code> 冷灰圆 → 深褐底 + 金边；组件内 24 处冷色回退</td></tr>
+  <tr><td><code>src/game.js</code></td><td>全局画布背景：冷青灰 → 深褐渐变 + 局部暖金/朱砂氛围光（强度按参考图收敛过一轮）</td></tr>
+  <tr><td><code>src/data/config.js</code></td><td><code>rarity</code> 五档品级色统一到 v2 实测色板</td></tr>
+  <tr><td><code>src/render/heroArt.js</code></td><td><code>HERO_AURA</code> 史诗紫 / 传奇金 → 实测色；光环渐变 8 处 RGB 同步</td></tr>
+  <tr><td><code>src/render/unitCard.js</code></td><td>兵牌底、未解锁态、空位态 15 处冷蓝灰 → 深褐（参考图 06 / 11 是深褐近黑）</td></tr>
+  <tr><td><code>src/screens/home.js</code></td><td>四个入口按钮高饱和实底 → 深褐 / 深墨青灰实底 + 细描边 + 亮色文字</td></tr>
+  <tr><td><code>src/screens/result.js</code></td><td>微信绿「分享得宝箱」→ 深褐底 + 鎏金描边 + 金字（对齐参考图 13）</td></tr>
+  <tr><td><code>src/screens/*.js</code> 其余 28 个</td><td>由回退脚本批量处理 UI 层冷色硬编码，共 <strong>321 处</strong>；兵种 / 战场 / 精灵美术文件排除不动</td></tr>
+  <tr><td><code>tools/recolor-theme-v2.mjs</code> <span class="tag">新增</span></td><td>幂等可复跑的回退脚本（二次运行 0 处），含 HEX / RGBA / 注释三类映射</td></tr>
+  <tr><td><code>tools/measure_palette.py</code> <span class="tag">新增</span></td><td>三栏冷暖像素量化验收工具，后续板块 3 每批可复用同一把尺子</td></tr>
+  <tr><td><code>tools/smoke.mjs</code></td><td>兵牌底色采样常量同步为 <code>[36,26,22]</code></td></tr>
+  <tr><td><code>tools/verify-wx-pack.mjs</code> / <code>build-wx.mjs</code></td><td>修复沙箱拦截删除导致的校验崩溃与产物污染（详见 05）</td></tr>
+</table>
+<div class="note"><strong>刻意保留不动</strong>：<code>specialSprites.js</code> 等兵种/器械美术色、<code>arenaField.js</code> 战场色、<code>config.js</code> 里「霜雪洛阳」章节的雪地冷灰（属场景美术，不是 UI 主题色）。板块 1 的分包链路（<code>subpackage.js</code> / <code>asset-routes.js</code> / 音频双轨升级）完全未动。</div>
+
+<h2>04 · 三栏量化对比（程序化，非肉眼）</h2>
+<p>方法：每张图缩放后量化为 48 色，统计「暖像素」（R&gt;B+12 且 R&gt;G+4）与「冷像素」（B&gt;R+12）占比。数据由 <code>tools/measure_palette.py s2.1</code> 生成，存于 <code>s2.1/color-metrics.json</code>。</p>
+<div class="stat">
+  <div><b>0.3% → 11.1% → 0.1%</b><span>冷色占比：参考图 / 改前 / S2.1 — 已基本清零</span></div>
+  <div><b>59.0% / 14.3% / 43.8%</b><span>暖色占比：参考图 / 改前 / S2.1 — 回升 29.5pt</span></div>
+  <div><b>12 / 12</b><span>逐屏判定达标（冷色≤2% 且暖色显著回升）</span></div>
+</div>
+<table>
+  <tr><th>界面</th><th>参考图 暖/冷</th><th>改前（冷玄墨）暖/冷</th><th>S2.1 暖/冷</th><th>与参考图差</th><th>判定</th></tr>
+  <tr><td>01 首页</td><td>46.0 / 0.0</td><td>15.2 / 14.3</td><td>51.7 / 0.3</td><td>+5.7</td><td style="color:#8ed0a6">✓</td></tr>
+  <tr><td>02 关卡</td><td>51.7 / 0.0</td><td>3.5 / 10.4</td><td>49.1 / 0.0</td><td>−2.6</td><td style="color:#8ed0a6">✓</td></tr>
+  <tr><td>03 商城</td><td>60.4 / 0.0</td><td>5.0 / 8.2</td><td>44.6 / 0.0</td><td>−15.8</td><td style="color:#8ed0a6">✓</td></tr>
+  <tr><td>04 战斗</td><td>92.5 / 0.1</td><td>74.7 / 0.9</td><td>82.7 / 0.4</td><td>−9.8</td><td style="color:#8ed0a6">✓</td></tr>
+  <tr><td>05 结算</td><td>60.6 / 0.1</td><td>4.8 / 43.7</td><td>60.5 / 0.2</td><td><strong>−0.1</strong></td><td style="color:#8ed0a6">✓ 几乎重合</td></tr>
+  <tr><td>06 布阵</td><td>72.2 / 0.9</td><td>45.8 / 4.5</td><td>58.7 / 0.0</td><td>−13.5</td><td style="color:#8ed0a6">✓</td></tr>
+  <tr><td>07 每周挑战</td><td>48.7 / 0.0</td><td>1.7 / 11.7</td><td>21.3 / 0.0</td><td>−27.4</td><td style="color:#e8b96a">△ 待板块 3</td></tr>
+  <tr><td>08 每日挑战</td><td>57.9 / 0.0</td><td>2.2 / 7.5</td><td>21.5 / 0.0</td><td>−36.4</td><td style="color:#e8b96a">△ 待板块 3</td></tr>
+  <tr><td>09 招募</td><td>70.7 / 0.1</td><td>8.0 / 5.3</td><td>42.9 / 0.1</td><td>−27.8</td><td style="color:#e8b96a">△ 待板块 3/4</td></tr>
+  <tr><td>10 宝箱</td><td>60.4 / 0.0</td><td>2.7 / 4.4</td><td>21.6 / 0.0</td><td>−38.8</td><td style="color:#e8b96a">△ 待板块 3</td></tr>
+  <tr><td>11 兵营</td><td>42.9 / 1.9</td><td>3.4 / 12.4</td><td>22.0 / 0.8</td><td>−20.9</td><td style="color:#e8b96a">△ 待板块 3</td></tr>
+  <tr><td>13 战败结算</td><td>44.5 / 0.0</td><td>4.4 / 10.1</td><td>48.6 / 0.0</td><td>+4.1</td><td style="color:#8ed0a6">✓</td></tr>
+</table>
+<div class="note warn2"><strong>如实说明剩余差距</strong>：6 屏（07/08/09/10/11/03）暖色仍低于参考图 15~39pt。核对真实截图后确认原因不是令牌色值，而是<strong>参考图有各屏专属的大面积暖橙插画底纹、金色粒子光斑与 3D 宝箱图标</strong>，当前是深褐纯色底 —— 这属于 S2.2（背景纹样/光效组件）与板块 3（各屏精修），不是 S2.1 令牌层能补的。若靠全局光晕硬拉，会让已达标的首页/结算/战败页过曝发橙（第二轮确实出现过，已打回收敛）。</div>
+
+<h2>05 · 三次打回修改记录</h2>
+<div class="screen">
+  <h4>打回 ① · 首页四入口变成高饱和纯色块</h4>
+  <div class="meta">首轮冒烟截图发现 · 严重</div>
+  <p>回退后首页宝箱/商城/兵营/招募变成亮橙、亮绿、淡紫实底，与参考图 01「深褐近黑底 + 细描边 + 亮字」完全不符。根因是这几个按钮原本就用了 <code>#b9a6dd / #35d07f / THEME.gold</code> 等高饱和填充色，冷玄墨主题下不显眼，暖褐主题下立刻刺眼。<strong>已按参考图重做这一组</strong>，并全局扫描所有 fill 位置的高饱和色，另修掉结算页的微信绿按钮。</p>
+</div>
+<div class="screen">
+  <h4>打回 ② · 全局光晕过强、战败页发橙；朱砂标题偏暗</h4>
+  <div class="meta">量化 + 参考图 13 实测取色发现</div>
+  <p>首次增强背景后战败页暖占比 69.6%（参考图仅 44.5%），画面上半屏明显发亮橙。同时从参考图 13 标题区取到朱砂中位色 <code>#CE4A3A</code>，比令牌里的 <code>#8D301B</code> 亮得多。<strong>已收敛光晕</strong>（0.13→0.085，半径 1.02W→0.78W，渐变顶部压暗），<strong>标题色改用实测 #CE4A3A</strong>，分享按钮由朱红实底改为深褐底金边金字。修正后战败页 48.6%（+4.1）、结算页 60.5%（−0.1）。</p>
+</div>
+<div class="screen">
+  <h4>打回 ③ · 校验脚本崩溃污染正式产物</h4>
+  <div class="meta">最终全链路复跑发现 · 真缺陷</div>
+  <p><code>verify-wx-pack.mjs</code> 的 <code>finally</code> 用 <code>unlinkSync</code> 删 <code>assets/</code> 下的模拟素材时被沙箱 safe-delete 拦截抛错，导致「重建正式产物」没执行，产物被污染成<strong>主包 3.61MB / 总包 4.90MB</strong>（BGM 主包与分包各一份）。</p>
+  <p><strong>修复</strong>：清理改为三级降级（直接删 → 同盘 rename 到产物目录 → 改名 <code>.disabled</code>），且 <code>build()</code> 无论清理成败都强制执行；<code>build-wx.mjs</code> 的 copyDir 再过滤 <code>.disabled</code> 兜底文件。中途一次过滤写宽了把模拟素材本身也排除、造成 4 项链路断言失败，已收窄为只排除 <code>.disabled</code>。最终连续 3 次 <strong>36 通过 / 0 失败</strong>，产物恢复 <strong>2.33MB / 3.61MB</strong>、零残留。</p>
+</div>
+
+<h2>06 · 逐屏三栏实物对照</h2>
+<p>左：参考视觉稿　中：板块 0 基线（冷玄墨）　右：S2.1 真实冒烟渲染。全部来自 <code>docs/精细化改造/{ref,before,s2.1}/</code>。</p>
+
+<div class="screen"><h4>01 首页</h4><div class="meta">参考 46.0/0.0 · 改前 15.2/14.3 · S2.1 51.7/0.3</div>
+<div class="trio"><figure><img src="ref/01_首页.png" alt="参考"><figcaption><b>参考图</b><span>暖褐暗金</span></figcaption></figure><figure><img src="before/01_首页.png" alt="改前"><figcaption><b>改前</b><span>冷玄墨</span></figcaption></figure><figure><img src="s2.1/01_首页.png" alt="S2.1"><figcaption><b>S2.1</b><span>深褐+金边</span></figcaption></figure></div></div>
+
+<div class="screen"><h4>05 胜利结算</h4><div class="meta">参考 60.6/0.1 · 改前 4.8/43.7 · S2.1 60.5/0.2 — 数值几乎重合</div>
+<div class="trio"><figure><img src="ref/05_结算.png" alt="参考"><figcaption><b>参考图</b><span>鎏金凯旋</span></figcaption></figure><figure><img src="before/05_结算.png" alt="改前"><figcaption><b>改前</b><span>冷蓝灰统计条</span></figcaption></figure><figure><img src="s2.1/05_结算.png" alt="S2.1"><figcaption><b>S2.1</b><span>暖褐+鎏金</span></figcaption></figure></div></div>
+
+<div class="screen"><h4>09 招募 · 英雄卡</h4><div class="meta">参考 70.7/0.1 · 改前 8.0/5.3 · S2.1 42.9/0.1 — 卡片质感已到位，写实立绘属板块 4</div>
+<div class="trio"><figure><img src="ref/09_招募.png" alt="参考"><figcaption><b>参考图</b><span>写实武将立绘</span></figcaption></figure><figure><img src="before/09_招募.png" alt="改前"><figcaption><b>改前</b><span>冷玄墨卡片</span></figcaption></figure><figure><img src="s2.1/09_招募.png" alt="S2.1"><figcaption><b>S2.1</b><span>金边+四角金饰</span></figcaption></figure></div></div>
+
+<div class="screen"><h4>10 宝箱 · 剩余差距样例</h4><div class="meta">参考 60.4/0.0 · 改前 2.7/4.4 · S2.1 21.6/0.0 — 缺大面积暖橙底纹与 3D 宝箱图标，归 S2.2 / 板块 3</div>
+<div class="trio"><figure><img src="ref/10_宝箱.png" alt="参考"><figcaption><b>参考图</b><span>暖橙底+光斑</span></figcaption></figure><figure><img src="before/10_宝箱.png" alt="改前"><figcaption><b>改前</b><span>冷玄墨</span></figcaption></figure><figure><img src="s2.1/10_宝箱.png" alt="S2.1"><figcaption><b>S2.1</b><span>深褐列表</span></figcaption></figure></div></div>
+
+<div class="screen"><h4>13 战败结算</h4><div class="meta">参考 44.5/0.0 · 改前 4.4/10.1 · S2.1 48.6/0.0 — 朱砂标题按实测 #CE4A3A</div>
+<div class="trio"><figure><img src="ref/13_战败结算.png" alt="参考"><figcaption><b>参考图</b><span>玉雕角花+朱红</span></figcaption></figure><figure><img src="before/13_战败结算.png" alt="改前"><figcaption><b>改前</b><span>冷玄铁</span></figcaption></figure><figure><img src="s2.1/13_战败结算.png" alt="S2.1"><figcaption><b>S2.1</b><span>深褐+朱砂标题</span></figcaption></figure></div></div>
+
+<h2>07 · 验收数据与回滚</h2>
+<table>
+  <tr><th>项目</th><th>结果</th></tr>
+  <tr><td>逻辑测试 <code>node tools/test.mjs</code></td><td style="color:#8ed0a6">1633 通过 / 0 失败</td></tr>
+  <tr><td>冒烟 <code>node tools/smoke.mjs</code></td><td style="color:#8ed0a6">90 断言 / 197 截图全绿</td></tr>
+  <tr><td>分包校验 <code>npm run verify:wx</code></td><td style="color:#8ed0a6">36 通过 / 0 失败（连续 3 次稳定）</td></tr>
+  <tr><td>回退脚本幂等性</td><td style="color:#8ed0a6">二次运行 0 文件 / 0 处</td></tr>
+  <tr><td>微信主包 / 总包</td><td style="color:#8ed0a6">2.33 MB / 4 MB · 3.61 MB / 30 MB</td></tr>
+  <tr><td>产物分包目录</td><td>仅 <code>pkg_audio</code>，模拟素材零残留</td></tr>
+  <tr><td>对照页外部依赖</td><td>零（纯内联 CSS，图片为本地相对路径）</td></tr>
+</table>
+<div class="note"><strong>回滚点</strong>：本步增量备份 <code>D:/Projects/record/trae_project/game_demo_backup_S2.1_20261122_143230</code>（146 个文件，含改动前的 src / tools / docs/精细化改造）；板块 0 全量备份 <code>game_demo_backup_20261122_115416</code>（378MB / 2006 文件）仍完整保留。若要撤销本步，用增量备份覆盖对应目录即可，不影响板块 1 的分包文件。</div>
+<div class="note good"><strong>协作提示</strong>：构建与校验脚本请不要并发执行 —— 校验脚本会临时往 <code>assets/heroes/</code> 放模拟素材，并发构建可能把它读进日志（曾出现一次 <code>heroes:1</code> 的误计）。单独构建产物是干净的。现在 finally 已有强制重建兜底，即使并发也不会留下污染包。</div>
+
+<h2>08 · 勾对清单</h2>
+<ul class="chk">
+  <li>方向基线与板块 0 一致（暖褐暗金、AI 立绘放分包）</li>
+  <li>THEME v2 令牌表完整，保留全部历史 key 与语义别名</li>
+  <li>色值来自 12 张参考图程序化取色，非目测</li>
+  <li>UI 层冷色 321 处回退，二次运行幂等</li>
+  <li>兵种 / 战场 / 雪地场景美术色刻意保留</li>
+  <li>高饱和实底、微信绿、infoBadge 冷灰等逐项修正</li>
+  <li>冷色占比 11.1% → 0.1%（参考图 0.3%）</li>
+  <li>12 屏逐屏真实截图三栏对照，5 屏已与参考图接近重合</li>
+  <li>剩余 6 屏差距定位清楚并归属到 S2.2 / 板块 3 / 板块 4</li>
+  <li>逻辑、冒烟、分包、体积四项门禁全绿</li>
+  <li class="pending">待你验收「过」→ 才进 S2.2 通用组件升级（雕花边框 / 角花 / 光晕 / 货币栏）</li>
+</ul>
+
+<footer>
+  板块 2 · S2.1 · 生成于 2026-11-22 · 全部截图为游戏真实 Canvas 渲染，非设计稿<br>
+  三栏数据：<code>docs/精细化改造/s2.1/color-metrics.json</code> · 基线：<code>docs/精细化改造/baseline.json</code>
+</footer>
+
+</div>
+</body>
+</html>

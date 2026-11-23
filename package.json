@@ -15,6 +15,7 @@
     "smoke": "node tools/smoke.mjs",
     "build:html": "node tools/build-html.mjs",
     "build:wx": "node tools/build-wx.mjs",
+    "verify:wx": "node tools/verify-wx-pack.mjs",
     "wx:release": "node tools/release-wx.mjs",
     "code-fortify": "minigame-code-fortify-cli-package-run"
   },

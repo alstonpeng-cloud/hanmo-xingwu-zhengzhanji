@@ -110,7 +110,7 @@ export class DailyChallengeScreen {
     const unlockedAll = dailyUnlocked(st);
     const day = ensureDaily(st);
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '每 日 挑 战', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -139,7 +139,7 @@ export class DailyChallengeScreen {
 
       // 1.2.8 · 卡面只写「第 N 关 + 敌军战力」：去掉英雄模型 / 将名 / 血量倍率行
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: done ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
+        fill: done ? 'rgba(58,46,30,0.82)' : unlocked ? '#2b2217' : '#17130e',
         stroke: done ? THEME.gold : current ? THEME.green : THEME.line,
         r: 14, lw: current ? 2.5 : 1.5,
       });
@@ -187,7 +187,7 @@ export class DailyChallengeScreen {
       const ratio = V.h / (V.h + max);
       const h = Math.max(26, (V.h - 4) * ratio);
       const sy = V.y + 2 + (V.h - 4 - h) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(213,153,71,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     if (!unlockedAll) {

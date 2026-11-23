@@ -10,11 +10,10 @@
 ### 放入真实主 BGM
 
 1. 把**你有授权的**《战争进化史》/《Glorious Morning》音频命名为 `glorious_morning.mp3`，放到本目录。
-2. 微信小游戏主包上限 4 MB，当前压缩版约 1.6 MB（80 kbps）；换更大的文件请重新压缩，例如：
-   ```powershell
-   node tools/encode-bgm.mjs "D:\你的文件.mp3"
-   ```
-3. 单文件版 `三国小兵军团.html` 也按相对路径读取，`assets/` 目录要和 HTML 放在一起。
+2. **主 BGM 会自动进入 `pkg_audio` 分包**（进入游戏后静默下载），不占 4 MB 主包额度；音质优先，不需要为了体积做有损压缩。除 `bgm_heroic_loop.mp3` 与 `sfx/` 之外，本目录下的音频文件都会被构建脚本自动迁入分包。
+3. 分包未就绪或下载失败时，主包里的 `bgm_heroic_loop.mp3`（48KB）先顶上；下载完成后音频层自动平滑升级到高音质主曲，玩家不会遇到整场静音。
+4. 命令行编码工具仍保留备用：`node tools/encode-bgm.mjs "D:\你的文件.mp3"`。
+5. 单文件版 `三国小兵军团.html` 也按相对路径读取，`assets/` 目录要和 HTML 放在一起。
 
 ## 音效
 

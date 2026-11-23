@@ -302,7 +302,7 @@ export class WeeklyChallengeScreen {
     const unlockedAll = weeklyUnlocked(st);
     const s = unlockedAll ? ensureWeekly(st) : null;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '周 常 挑 战', W / 2 + 20, 72, { size: 38, weight: '700', align: 'center', color: THEME.gold });
     infoBadge(ctx, this.infoRect.x + 32, this.infoRect.y + 32, 24);
@@ -380,7 +380,7 @@ export class WeeklyChallengeScreen {
 
       const current = unlocked && !cleared;
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: cleared ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
+        fill: cleared ? 'rgba(58,46,30,0.82)' : unlocked ? '#2b2217' : '#17130e',
         stroke: cleared ? THEME.gold : current ? THEME.green : THEME.line,
         r: 14, lw: current ? 2.5 : 1.5,
       });
@@ -527,7 +527,7 @@ export class WeeklyChallengeScreen {
       });
       text(ctx, maxed ? '满级' : `升 ${upCost}`, upRect.x + upRect.w / 2, upRect.y + 20, {
         size: 15, weight: '600', align: 'center',
-        color: maxed ? THEME.textWeak : canUp ? THEME.green : '#8d97a4',
+        color: maxed ? THEME.textWeak : canUp ? THEME.green : '#9a8a72',
       });
       panel(ctx, sellRect.x, sellRect.y, sellRect.w, sellRect.h, {
         fill: 'rgba(34,30,24,0.92)', stroke: '#8a7757', r: 7, lw: 1.3,
@@ -546,7 +546,7 @@ export class WeeklyChallengeScreen {
       const ratio = V.h / (V.h + max);
       const bh = Math.max(26, (V.h - 4) * ratio);
       const by = V.y + 2 + (V.h - 4 - bh) * (this.scrollB / max);
-      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, by, 6, bh, { fill: 'rgba(213,153,71,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     text(ctx, '积分每周一 0 点归零重置 —— 买好的兵只在本周有效', 375, 1236, {

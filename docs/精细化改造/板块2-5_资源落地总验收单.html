@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>板块 2–5 · 资源落地总验收单</title>
+<style>
+:root{--bg:#17130e;--panel:#241c14;--panel2:#2e2418;--line:#6b5230;--gold:#d59947;--goldlit:#f4d488;--text:#f2ead8;--dim:#c2b394;--weak:#8a7d64;--red:#ce4a3a;--green:#3e885d}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 700px at 50% -10%,#3a2c1c 0%,var(--bg) 62%);color:var(--text);font:15px/1.7 "PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+.wrap{max-width:1400px;margin:0 auto;padding:40px 28px 90px}
+header{text-align:center;border-bottom:1px solid var(--line);padding-bottom:28px;margin-bottom:34px}
+h1{font-size:34px;letter-spacing:5px;margin:0 0 10px;color:var(--goldlit);text-shadow:0 2px 18px rgba(213,153,71,.35)}
+.sub{color:var(--dim);font-size:14px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:38px}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:14px;padding:18px 20px;position:relative;overflow:hidden}
+.card:before{content:"";position:absolute;inset:5px;border:1px solid rgba(213,153,71,.22);border-radius:9px;pointer-events:none}
+.card .k{color:var(--dim);font-size:13px;letter-spacing:2px}
+.card .v{font-size:27px;font-weight:700;color:var(--goldlit);margin:4px 0 2px}
+.card .sub{color:var(--weak);font-size:12px}
+.card.ok:after{content:"✓";position:absolute;right:16px;top:14px;color:var(--green);font-size:18px}
+h2{font-size:21px;color:var(--gold);border-left:4px solid var(--gold);padding-left:12px;margin:44px 0 18px;letter-spacing:1px}
+.triple{background:rgba(36,28,20,.62);border:1px solid rgba(107,82,48,.6);border-radius:14px;padding:20px;margin-bottom:20px}
+.triple h3{margin:0 0 14px;font-size:17px;color:var(--goldlit);font-weight:600}
+.shot{font:12px/1.5 ui-monospace,Consolas,monospace;color:var(--weak);margin-left:10px}
+.badge{float:right;font-size:12px;padding:2px 12px;border-radius:20px;border:1px solid}
+.badge.ok{color:#8fd3a8;border-color:rgba(62,136,93,.8);background:rgba(62,136,93,.12)}
+.badge.warn{color:var(--red);border-color:rgba(206,74,58,.7)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+figure{margin:0;background:#0f0c09;border:1px solid rgba(107,82,48,.45);border-radius:10px;overflow:hidden}
+figure img{display:block;width:100%;height:auto;max-height:560px;object-fit:contain;background:#0f0c09}
+figcaption{text-align:center;font-size:12px;color:var(--dim);padding:8px;border-top:1px solid rgba(107,82,48,.4)}
+.metrics{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:12px;font-size:12.5px;color:var(--weak)}
+.metrics .hi{color:var(--goldlit);font-weight:600}
+table{width:100%;border-collapse:collapse;background:rgba(36,28,20,.62);border-radius:10px;overflow:hidden;font-size:13.5px}
+th,td{padding:10px 14px;border-bottom:1px solid rgba(107,82,48,.35);text-align:left;vertical-align:top}
+th{background:rgba(213,153,71,.12);color:var(--goldlit);font-weight:600}
+td code{color:var(--gold);font-size:12.5px}
+td.names{color:var(--weak);font-size:12px;word-break:break-all}
+.summary{display:flex;gap:28px;flex-wrap:wrap;background:rgba(36,28,20,.62);border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin-bottom:20px}
+.summary div{font-size:14px;color:var(--dim)}
+.summary b{color:var(--goldlit);font-size:19px;margin-left:8px}
+ul{columns:2;column-gap:36px;padding-left:20px}
+li{margin-bottom:7px;break-inside:avoid}
+.note{background:rgba(206,74,58,.08);border:1px solid rgba(206,74,58,.35);border-radius:12px;padding:16px 20px;color:var(--dim);font-size:13.5px}
+.note b{color:var(--red)}
+code{background:rgba(0,0,0,.3);padding:1px 6px;border-radius:4px;color:var(--gold)}
+@media(max-width:820px){.grid{grid-template-columns:1fr}ul{columns:1}}
+</style></head><body><div class="wrap">
+<header>
+  <h1>板块 2–5 · 资源落地总验收单</h1>
+  <div class="sub">暖褐暗金完全复刻 · AI 立绘 / 3D 建模 / 分包资源真实接入 · 12 屏三栏对照</div>
+  <div class="sub">项目 game_demo · 微信小游戏 · 视觉方向「汉帛·朱金 v2」</div>
+</header>
+
+<h2>一、门禁指标</h2>
+<div class="cards"><div class="card ok"><div class="k">主包</div><div class="v">2.34 MB</div><div class="sub">/ 4 MB 硬线</div></div><div class="card ok"><div class="k">总包</div><div class="v">29.09 MB</div><div class="sub">/ 30 MB 上限</div></div><div class="card ok"><div class="k">逻辑回归</div><div class="v">1633 / 0</div><div class="sub">通过 / 失败</div></div><div class="card ok"><div class="k">渲染冒烟</div><div class="v">90 / 197</div><div class="sub">断言 / 截图</div></div><div class="card ok"><div class="k">分包校验</div><div class="v">97 / 0</div><div class="sub">连续 2 次稳定</div></div><div class="card ok"><div class="k">色度达标</div><div class="v">12 / 12</div><div class="sub">12 屏暖褐验收</div></div></div>
+<div class="summary">
+  <div>参考图暖色均值<b>59.0%</b></div>
+  <div>改前暖色均值<b>14.3%</b></div>
+  <div>改后暖色均值<b>46.9%</b></div>
+  <div>改后冷色残留<b>0.1%</b></div>
+  <div>逐屏达标<b>12 / 12</b></div>
+</div>
+
+<h2>二、12 屏三栏对照（参考图 / 改前 / 改后）</h2>
+
+<section class="triple">
+  <h3>01_首页 <span class="shot">01_home.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/01_%E9%A6%96%E9%A1%B5.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/01_%E9%A6%96%E9%A1%B5.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/01_%E9%A6%96%E9%A1%B5.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 46.0% / 冷 0.0%</span>
+    <span>改前 暖 15.2% / 冷 14.3%</span>
+    <span class="hi">改后 暖 54.5% / 冷 0.2%</span>
+    <span>色相 31.9°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>02_关卡 <span class="shot">02_levels.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/02_%E5%85%B3%E5%8D%A1.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/02_%E5%85%B3%E5%8D%A1.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/02_%E5%85%B3%E5%8D%A1.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 51.7% / 冷 0.0%</span>
+    <span>改前 暖 3.5% / 冷 10.4%</span>
+    <span class="hi">改后 暖 49.3% / 冷 0.0%</span>
+    <span>色相 34.3°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>03_商城 <span class="shot">26_shop.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/03_%E5%95%86%E5%9F%8E.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/03_%E5%95%86%E5%9F%8E.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/03_%E5%95%86%E5%9F%8E.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 60.4% / 冷 0.0%</span>
+    <span>改前 暖 5.0% / 冷 8.2%</span>
+    <span class="hi">改后 暖 46.2% / 冷 0.0%</span>
+    <span>色相 33.4°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>04_战斗 <span class="shot">48g_battle_heroes.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/04_%E6%88%98%E6%96%97.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/04_%E6%88%98%E6%96%97.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/04_%E6%88%98%E6%96%97.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 92.5% / 冷 0.1%</span>
+    <span>改前 暖 74.7% / 冷 0.9%</span>
+    <span class="hi">改后 暖 82.9% / 冷 0.4%</span>
+    <span>色相 32.3°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>05_结算 <span class="shot">12_result.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/05_%E7%BB%93%E7%AE%97.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/05_%E7%BB%93%E7%AE%97.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/05_%E7%BB%93%E7%AE%97.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 60.6% / 冷 0.1%</span>
+    <span>改前 暖 4.8% / 冷 43.7%</span>
+    <span class="hi">改后 暖 68.5% / 冷 0.2%</span>
+    <span>色相 31.9°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>06_布阵 <span class="shot">03_deploy.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/06_%E5%B8%83%E9%98%B5.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/06_%E5%B8%83%E9%98%B5.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/06_%E5%B8%83%E9%98%B5.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 72.2% / 冷 0.9%</span>
+    <span>改前 暖 45.8% / 冷 4.5%</span>
+    <span class="hi">改后 暖 58.7% / 冷 0.0%</span>
+    <span>色相 32.1°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>07_每周挑战 <span class="shot">65a_weekly_stages.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/07_%E6%AF%8F%E5%91%A8%E6%8C%91%E6%88%98.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/07_%E6%AF%8F%E5%91%A8%E6%8C%91%E6%88%98.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/07_%E6%AF%8F%E5%91%A8%E6%8C%91%E6%88%98.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 48.7% / 冷 0.0%</span>
+    <span>改前 暖 1.7% / 冷 11.7%</span>
+    <span class="hi">改后 暖 23.7% / 冷 0.0%</span>
+    <span>色相 35.6°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>08_每日挑战 <span class="shot">66_daily_challenge.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/08_%E6%AF%8F%E6%97%A5%E6%8C%91%E6%88%98.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/08_%E6%AF%8F%E6%97%A5%E6%8C%91%E6%88%98.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/08_%E6%AF%8F%E6%97%A5%E6%8C%91%E6%88%98.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 57.9% / 冷 0.0%</span>
+    <span>改前 暖 2.2% / 冷 7.5%</span>
+    <span class="hi">改后 暖 21.7% / 冷 0.0%</span>
+    <span>色相 35.8°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>09_招募 <span class="shot">48b_hero_screen.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/09_%E6%8B%9B%E5%8B%9F.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/09_%E6%8B%9B%E5%8B%9F.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/09_%E6%8B%9B%E5%8B%9F.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 70.7% / 冷 0.1%</span>
+    <span>改前 暖 8.0% / 冷 5.3%</span>
+    <span class="hi">改后 暖 46.2% / 冷 0.0%</span>
+    <span>色相 35.3°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>10_宝箱 <span class="shot">25b_chests.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/10_%E5%AE%9D%E7%AE%B1.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/10_%E5%AE%9D%E7%AE%B1.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/10_%E5%AE%9D%E7%AE%B1.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 60.4% / 冷 0.0%</span>
+    <span>改前 暖 2.7% / 冷 4.4%</span>
+    <span class="hi">改后 暖 27.4% / 冷 0.0%</span>
+    <span>色相 30.9°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>11_兵营 <span class="shot">14_barracks.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/11_%E5%85%B5%E8%90%A5.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/11_%E5%85%B5%E8%90%A5.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/11_%E5%85%B5%E8%90%A5.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 42.9% / 冷 1.9%</span>
+    <span>改前 暖 3.4% / 冷 12.4%</span>
+    <span class="hi">改后 暖 21.3% / 冷 0.8%</span>
+    <span>色相 45.5°</span>
+  </div>
+</section>
+<section class="triple">
+  <h3>13_战败结算 <span class="shot">37_result_fail_counter_ring.png</span> <span class="badge ok">达标</span></h3>
+  <div class="grid">
+    <figure><img loading="lazy" src="ref/13_%E6%88%98%E8%B4%A5%E7%BB%93%E7%AE%97.png" alt="参考图 · 目标效果"><figcaption>参考图 · 目标效果</figcaption></figure>
+    <figure><img loading="lazy" src="before/13_%E6%88%98%E8%B4%A5%E7%BB%93%E7%AE%97.png" alt="改前 · 冷玄墨基线"><figcaption>改前 · 冷玄墨基线</figcaption></figure>
+    <figure><img loading="lazy" src="after/13_%E6%88%98%E8%B4%A5%E7%BB%93%E7%AE%97.png" alt="改后 · 资源落地"><figcaption>改后 · 资源落地</figcaption></figure>
+  </div>
+  <div class="metrics">
+    <span>参考图 暖 44.5% / 冷 0.0%</span>
+    <span>改前 暖 4.4% / 冷 10.1%</span>
+    <span class="hi">改后 暖 63.0% / 冷 0.0%</span>
+    <span>色相 30.7°</span>
+  </div>
+</section>
+
+<h2>三、包体构成（构建产物实测）</h2>
+<table><thead><tr><th>分包名</th><th>根目录</th><th>文件数</th><th>体积</th></tr></thead><tbody>
+<tr><td>audio</td><td><code>pkg_audio</code></td><td>1</td><td>1.29 MB</td></tr><tr><td>heroes</td><td><code>pkg_heroes</code></td><td>12</td><td>9.22 MB</td></tr><tr><td>siege</td><td><code>pkg_siege</code></td><td>5</td><td>4.34 MB</td></tr><tr><td>art</td><td><code>pkg_art</code></td><td>11</td><td>11.90 MB</td></tr>
+<tr><td>主包</td><td><code>wechat/ 除 pkg_* 外</code></td><td>—</td><td>2.34 MB</td></tr>
+<tr><td><b>合计</b></td><td>—</td><td>—</td><td><b>29.09 MB / 30 MB</b></td></tr>
+</tbody></table>
+
+<h2>四、美术资源清单</h2>
+<table><thead><tr><th>类别</th><th>数量</th><th>体积</th><th>文件</th></tr></thead><tbody><tr><td>英雄立绘 · hero_*.png</td><td>12 张</td><td>9.22 MB</td><td class="names">hero_caocao.png、hero_dongzhuo.png、hero_guanping.png、hero_guanyu.png、hero_huanggai.png、hero_liru.png、hero_liubei.png、hero_xiahouyuan.png、hero_zhangfei.png、hero_zhangjiao.png、hero_zhangren.png、hero_zhouyu.png</td></tr><tr><td>器械建模 · siege_*.png</td><td>5 张</td><td>4.34 MB</td><td class="names">siege_ballista.png、siege_catapult.png、siege_ram.png、siege_shield_cart.png、siege_war_drum.png</td></tr><tr><td>宝箱建模 · chest_*.png</td><td>6 张</td><td>5.50 MB</td><td class="names">chest_epic.png、chest_gold.png、chest_legendary.png、chest_rare.png、chest_silver.png、chest_wood.png</td></tr><tr><td>全屏背景 · bg_*.png / jpg</td><td>5 张</td><td>6.40 MB</td><td class="names">bg_barracks.jpg、bg_home.png、bg_recruit.png、bg_result.png、bg_shop.jpg</td></tr></tbody></table>
+<p class="sub">首页 / 招募 / 结算三屏背景为无损 PNG；商城 / 兵营背景为 4:4:4 q95 JPEG。
+28 张素材全部经去水印、影棚底抠图、边缘去灰后进入分包，未就绪时自动回退程序化建模。</p>
+
+<h2>五、本轮真实落地项</h2>
+<ul>
+<li><b>建模</b>：12 张 Q 版 3D 英雄立绘接入 <code>drawHeroFigure()</code>，影响英雄 / 招募 / 布阵 / 战场 / 结算等 8+ 界面。</li>
+<li><b>建模</b>：6 种 3D 宝箱接入 <code>drawChest()</code>，图标尺寸由 118×104 放大到 152×134；开盖动画仍走程序化保证盖子会掀。</li>
+<li><b>建模</b>：5 张 3D 器械接入 <code>drawEngineFigure()</code>，并在兵营「器械」弹窗新增器械图谱，5 张全部真实出镜。</li>
+<li><b>UI</b>：5 张全屏背景插画按屏幕 <code>artBg</code> 专属分发；结算页补齐 <code>artBg = 'result'</code>。</li>
+<li><b>UI</b>：新增 <code>carvedFrame()</code> 云纹角花与 <code>goldDust()</code> 确定性金粉，铺到首页、商城、宝箱、招募、结算五屏。</li>
+<li><b>UI</b>：商城特殊宝箱补传 <code>kind</code>，改用 3D 贴图而非程序化箱体。</li>
+<li><b>分包</b>：<code>packageArt.js</code> 统一资源路由，分包未就绪 / 图片加载失败 / Node 单测一律回退程序化绘制。</li>
+<li><b>工具</b>：<code>prepare_art.py</code> 重建抠图算法（背景色场 + 中性/暖白双判据 + 区域生长），修复关羽等大片白底。</li>
+<li><b>工具</b>：<code>tools/smoke.mjs</code> 同步预加载分包素材，197 张截图均为真实位图渲染而非兜底。</li>
+<li><b>工具</b>：<code>verify-wx-pack.mjs</code> 修正板块 1 遗留断言：改为检查模拟素材零残留 + 真实 heroes 分包完整保留。</li>
+<li><b>包体</b>：主包 3.61 → 2.34 MB，BGM 与全部美术迁出；总包用至 29.09 MB / 30 MB。</li>
+</ul>
+
+<h2>六、验收命令与结果</h2>
+<table><thead><tr><th>命令</th><th>结果</th></tr></thead><tbody>
+<tr><td><code>node tools/test.mjs</code></td><td>1633 通过 / 0 失败</td></tr>
+<tr><td><code>node tools/smoke.mjs</code></td><td>90 断言 / 197 截图（校验通过 197 张）</td></tr>
+<tr><td><code>node tools/build-wx.mjs</code></td><td>主包 2.34 MB / 4 MB，合计 29.09 MB / 30 MB</td></tr>
+<tr><td><code>node tools/verify-wx-pack.mjs</code></td><td>97 通过 / 0 失败（连续 2 次稳定）</td></tr>
+<tr><td><code>node tools/release-wx.mjs</code></td><td>通过；加固产物 1.88 MB / 4 MB；zip 28.84 MB</td></tr>
+<tr><td><code>python tools/measure_palette.py after</code></td><td>12 / 12 屏达标，冷色残留 0.1%</td></tr>
+</tbody></table>
+
+<h2>七、已知残留与上线前人工确认</h2>
+<div class="note">
+<b>视觉</b>：银箱 / 黄盖 / 弩车等素材中心区仍有约 1%–4% 的「浅灰白量化命中」，经深褐底目检确认主要是银甲、石弹、刀刃高光本身被计入口径，不是背景白块；张任两腿间、个别英雄脚下残留极窄影棚地面条，游戏内 80–120px 显示尺寸下不明显。<br><br>
+<b>上线前需人工确认</b>：AppID 为「小游戏」类型并已开通类目；广告位 ID 已替换；BGM 版权范围；微信后台用户隐私保护指引。当前 <code>game.json</code> 的 AppID 仍是 touristappid，仅可预览不可上传。<br><br>
+<b>回退点</b>：<code>D:/Projects/record/trae_project/game_demo_backup_20261122_115416</code>（全量）、<code>game_demo_backup_S2.1_20261122_143230</code>（S2.1 增量）。
+</div>
+</div></body></html>

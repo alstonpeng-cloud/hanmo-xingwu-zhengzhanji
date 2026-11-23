@@ -91,7 +91,7 @@ export class TrialScreen {
     const W = g.W;
     const cleared = Math.max(0, Math.min(CONFIG.trials.total, st.trialCleared || 0));
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '演 武', W / 2 + 20, 56, { size: 34, weight: '600', align: 'center', color: THEME.gold });
     text(ctx, `精英挑战 · 已通关 ${cleared} / ${CONFIG.trials.total} 关`, W / 2 + 20, 92, {
@@ -128,7 +128,7 @@ export class TrialScreen {
       trial.enemies.forEach((e) => { rar[rarityOf(e.troop)]++; });
 
       panel(ctx, rect.x, rect.y, rect.w, rect.h, {
-        fill: done ? 'rgba(39,48,56,0.82)' : unlocked ? '#1b2227' : '#0c1013',
+        fill: done ? 'rgba(58,46,30,0.82)' : unlocked ? '#2b2217' : '#17130e',
         stroke: done ? THEME.gold : current ? THEME.goldDim : THEME.line,
         r: 12, lw: current ? 2 : 1,
       });
@@ -189,11 +189,11 @@ export class TrialScreen {
       const ratio = V.h / (V.h + max);
       const h = Math.max(26, (V.h - 4) * ratio);
       const sy = V.y + 2 + (V.h - 4 - h) * (this.scrollY / max);
-      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(232,180,76,0.75)', stroke: null, r: 3, lw: 0 });
+      panel(ctx, x - 1, sy, 6, h, { fill: 'rgba(213,153,71,0.75)', stroke: null, r: 3, lw: 0 });
     }
 
     const lockedAll = st.maxCleared < CONFIG.trials.unlockLevel;
-    panel(ctx, 70, 1030, 610, 120, { fill: 'rgba(27,34,39,0.6)', stroke: THEME.line, r: 16 });
+    panel(ctx, 70, 1030, 610, 120, { fill: 'rgba(43,34,23,0.6)', stroke: THEME.line, r: 16 });
     if (lockedAll) {
       text(ctx, `演武在主线通关 ${CONFIG.trials.unlockLevel} 关后开放`, 375, 1062, {
         size: 20, align: 'center', color: THEME.text,

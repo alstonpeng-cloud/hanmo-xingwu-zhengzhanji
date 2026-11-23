@@ -88,7 +88,7 @@ export class DailyShopScreen {
     const hh = Math.floor(mins / 60);
     const mm = mins % 60;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '每 日 商 店', W / 2 + 20, 76, { size: 34, weight: '600', align: 'center' });
     coinBadge(ctx, 700, 76, st.coins, { size: 24, align: 'right' });
@@ -133,7 +133,7 @@ export class DailyShopScreen {
   drawLocked(ctx, st) {
     const need = CONFIG.dailyShop.unlockLevel;
     const cur = Math.min(st.maxCleared, need);
-    panel(ctx, 70, 240, 610, 380, { fill: 'rgba(27,34,39,0.7)', stroke: THEME.line, r: 20 });
+    panel(ctx, 70, 240, 610, 380, { fill: 'rgba(43,34,23,0.7)', stroke: THEME.line, r: 20 });
     text(ctx, '每日商店尚未解锁', 375, 320, { size: 30, weight: '600', align: 'center', color: THEME.textDim });
     text(ctx, `通关第 ${need} 关后开放`, 375, 380, {
       size: 24, align: 'center', color: THEME.gold,
@@ -157,7 +157,7 @@ export class DailyShopScreen {
     this.cardRects.push({ rect: buyRect, index: s.index });
 
     panel(ctx, x, y, CARD_W, CARD_H, {
-      fill: s.sold ? 'rgba(27,34,39,0.85)' : '#1b2227',
+      fill: s.sold ? 'rgba(43,34,23,0.85)' : '#2b2217',
       stroke: s.sold ? THEME.line : rar.color, r: 18, lw: s.sold ? 1 : 2,
     });
 
@@ -185,7 +185,7 @@ export class DailyShopScreen {
       : full ? '兵营已满'
         : affordable ? '购 买' : '铜钱不足', {
       size: 22,
-      fill: canBuy ? '#273038' : THEME.panel,
+      fill: canBuy ? '#332c1d' : THEME.panel,
       stroke: canBuy ? rar.color : THEME.line,
       textColor: canBuy ? THEME.gold : THEME.textWeak,
       disabled: !canBuy,

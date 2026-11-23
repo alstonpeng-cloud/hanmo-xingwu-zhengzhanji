@@ -46,7 +46,7 @@ export class UnitShowcaseScreen {
     const pow = troopPower(u.troop, u.level);
 
     screenDim(ctx, W, g.H, 0.82);
-    panel(ctx, 82, 150, 586, 1010, { fill: '#12171b', stroke: rar.color, r: 26, lw: 3 });
+    panel(ctx, 82, 150, 586, 1010, { fill: '#211a12', stroke: rar.color, r: 26, lw: 3 });
 
     // 顶部：新兵种解锁
     text(ctx, '新 兵 种 解 锁', W / 2, 210, { size: 22, align: 'center', color: THEME.textDim });
@@ -62,7 +62,7 @@ export class UnitShowcaseScreen {
     drawFrame(ctx, sheet, 'idle', 0, W / 2, 640, 3.05, false);
 
     // 属性
-    panel(ctx, 118, 676, 514, 104, { fill: 'rgba(27,34,39,0.72)', stroke: THEME.line, r: 16 });
+    panel(ctx, 118, 676, 514, 104, { fill: 'rgba(43,34,23,0.72)', stroke: THEME.line, r: 16 });
     const cols = [
       { label: '生命', value: `${s.hp}`, x: 178 },
       { label: '攻击', value: `${s.atk}`, x: 328 },
@@ -102,7 +102,7 @@ export class UnitShowcaseScreen {
     }
 
     button(ctx, this.confirmRect, '确 认', {
-      size: 28, fill: '#273038', stroke: rar.color, textColor: THEME.gold,
+      size: 28, fill: '#332c1d', stroke: rar.color, textColor: THEME.gold,
     });
   }
 }

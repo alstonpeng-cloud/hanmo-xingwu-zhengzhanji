@@ -62,7 +62,7 @@ export class GrowthScreen {
     let nextIdx = GROWTH_NODES.findIndex((n) => !growthStatus(st, n).unlocked);
     if (nextIdx < 0) nextIdx = GROWTH_NODES.length - 1;
 
-    panel(ctx, 0, 0, W, 118, { fill: 'rgba(12,16,19,0.9)', stroke: THEME.line, r: 0, lw: 0 });
+    panel(ctx, 0, 0, W, 118, { fill: 'rgba(23,19,14,0.9)', stroke: THEME.line, r: 0, lw: 0 });
     backButton(ctx, this.backRect);
     text(ctx, '成 长 之 路', W / 2 + 20, 56, {
       size: 34, weight: '600', align: 'center', color: THEME.gold,
@@ -95,7 +95,7 @@ export class GrowthScreen {
     ctx.lineTo(L.lineX, lastY);
     ctx.stroke();
     if (st.maxCleared > 0) {
-      ctx.strokeStyle = 'rgba(232,180,76,0.9)';
+      ctx.strokeStyle = 'rgba(213,153,71,0.9)';
       ctx.lineWidth = 3;
       ctx.beginPath();
       ctx.moveTo(L.lineX, firstY);
@@ -123,7 +123,7 @@ export class GrowthScreen {
       ctx.restore();
 
       panel(ctx, card.x, card.y, card.w, card.h, {
-        fill: status.unlocked ? '#1b2227' : '#0c1013',
+        fill: status.unlocked ? '#2b2217' : '#17130e',
         stroke: status.unlocked ? THEME.goldDim : isNext ? '#8a6f32' : THEME.line,
         r: 14, lw: isNext ? 2.2 : 1.2,
       });
@@ -150,7 +150,7 @@ export class GrowthScreen {
         ctx.save();
         ctx.beginPath();
         ctx.arc(sx, card.y + 58, 28, 0, Math.PI * 2);
-        ctx.fillStyle = status.unlocked ? '#273038' : '#241c12';
+        ctx.fillStyle = status.unlocked ? '#332c1d' : '#241c12';
         ctx.fill();
         ctx.strokeStyle = status.unlocked ? THEME.goldDim : '#3a4453';
         ctx.lineWidth = 1.6;

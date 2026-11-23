@@ -2,6 +2,7 @@
 // 小木箱与金箱不是换色：木箱是「矮胖木板箱 + 平盖 + 麻绳捆扎」，
 // 金箱是「高箱体 + 拱形盖 + 金属包角 + 宝石锁 + 顶部冠饰」，轮廓与结构一眼可分。
 import { roundRectPath } from './draw.js';
+import { ART as ART_PATHS, drawArt } from './packageArt.js';
 
 // 两种箱子的结构参数（导出给自动化测试核对「不是只换颜色」）
 export const CHEST_MODEL = {
@@ -36,6 +37,18 @@ export function drawChest(ctx, cx, cy, s = 1, opt = {}) {
     open = false,
     glow = true,
   } = opt;
+
+  // 板块 3/4：6 种 3D 宝箱位图。开盖动画（open=true）没有对应贴图，
+  // 仍走下面的程序化箱体，保证开箱动作的盖子会真的掀起来。
+  const BITMAP_KINDS = ['wood', 'silver', 'gold', 'rare', 'epic', 'legendary'];
+  if (!open && BITMAP_KINDS.includes(kind)) {
+    // AI 生成的 1024² 图里箱体四周留有透明留白，按 118/104 等比缩放后
+    // 在列表行里只剩约 40px 可见，明显偏小。放大到 152/134 让 3D 箱体
+    // 真正撑满图标区；结算页的大宝箱同步把下方文字让开 16px。
+    const drawn = drawArt(ctx, ART_PATHS.chest(kind), cx, cy,
+      152 * s, 134 * s, { alpha, shadow: 10 * s });
+    if (drawn) return;
+  }
 
   ctx.save();
   ctx.globalAlpha = alpha;
@@ -282,8 +295,8 @@ function drawClassicChest(ctx, cx, cy, s, { color, open, glow }) {
 
   if (glow) {
     const g = ctx.createRadialGradient(cx, cy + h * 0.1, 2 * s, cx, cy + h * 0.1, w * 0.72);
-    g.addColorStop(0, 'rgba(232,180,76,0.45)');
-    g.addColorStop(1, 'rgba(232,180,76,0)');
+    g.addColorStop(0, 'rgba(213,153,71,0.45)');
+    g.addColorStop(1, 'rgba(213,153,71,0)');
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(cx, cy + h * 0.1, w * 0.72, 0, Math.PI * 2);

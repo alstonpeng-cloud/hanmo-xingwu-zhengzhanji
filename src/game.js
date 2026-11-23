@@ -2,7 +2,7 @@
 import { CONFIG } from './data/config.js';
 import { initSprites, setTroopResolver } from './render/sprites.js';
 import { loadState, saveState, resetState, readLastSeen } from './core/save.js';
-import { text, panel, THEME } from './render/draw.js';
+import { text, panel, THEME, goldDust } from './render/draw.js';
 import { initAudio, unlockAudio, playSfx, setAudioEnabled, startBgm, stopBgm, setBgmVolume, setSfxVolume, suspendForVisibility, resumeForVisibility } from './core/audio.js';
 import { HomeScreen } from './screens/home.js';
 import { DeployScreen } from './screens/deploy.js';
@@ -12,6 +12,7 @@ import { UnitShowcaseScreen } from './screens/unitShowcase.js';
 import { pickTutorial, markTutorialSeen, skipTutorial, findStep, tutorialSeen } from './core/tutorial.js';
 import { drawTutorialOverlay, tutorialPointer } from './render/tutorialOverlay.js';
 import { initTitleImage } from './render/title.js';
+import { initPackageArt, warmAllArt, drawBackdrop, ART } from './render/packageArt.js';
 import { initClock, now as clockNow } from './core/clock.js';
 
 export class Game {
@@ -38,6 +39,10 @@ export class Game {
 
     initSprites({ createCanvas: platform.createCanvas, loadImage: platform.loadImage });
     initTitleImage(platform.loadImage);
+    // 板块 3/4：分包美术（英雄立绘 / 3D 宝箱 / 器械 / 暖金背景）接入渲染层。
+    // 微信侧分包未就绪时只登记订阅，业务层自动走程序化兜底；就绪后无感升级。
+    initPackageArt({ loadImage: platform.loadImage });
+    warmAllArt();
     setTroopResolver((id) => CONFIG.troops.find((t) => t.id === id));
     // 声音：平台提供播放器（Web = HTMLAudio，微信 = InnerAudioContext）；没有实现时全部静默
     initAudio(platform.audio || null, {
@@ -387,28 +392,44 @@ export class Game {
     this.oy = (ch - this.H * scale) / 2;
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.fillStyle = '#080b0d';
+    ctx.fillStyle = '#0d0a07';
     ctx.fillRect(0, 0, bw, bh);
     ctx.setTransform(scale * dpr, 0, 0, scale * dpr, this.ox * dpr, this.oy * dpr);
 
-    // 冷玄墨底（墨韵丹符）：冷青灰渐变 + 极淡的丹砂/鎏金角落辉光
+    // 板块 3/4：分包暖褐暗金插画底纹（云纹 + 金粉 + 纸纹）。
+    // 页面可用 artBg 指定专属背景；未就绪时 drawBackdrop 返回 false，
+    // 下面原有的程序化渐变照常铺满，首帧与降级场景都不会空白。
+    const bgKey = (this.screen && this.screen.artBg) || 'home';
+    const hasArtBg = drawBackdrop(ctx, ART.bg(bgKey), this.W, this.H);
+
+    // 暖褐墨底（汉帛·朱金 v2 / S2.1）：深褐渐变 + 参考图那种大面积暖金氛围光
+    // 光晕只作用于背景，面板为不透明实底，不会冲淡内容；强度按 12 张参考图实测克制设定
     const g = ctx.createLinearGradient(0, 0, 0, this.H);
-    g.addColorStop(0, '#12171b');
-    g.addColorStop(0.55, '#0c1013');
-    g.addColorStop(1, '#080b0d');
+    g.addColorStop(0, '#241a12');
+    g.addColorStop(0.55, '#1a130d');
+    g.addColorStop(1, '#0f0a06');
+    ctx.save();
+    // 有插画底时只压一层薄渐变统一色调，保留云纹与金粉细节；无插画时全量铺底
+    ctx.globalAlpha = hasArtBg ? 0.42 : 1;
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, this.W, this.H);
-    // 顶角丹砂 + 底角鎏金的极淡氛围光，克制不抢内容
-    const haloTop = ctx.createRadialGradient(this.W * 0.82, this.H * 0.06, 10, this.W * 0.82, this.H * 0.06, this.W * 0.95);
-    haloTop.addColorStop(0, 'rgba(192,57,43,0.055)');
-    haloTop.addColorStop(1, 'rgba(192,57,43,0)');
+    ctx.restore();
+    // 主光：上方偏右的局部暖金（参考图是局部纸纹暖光，不是整屏发橙）
+    const haloTop = ctx.createRadialGradient(this.W * 0.78, this.H * 0.10, 10, this.W * 0.78, this.H * 0.10, this.W * 0.78);
+    haloTop.addColorStop(0, 'rgba(213,153,71,0.085)');
+    haloTop.addColorStop(0.55, 'rgba(190,110,50,0.035)');
+    haloTop.addColorStop(1, 'rgba(190,110,50,0)');
     ctx.fillStyle = haloTop; ctx.fillRect(0, 0, this.W, this.H);
-    const haloBot = ctx.createRadialGradient(this.W * 0.12, this.H * 0.92, 10, this.W * 0.12, this.H * 0.92, this.W * 0.9);
-    haloBot.addColorStop(0, 'rgba(232,180,76,0.045)');
-    haloBot.addColorStop(1, 'rgba(232,180,76,0)');
+    // 辅光：左下角朱砂余晖，压住大面积纯黑、让暗部也有暖褐层次
+    const haloBot = ctx.createRadialGradient(this.W * 0.14, this.H * 0.90, 10, this.W * 0.14, this.H * 0.90, this.W * 0.92);
+    haloBot.addColorStop(0, 'rgba(141,48,27,0.055)');
+    haloBot.addColorStop(1, 'rgba(141,48,27,0)');
     ctx.fillStyle = haloBot; ctx.fillRect(0, 0, this.W, this.H);
 
     if (this.screen && this.screen.draw) this.screen.draw(ctx);
+    // S2.2：全屏金色浮尘（确定性分布，低透明度，浮在内容之上但不挡文字；
+    // toast 与新手引导在其后绘制，始终盖住粒子）
+    goldDust(ctx, this.W, this.H, this.time, { count: 30, alpha: 0.42 });
     // 页面已经切走：提示卡 / 强引导不能跟着漂到新页面上
     if (this.tutorial.active && this.tutorial.screenRef !== this.screen) {
       if (!this.tutorial.active.replay) {

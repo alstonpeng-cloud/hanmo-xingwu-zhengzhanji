@@ -3,6 +3,7 @@
 // 坐标系：脚底中心 (0,0)，向上为负 y，标准高度 100；调用方按目标像素高度整体缩放。
 // 战场、布阵器械面板、兵营器械升级页、战报输出榜图标共用同一份模型。
 import { inkShade, inkOutline, isInkFill, mute } from './ink.js';
+import { ART as ART_PATHS, drawArt } from './packageArt.js';
 
 const INK = '#241a14';
 
@@ -262,6 +263,11 @@ export function drawAuraRing(ctx, opts = {}) {
 export function drawEngineFigure(ctx, engineId, opts = {}) {
   const { x = 0, y = 0, size = 100, flip = false, t = 0, color = '#5f90b8', alpha = 1, fire = 0 } = opts;
   if (engineId !== 'thunder' && engineId !== 'drum') return;
+  // 板块 3/4：3D 器械建模位图。霹雳车开火当帧（fire>0）保留程序化甩臂动画，
+  // 其余帧用位图；未就绪则整体回退原建模。
+  const artId = engineId === 'thunder' ? 'catapult' : 'war_drum';
+  if (fire <= 0 && drawArt(ctx, ART_PATHS.siege(artId), x, y - size * 0.5,
+    size * 1.3, size * 1.3, { flip, alpha, shadow: 8 })) return;
   const k = size / 100;
   ctx.save();
   ctx.globalAlpha = alpha;

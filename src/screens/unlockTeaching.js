@@ -57,7 +57,7 @@ export class UnlockTeachingScreen {
     const shown = this.t - this.pageStart;
     const fade = clamp01(shown / 0.45); // 本页淡入进度 0→1
     panel(ctx, PANEL.x, PANEL.y, PANEL.w, PANEL.h, {
-      fill: '#12171b', stroke: THEME.gold, r: 24, lw: 2.4,
+      fill: '#211a12', stroke: THEME.gold, r: 24, lw: 2.4,
     });
     // 标题渐显：比面板内容稍晚一点浮现
     text(ctx, '新 内 容 解 锁', W / 2, 196, {
@@ -71,7 +71,7 @@ export class UnlockTeachingScreen {
     // 金色边框始终可见，按钮 / 文案统一从底色中浮现（button() 自身不支持 alpha）
     if (fade < 1) {
       panel(ctx, PANEL.x + 3, PANEL.y + 3, PANEL.w - 6, PANEL.h - 6, {
-        fill: '#12171b', stroke: null, alpha: 1 - fade, r: 21,
+        fill: '#211a12', stroke: null, alpha: 1 - fade, r: 21,
       });
     }
   }

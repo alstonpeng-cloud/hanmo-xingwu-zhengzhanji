@@ -1,0 +1,146 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>汉末行伍征战记 · 留存玩家专项报告</title><style>
+:root{--bg:#14110c;--panel:#1f1a12;--line:#5a4528;--gold:#d59947;--goldlit:#f4d488;
+--text:#e8d9b8;--muted:#a08b63;--red:#ce4a3a;--green:#5ba877;--blue:#6a9fc4;--purple:#a878b8}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.7}
+.wrap{max-width:1040px;margin:0 auto;padding:32px 24px 80px}
+header{text-align:center;padding:36px 0 28px;border-bottom:1px solid var(--line)}
+header h1{font-size:32px;color:var(--goldlit);margin:0 0 10px;letter-spacing:2px}
+header .sub{color:var(--muted);font-size:14px}
+h2{font-size:22px;color:var(--goldlit);margin:44px 0 16px;padding-left:12px;border-left:3px solid var(--gold)}
+h3{font-size:16px;color:var(--gold);margin:26px 0 10px}
+p,li{font-size:14px;color:#d4c4a0}ul,ol{padding-left:22px}li{margin:7px 0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin:16px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:18px 0}
+.kpi{background:linear-gradient(135deg,#2a2218,#1f1a12);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.kpi .v{font-size:26px;color:var(--goldlit);font-weight:700;line-height:1.2}
+.kpi .l{font-size:12px;color:var(--muted);margin-top:6px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13px}
+th{background:#2a2218;color:var(--goldlit);text-align:left;padding:10px 12px;border:1px solid var(--line)}
+td{padding:9px 12px;border:1px solid var(--line)}
+tr:nth-child(even) td{background:#1c1810}
+.tag{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:600}
+.tag.good{background:rgba(91,168,119,.18);color:var(--green)}
+.tag.warn{background:rgba(206,74,58,.18);color:var(--red)}
+.tag.info{background:rgba(213,153,71,.18);color:var(--gold)}
+.verdict{background:linear-gradient(135deg,rgba(213,153,71,.12),rgba(91,168,119,.08));border-left:4px solid var(--gold);border-radius:8px;padding:16px 20px;margin:18px 0}
+.verdict h4{margin:0 0 8px;color:var(--goldlit);font-size:15px}
+.chart{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;margin:16px 0}
+.timeline{position:relative;padding-left:28px;margin:18px 0}
+.timeline:before{content:'';position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-item{position:relative;margin:14px 0;padding:12px 16px;background:#1c1810;border:1px solid var(--line);border-radius:8px}
+.tl-item:before{content:'';position:absolute;left:-24px;top:18px;width:10px;height:10px;border-radius:50%;background:var(--gold);border:2px solid var(--bg)}
+.tl-item .day{font-size:12px;color:var(--gold);font-weight:600}
+.tl-item .rw{font-size:14px;color:var(--text);margin-top:3px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+.foot{margin-top:50px;padding-top:20px;border-top:1px solid var(--line);font-size:12px;color:var(--muted);text-align:center}
+</style></head><body><div class="wrap">
+<header><h1>留存玩家专项报告</h1><div class="sub">体验版 1.3.1 · 留存钩子设计 / 生命周期节奏 / 风险与建议</div></header>
+
+<h2>一、留存设计总览</h2>
+<div class="grid">
+<div class="kpi"><div class="v">7 天</div><div class="l">连续登录奖励周期</div><div class="d">武将×2 + 传奇箱×4</div></div>
+<div class="kpi"><div class="v">4 个</div><div class="l">每日任务</div><div class="d">3 个给稀有宝箱</div></div>
+<div class="kpi"><div class="v">8 次/天</div><div class="l">挂机宝箱领取上限</div><div class="d">按关卡品质递增</div></div>
+<div class="kpi"><div class="v">5 类</div><div class="l">成就系统</div><div class="d">16 个成就</div></div>
+<div class="kpi"><div class="v">27 次/天</div><div class="l">广告领取总上限</div><div class="d">金币10+兵10+木5+银2</div></div>
+<div class="kpi"><div class="v">周常</div><div class="l">长线循环目标</div><div class="d">1600 积分 / 5 阶 / 周重置</div></div>
+</div>
+<div class="verdict"><h4>留存设计判定：短中长期钩子完整，属于"重留存、轻付费"结构</h4>
+<p>游戏用「7 日登录（次日留存）→ 每日任务+挂机（日活）→ 周常积分（周留存）→ 主线 2600 关+试炼/列传（长期目标）」
+四层钩子覆盖了玩家完整生命周期。所有奖励都是<b>免费可得</b>，没有强制付费墙——
+配合单次抽卡仅需 1 的低门槛，属于典型的"用内容深度换留存"设计。</p></div>
+
+<h2>二、新手期：7 日登录与次日留存</h2><div class="card"><h3>2.1 七日奖励梯度</h3><div class="timeline">
+<div class="tl-item"><div class="day">第 1 天</div><div class="rw">史诗宝箱×1</div></div>
+<div class="tl-item"><div class="day">第 2 天</div><div class="rw">传奇宝箱×1</div></div>
+<div class="tl-item"><div class="day">第 3 天</div><div class="rw">黄盖(武将)</div></div>
+<div class="tl-item"><div class="day">第 4 天</div><div class="rw">10万铜钱</div></div>
+<div class="tl-item"><div class="day">第 5 天</div><div class="rw">传奇宝箱×3</div></div>
+<div class="tl-item"><div class="day">第 6 天</div><div class="rw">白马义从(Lv6)</div></div>
+<div class="tl-item"><div class="day">第 7 天</div><div class="rw">张飞(武将)</div></div>
+</div>
+<p><b>梯度设计解读：</b>奖励安排有明显的"价值曲线"——
+前两天给宝箱（即时满足），第 3 天给武将黄盖（首次"角色获得"惊喜），
+第 4 天给 10 万铜钱（中期资源补充，对应武将升级/买兵需求），
+第 5 天加码到 3 个传奇箱，第 6 天给 Lv6 成型的白马义从（直接能上场的高级兵），
+第 7 天压轴给武将张飞。<b>稀有度逐步抬升 + 中间穿插实用资源</b>，是标准且有效的 7 日留存节奏。</p>
+</div>
+<div class="card"><h3>2.2 关键洞察：奖励前置 vs 系统解锁</h3>
+<table><tr><th>内容</th><th>发放时间</th><th>系统解锁</th><th>留存意义</th></tr>
+<tr><td>武将黄盖（D3）、张飞（D7）</td><td>第 3 / 7 天登录</td><td class="tag warn">L200 才解锁武将系统</td><td><b>期待感锚点</b>：先让玩家"看到"武将，L200 后可立即上手</td></tr>
+<tr><td>每日任务</td><td>L30 起</td><td>L30</td><td>新手期先专注推图，避免任务干扰</td></tr>
+<tr><td>周常 / 每日商店</td><td>周常 L30 / 商店 L100</td><td>30 / 100</td><td>随着进度逐步开放，持续制造新鲜感</td></tr>
+</table>
+<p><span class="tag info">设计点评</span> 武将"先行发放、延后解锁"是一把双刃剑：
+好处是给了玩家一个明确的长期目标（"我攒的武将到 200 关就能用"），
+强化 L1→L200 的推进动力；风险是新手前 200 关拿到了武将却用不了，
+若没有清晰的预告 UI，可能产生"奖励打了折扣"的困惑。<b>建议在获得武将时弹提示："武将系统第 200 关解锁"。</b></p>
+</div>
+
+<h2>三、日活：日常循环设计</h2>
+<div class="card"><h3>3.1 每日任务（4 项，L30 解锁）</h3>
+<table><tr><th>任务</th><th>要求</th><th>奖励</th></tr>
+<tr><td>通关 10 关</td><td>见配置</td><td>rare</td></tr>
+<tr><td>合成 3 个兵种</td><td>见配置</td><td>rare</td></tr>
+<tr><td>开启 3 个宝箱</td><td>见配置</td><td>rare</td></tr>
+<tr><td>每日签到</td><td>见配置</td><td>签到</td></tr>
+</table>
+<p>三项任务给稀有宝箱（期望战力 1,385），且要求分别是"通关 10 关 / 合成 3 个兵种 / 开 3 个箱"——
+正好对应该游戏的三条核心行为（推图、合成、开箱），<b>把日常任务与核心玩法绑定，而不是额外负担</b>，
+这是保持日活的关键设计。</p>
+</div>
+<div class="card"><h3>3.2 挂机与广告：碎片时间填充</h3>
+<ul>
+<li><b>挂机宝箱</b>：每 15 分钟产出 1 个，每日上限 8 个；品质按关卡进阶（L0 木箱 → L200 银箱 → L600 金箱）。</li>
+<li><b>广告领取</b>：金币 10 次/天（2000~4000 金币）、兵 10 次、木箱 5 次、银箱 2 次。</li>
+</ul>
+<p>挂机与广告都是"低成本高感知"的留存工具：玩家每天上线点几下就能拿到资源，
+形成"登录→领取→下线"的轻量循环。每日上限（8 箱 / 27 次广告）防止过度刷取，
+也避免了"不看广告就没法玩"的负面体验——因为所有奖励都可以免费获得，广告只是加速。</p>
+</div>
+
+<h2>四、长线留存：目标梯队</h2>
+<div class="card"><h3>4.1 内容消耗路径</h3>
+<table><tr><th>阶段</th><th>关卡区间</th><th>可用内容</th><th>留存钩子</th></tr>
+<tr><td>新手期</td><td>L1~L30</td><td>主线推图、自动战斗(L3)</td><td>快速正反馈</td></tr>
+<tr><td>成长期</td><td>L30~L200</td><td>+每日任务(L30)、+周常(L30)、+试炼(L150)、+武将(L200)</td><td>日常循环建立</td></tr>
+<tr><td>中期</td><td>L200~L800</td><td>+每日商店(L100)、+列传、+过五关斩六将(L200)、+挂机金箱(L600)</td><td>多系统并行</td></tr>
+<tr><td>后期</td><td>L800~L2600</td><td>全系统 + 12 章试炼 + 150 关列传 + 5 阶周常</td><td>长线目标</td></tr>
+</table>
+<p>主线的 6 章按每 100 关一个城池划分（涿郡/广宗/颍川/宛城…），每个城池完成给一次奖励
+（稀有兵、史诗箱、传奇箱等）。<b>每 100 关一个小目标 + 每 400 关一个大章节</b>，
+把 2600 关的漫长路径切成可感知的进度段，避免"望不到头"的弃坑感。</p>
+</div>
+<div class="card"><h3>4.2 成就与收集驱动</h3>
+<p>16 个成就覆盖 5 类（征战/挑战/图鉴/养成/经济），按品级发放宝箱。
+成就系统对"收集型玩家"提供额外目标，与主线推图形成互补——
+即使玩家卡在某个关卡，仍可通过完成成就获得资源继续成长，<b>降低卡关导致的流失</b>。</p>
+</div>
+
+<h2>五、留存风险与优化建议</h2>
+<div class="card"><h3>5.1 潜在风险</h3>
+<table><tr><th>风险点</th><th>程度</th><th>说明</th></tr>
+<tr><td>武将 L200 才解锁</td><td><span class="tag warn">中</span></td><td>D3/D7 送武将但前期无法使用，若无提示易产生困惑</td></tr>
+<tr><td>主线 2600 关过长</td><td><span class="tag info">低</span></td><td>有章节/城池切分，且多系统并行补充，风险可控</td></tr>
+<tr><td>广告上限较高（27 次/天）</td><td><span class="tag info">低</span></td><td>全免费可得，不构成付费胁迫；但可能拉长单次在线时长</td></tr>
+<tr><td>周常重置的挫败感</td><td><span class="tag info">低</span></td><td>积分制而非排名制，无 PVP 压力，对休闲玩家友好</td></tr>
+</table>
+</div>
+<div class="card"><h3>5.2 优化建议（按优先级）</h3>
+<ol>
+<li><b>高：武将解锁预告</b>——在 D3/D7 发放武将时弹提示"第 200 关解锁武将系统"，把奖励前置的"困惑"转化为"期待"。</li>
+<li><b>中：回归奖励</b>——当前无"连续登录中断后召回"机制，建议对 7 日未登录玩家给一次传奇箱，捡回流失用户。</li>
+<li><b>中：周常进度可视化</b>——5 阶积分（1600 分）建议在 UI 明确展示"本周还差多少分到下一阶"，强化目标感。</li>
+<li><b>低：成就完成反馈</b>——16 个成就建议在完成时弹出专属动画/音效，增强收集成就感。</li>
+</ol>
+</div>
+<div class="verdict"><h4>留存结论</h4>
+<p><span class="tag good">结构完整</span> 次日（7 日登录）、日活（日常+挂机+广告）、
+周留存（周常积分）、长期（2600 关+试炼+列传+成就）四层钩子齐备，
+且全部奖励免费可得，无强制付费墙。主要可优化点是"武将发放与解锁的时间差"需要 UI 预告，
+以及缺少流失召回机制。整体留存设计在休闲小游戏中属于中上水平。</p></div>
+<div class="foot">本报告由 <code>tools/make_retention_report.py</code> 自动生成 · 数据源为游戏真实配置 · 体验版 1.3.1</div>
+</div></body></html>

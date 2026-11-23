@@ -1,26 +1,29 @@
 // 极简 Canvas UI 工具箱：面板、按钮、文字、血条、货币徽章
 // 不依赖 DOM，移植微信小游戏时可直接复用
 //
-// 设计系统「墨韵丹符」——单一设计令牌源 (design tokens)
+// 设计系统「汉帛 · 朱金」v2 —— 单一设计令牌源 (design tokens)
 // THEME 被 30+ 界面引用，改这里即全局换肤；保留全部历史 key 兼容旧代码。
 //
-// 色相即语义：鎏金=成功/凯旋，玄铁=失败/收敛，青蚨=商城/交易，
-// 紫气=宝箱/珍藏，丹砂=品牌/一级操作。基调为冷玄墨（非旧版暖褐）。
+// 风格基准：暖褐暗金，完全复刻 docs/ui-images/ 下 12 张参考视觉稿。
+// 取色方式：对 12 张图做 48 色量化后按像素占比统计（见 docs/精细化改造/baseline.json）。
+//   · 结构色（底/面板/文字）沿用原始暖褐层次 —— 与实测 #2A2218 / #372617 / #15120D 吻合
+//   · 强调色（金/朱红/紫/青绿）直接采用实测值 #D59947 / #8D301B / #96659A / #3E885D
+// 语义别名全部保留但映射到暖体系：商城/宝箱标题回归鎏金，失败回归暖褐+朱红。
 
-// ── 色彩令牌：冷玄墨底 + 鎏金/丹砂/青蚨/紫气/玄铁语义色 ──
+// ── 色彩令牌：暖褐墨底 + 鎏金/朱砂/紫气/竹青 ──
 const INK = {
-  bg0: '#0c1013', bg1: '#12171b', panel: '#1b2227',
-  panel2: '#273038', panel3: '#36404a', line: '#46535e', lineSoft: '#313c45',
+  bg0: '#17130e', bg1: '#211a12', panel: '#2a2218',
+  panel2: '#372617', panel3: '#4a3a24', line: '#8a6a3a', lineSoft: '#5a4528',
 };
 const SEMANTIC = {
-  // 鎏金 · 成功 / 凯旋 / 货币（沿用旧 gold key，色值升级为纯正暖金）
-  gold: '#e8b44c', goldDim: '#8a6420', goldLit: '#f8e1ac',
-  // 丹砂 · 品牌 / 一级操作（沿用旧 red key）
-  red: '#c0392b', redDim: '#8e2e26', redLit: '#ec8870',
-  // 青蚨 · 商城 / 交易 / 正向（沿用旧 green key）
-  green: '#3e9a85', blue: '#5b9bd5', purple: '#9b77cf',
+  // 鎏金 · 胜利 / 货币 / 主描边（实测 #D59947）
+  gold: '#d59947', goldDim: '#8a6a32', goldLit: '#f4d488',
+  // 朱砂 · 品牌 / 一级操作（实测深色 #8D301B）；标题亮阶按参考图 13 实测 #CE4A3A
+  red: '#8d301b', redDim: '#662718', redLit: '#ce4a3a',
+  // 竹青 / 靛青 / 紫气（实测 #3E885D · #96659A）
+  green: '#3e885d', blue: '#5b7c99', purple: '#96659a',
 };
-const TYPE_COLOR = { text: '#ecf1f4', textDim: '#b2bec7', textWeak: '#8c9ba7' };
+const TYPE_COLOR = { text: '#f2ead8', textDim: '#c2b394', textWeak: '#8a7d64' };
 
 export const THEME = {
   ...INK, ...SEMANTIC, ...TYPE_COLOR,
@@ -32,20 +35,26 @@ export const THEME = {
   text: TYPE_COLOR.text, textDim: TYPE_COLOR.textDim, textWeak: TYPE_COLOR.textWeak,
   // 兼容旧别名
   vermilion: SEMANTIC.red, jade: SEMANTIC.green, indigo: SEMANTIC.blue,
-  // ── 墨韵丹符 · 新语义别名（供重点界面显式引用）──
-  victory: SEMANTIC.gold,           // 成功 / 凯旋
-  defeat: '#5b6b78',                // 玄铁 · 失败 / 收敛
-  defeatLit: '#aebbc4',             // 玄铁亮阶
-  blood: '#a6433a',                 // 残赤 · 仅失败标题点睛
-  shop: '#3e9a85',                  // 青蚨 · 商城
-  shopDim: '#256357',
-  treasure: '#9b77cf',              // 紫气 · 宝箱 / 招募
-  treasureDim: '#5c4385',
-  seal: SEMANTIC.red,               // 丹砂 · 品牌印章
+  // ── 语义别名（保留 key，值回退到暖褐暗金体系）──
+  victory: SEMANTIC.gold,            // 凯旋 / 成功
+  defeat: '#6b4a38',                 // 败 · 暖褐灰（不再是冷玄铁）
+  defeatLit: '#c9ae8e',              // 败 · 亮阶文字
+  blood: SEMANTIC.redLit,            // 朱砂亮阶 · 失败标题（参考图 13 实测 #CE4A3A）
+  shop: SEMANTIC.gold,               // 商城标题回归鎏金
+  shopDim: SEMANTIC.goldDim,
+  treasure: '#c9a45c',               // 宝箱 / 招募 · 金木色
+  treasureDim: SEMANTIC.goldDim,
+  seal: SEMANTIC.red,                // 朱砂印章
+  // ── v2 新增：S2.2 纹样 / 光效 / 品级用 ──
+  goldSoft: '#aa8b58',               // 实测金中间调
+  brown: '#5f452c',                  // 暖褐中间调
+  inkDeep: '#15120d',                // 实测最深底
+  haloGold: 'rgba(213,153,71,0.16)', // 金色氛围光
+  haloRed: 'rgba(141,48,27,0.14)',   // 朱砂氛围光
 };
 
 // 高频硬编码色收口参考（逐步替换为 THEME.xxx）
-export const LEGACY = { goldButtonFill: '#273038', topBarFill: 'rgba(12,16,19,0.92)' };
+export const LEGACY = { goldButtonFill: '#332c1d', topBarFill: 'rgba(23,19,14,0.92)' };
 
 // ── 字体令牌：宋体撑题材(标题/大字) + 黑体保可读(正文/数值) ──
 export const FONT_SANS = '"PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Hiragino Sans GB", sans-serif';
@@ -122,7 +131,7 @@ export function fillRect(ctx, x, y, w, h, color, alpha = 1) {
 export function button(ctx, rect, label, opt = {}) {
   const {
     sub = '', fill = THEME.panel2, stroke = THEME.line, textColor = THEME.text,
-    disabled = false, size = 34, subSize = 22, active = false, r = 18,
+    disabled = false, size = 34, subSize = 22, subColor = THEME.textDim, active = false, r = 18,
   } = opt;
   const { x, y, w, h } = rect;
   const a = disabled ? 0.42 : 1;
@@ -145,7 +154,7 @@ export function button(ctx, rect, label, opt = {}) {
   const cx = x + w / 2;
   if (sub) {
     text(ctx, label, cx, y + h / 2 - size * 0.32, { size, color: disabled ? THEME.textWeak : textColor, align: 'center', weight: '600', alpha: a });
-    text(ctx, sub, cx, y + h / 2 + size * 0.62, { size: subSize, color: THEME.textDim, align: 'center', alpha: a });
+    text(ctx, sub, cx, y + h / 2 + size * 0.62, { size: subSize, color: subColor, align: 'center', alpha: a });
   } else {
     text(ctx, label, cx, y + h / 2, { size, color: disabled ? THEME.textWeak : textColor, align: 'center', weight: '600', alpha: a });
   }
@@ -156,7 +165,7 @@ export function hit(rect, x, y) {
 }
 
 export function bar(ctx, x, y, w, h, ratio, opt = {}) {
-  const { bg = '#0c1013', fill = THEME.green, r = 4, stroke = null } = opt;
+  const { bg = '#17130e', fill = THEME.green, r = 4, stroke = null } = opt;
   ctx.save();
   roundRectPath(ctx, x, y, w, h, r);
   ctx.fillStyle = bg;
@@ -186,8 +195,8 @@ export function coinBadge(ctx, x, y, amount, opt = {}) {
   const w = size * 1.6 + 12 + textWidth(ctx, label, size, '600');
   const bx = align === 'center' ? x - w / 2 : align === 'right' ? x - w : x;
   ctx.save();
-  fillEllipse(ctx, bx + size * 0.8, y, size * 0.8, size * 0.8, '#e8b44c');
-  fillEllipse(ctx, bx + size * 0.8, y, size * 0.45, size * 0.45, '#8a6420');
+  fillEllipse(ctx, bx + size * 0.8, y, size * 0.8, size * 0.8, '#d59947');
+  fillEllipse(ctx, bx + size * 0.8, y, size * 0.45, size * 0.45, '#8a6a32');
   ctx.restore();
   text(ctx, label, bx + size * 1.7 + 10, y, { size, color: THEME.gold, weight: '600' });
   return w;
@@ -229,13 +238,13 @@ export function infoBadge(ctx, x, y, r = 24) {
   ctx.save();
   ctx.beginPath();
   ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(91, 107, 120, 0.92)';
+  ctx.fillStyle = 'rgba(74, 56, 38, 0.92)';
   ctx.fill();
-  ctx.strokeStyle = 'rgba(174, 187, 196, 0.85)';
+  ctx.strokeStyle = 'rgba(213, 153, 71, 0.85)';
   ctx.lineWidth = 2;
   ctx.stroke();
   ctx.restore();
-  text(ctx, '!', x, y + 1, { size: r * 1.25, align: 'center', color: '#ecf1f4', weight: '700' });
+  text(ctx, '!', x, y + 1, { size: r * 1.25, align: 'center', color: '#f2ead8', weight: '700' });
 }
 
 // 通用说明弹层：标题 + 多段大号正文（替代页面里的小字说明）
@@ -285,16 +294,16 @@ export function primaryButton(ctx, rect, label, opt = {}) {
   const a = disabled ? 0.45 : 1;
   ctx.save();
   ctx.globalAlpha = a;
-  if (glow && !disabled) { ctx.shadowColor = 'rgba(192,57,43,0.5)'; ctx.shadowBlur = 24; }
+  if (glow && !disabled) { ctx.shadowColor = 'rgba(141,48,27,0.5)'; ctx.shadowBlur = 24; }
   roundRectPath(ctx, x, y, w, h, r);
   const grad = ctx.createLinearGradient(0, y, 0, y + h);
-  grad.addColorStop(0, disabled ? '#4a3b3a' : '#d9543f');
-  grad.addColorStop(1, disabled ? '#332927' : '#8e2e26');
+  grad.addColorStop(0, disabled ? '#4a3b3a' : '#a83c26');
+  grad.addColorStop(1, disabled ? '#3d2b23' : '#662718');
   ctx.fillStyle = grad; ctx.fill();
   ctx.shadowBlur = 0;
   ctx.strokeStyle = disabled ? THEME.line : THEME.gold; ctx.lineWidth = 2.5; ctx.stroke();
   roundRectPath(ctx, x + 5, y + 5, w - 10, h - 10, Math.max(0, r - 4));
-  ctx.strokeStyle = 'rgba(248,225,172,0.42)'; ctx.lineWidth = 1; ctx.stroke();
+  ctx.strokeStyle = 'rgba(244,212,136,0.42)'; ctx.lineWidth = 1; ctx.stroke();
   ctx.restore();
   const cx = x + w / 2;
   if (sub) {
@@ -319,8 +328,8 @@ export function menuBackdrop(ctx, W, H, opt = {}) {
   ctx.fillRect(0, 0, W, H);
   // 左下角次级金雾（错位摆放，避免上下对称的呆板感）
   g = ctx.createRadialGradient(W * 0.16, H * 0.94, 20, W * 0.16, H * 0.94, W * 0.78);
-  g.addColorStop(0, 'rgba(232,180,76,0.055)');
-  g.addColorStop(1, 'rgba(232,180,76,0)');
+  g.addColorStop(0, 'rgba(213,153,71,0.055)');
+  g.addColorStop(1, 'rgba(213,153,71,0)');
   ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
 
@@ -330,13 +339,13 @@ export function menuBackdrop(ctx, W, H, opt = {}) {
   const breath = 1 + 0.012 * Math.sin(t * 0.6);
   ctx.lineWidth = 1;
   for (let i = 1; i <= 4; i++) {
-    ctx.strokeStyle = i % 2 === 0 ? 'rgba(232,180,76,0.045)' : 'rgba(232,180,76,0.075)';
+    ctx.strokeStyle = i % 2 === 0 ? 'rgba(213,153,71,0.045)' : 'rgba(213,153,71,0.075)';
     ctx.beginPath();
     ctx.arc(cx, cy, (86 + i * 62) * breath, 0, Math.PI * 2);
     ctx.stroke();
   }
   // 八向短刻（汉镜纹样）
-  ctx.strokeStyle = 'rgba(232,180,76,0.085)';
+  ctx.strokeStyle = 'rgba(213,153,71,0.085)';
   for (let i = 0; i < 8; i++) {
     const a = (i / 8) * Math.PI * 2 + Math.PI / 8;
     const r0 = 338 * breath;
@@ -363,7 +372,7 @@ export function eventOrb(ctx, cx, cy, radius, label, opt = {}) {
   ctx.save();
   if (active) {
     const g = ctx.createRadialGradient(cx, cy, radius * 0.6, cx, cy, radius * (1.7 + breath * 0.35));
-    g.addColorStop(0, 'rgba(232,180,76,0.30)'); g.addColorStop(1, 'rgba(232,180,76,0)');
+    g.addColorStop(0, 'rgba(213,153,71,0.30)'); g.addColorStop(1, 'rgba(213,153,71,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, radius * (1.7 + breath * 0.35), 0, Math.PI * 2); ctx.fill();
     const wave = (t * 0.7 + phase * 0.2) % 1;
     ctx.globalAlpha = (1 - wave) * 0.5; ctx.strokeStyle = THEME.gold; ctx.lineWidth = 2;
@@ -371,11 +380,11 @@ export function eventOrb(ctx, cx, cy, radius, label, opt = {}) {
     ctx.globalAlpha = 1;
   }
   const body = ctx.createRadialGradient(cx - radius * 0.25, cy - radius * 0.3, radius * 0.1, cx, cy, radius);
-  body.addColorStop(0, active ? '#36404a' : '#1b2227');
-  body.addColorStop(1, active ? '#12171b' : '#0c1013');
+  body.addColorStop(0, active ? '#4a3a24' : '#2b2217');
+  body.addColorStop(1, active ? '#211a12' : '#17130e');
   ctx.fillStyle = body; ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.fill();
   ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
-  ctx.strokeStyle = 'rgba(248,225,172,0.32)'; ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(244,212,136,0.32)'; ctx.lineWidth = 1;
   ctx.beginPath(); ctx.arc(cx, cy, radius - 6, 0, Math.PI * 2); ctx.stroke();
   if (active) {
     for (let i = 0; i < 4; i++) {
@@ -395,18 +404,18 @@ export function eventOrb(ctx, cx, cy, radius, label, opt = {}) {
     const bw = radius * 0.46, bh = radius * 0.36;
     const sr = bw * 0.30;
     ctx.save();
-    ctx.strokeStyle = '#8c9ba7';
+    ctx.strokeStyle = '#8a7d64';
     ctx.lineWidth = Math.max(2.4, radius * 0.09);
     ctx.beginPath();
     ctx.arc(lx, ly - bh * 0.42, sr, Math.PI, 0);
     ctx.stroke();
     roundRectPath(ctx, lx - bw / 2, ly - bh / 2, bw, bh, radius * 0.06);
-    ctx.fillStyle = '#5b6b78';
+    ctx.fillStyle = '#6b4a38';
     ctx.fill();
-    ctx.strokeStyle = '#aebbc4';
+    ctx.strokeStyle = '#c9ae8e';
     ctx.lineWidth = 1.6;
     ctx.stroke();
-    ctx.fillStyle = '#1b2227';
+    ctx.fillStyle = '#2b2217';
     ctx.beginPath();
     ctx.arc(lx, ly - bh * 0.02, Math.max(1.6, bw * 0.10), 0, Math.PI * 2);
     ctx.fill();
@@ -430,6 +439,89 @@ export function eventOrb(ctx, cx, cy, radius, label, opt = {}) {
     ctx.stroke();
     ctx.restore();
   }
+}
+
+// ── S2.2 · 雕花边框 / 金色浮尘（复刻参考图 01 / 09 / 10 的云纹角花与金粉氛围）──
+// 作为「叠加装饰」使用：不改动 panel / button 的既有绘制，也不影响命中区域，
+// 只对指定面板额外加一层雕花，既有布局与自动化断言完全不变。
+export function carvedFrame(ctx, x, y, w, h, opt = {}) {
+  const {
+    color = THEME.gold, alpha = 0.88, lw = 2, corner = 30,
+    inset = 5, inner = true, glow = 0, r = 18,
+  } = opt;
+  const c = Math.max(8, Math.min(corner, w / 3, h / 3));
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  if (glow > 0) { ctx.shadowColor = color; ctx.shadowBlur = glow; }
+  for (const [ax, ay, sx, sy] of [
+    [x + inset, y + inset, 1, 1],
+    [x + w - inset, y + inset, -1, 1],
+    [x + inset, y + h - inset, 1, -1],
+    [x + w - inset, y + h - inset, -1, -1],
+  ]) {
+    // 外框 L 型主笔
+    ctx.beginPath();
+    ctx.moveTo(ax + sx * (c + 14), ay + sy * 2);
+    ctx.lineTo(ax + sx * c * 0.55, ay + sy * 2);
+    ctx.quadraticCurveTo(ax + sx * 2, ay + sy * 2, ax + sx * 2, ay + sy * c * 0.55);
+    ctx.lineTo(ax + sx * 2, ay + sy * (c + 14));
+    ctx.stroke();
+    // 云头回旋 + 两道短须
+    ctx.beginPath();
+    ctx.moveTo(ax + sx * (c + 12), ay + sy * 12);
+    ctx.quadraticCurveTo(ax + sx * (c + 2), ay + sy * 15, ax + sx * (c - 2), ay + sy * 9);
+    ctx.quadraticCurveTo(ax + sx * (c - 8), ay + sy * 3, ax + sx * (c - 14), ay + sy * 9);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ax + sx * 12, ay + sy * (c + 12));
+    ctx.quadraticCurveTo(ax + sx * 15, ay + sy * (c + 2), ax + sx * 9, ay + sy * (c - 2));
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(ax + sx * 2, ay + sy * 13);
+    ctx.lineTo(ax + sx * 8, ay + sy * 7);
+    ctx.lineTo(ax + sx * 13, ay + sy * 2);
+    ctx.stroke();
+  }
+  if (inner) {
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = alpha * 0.38;
+    ctx.lineWidth = 1;
+    roundRectPath(ctx, x + inset + 8, y + inset + 8,
+      Math.max(2, w - (inset + 8) * 2), Math.max(2, h - (inset + 8) * 2),
+      Math.max(4, r - 6));
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// 确定性金色浮尘：不用 Math.random，保证冒烟截图逐帧可复现；
+// 两层实心圆代替逐粒子径向渐变，每帧开销恒定，适合 60fps 小游戏。
+export function goldDust(ctx, W, H, t, opt = {}) {
+  const { count = 30, alpha = 0.5, seed = 7 } = opt;
+  const fract = (v) => v - Math.floor(v);
+  ctx.save();
+  for (let i = 0; i < count; i += 1) {
+    const px = fract(Math.sin((i + 1) * 127.1 + seed) * 43758.5453) * W;
+    const baseY = fract(Math.sin((i + 1) * 311.7 + seed * 3) * 22578.145) * H;
+    const speed = 7 + (i % 5) * 3.5;
+    const span = H + 100;
+    const py = (((baseY - t * speed) % span) + span) % span - 50;
+    const r = 1.0 + fract(Math.sin(i * 78.233) * 12345.6789) * 2.0;
+    const a = alpha * (0.30 + 0.70 * (0.5 + 0.5 * Math.sin(t * 1.5 + i * 1.7)));
+    ctx.fillStyle = `rgba(213,153,71,${(a * 0.20).toFixed(3)})`;
+    ctx.beginPath();
+    ctx.arc(px, py, r * 3.2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = `rgba(255,238,190,${a.toFixed(3)})`;
+    ctx.beginPath();
+    ctx.arc(px, py, r * 0.55, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.restore();
 }
 
 export function backButton(ctx, rect, label = '返回') {
